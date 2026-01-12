@@ -13,7 +13,11 @@ import {
   Award,
   Home,
   Info,
-  Phone
+  Phone,
+  Briefcase,
+  Users,
+  Pill,
+  Utensils
 } from 'lucide-react';
 import { MenuItem, NewsItem } from './types';
 
@@ -130,7 +134,7 @@ export const SERVICE_CATEGORIES = [
   },
 ];
 
-// Navigation Menu Structure (Kept for Header)
+// Navigation Menu Structure (Restored Full Structure)
 export const MAIN_MENU: MenuItem[] = [
   { 
     id: 'home', 
@@ -139,38 +143,51 @@ export const MAIN_MENU: MenuItem[] = [
     icon: Home 
   },
   { 
+    id: 'about', 
+    title: 'Giới thiệu', 
+    path: '/intro', 
+    icon: Info,
+    children: [
+      { id: 'intro-general', title: 'Giới thiệu chung', path: '/intro/general', icon: Info },
+      { id: 'org-structure', title: 'Cơ cấu tổ chức', path: '/intro/structure', icon: Building2 },
+      { id: 'leaders', title: 'Lãnh đạo Sở Y tế', path: '/intro/leaders', icon: Users },
+      { id: 'contact', title: 'Thông tin liên hệ', path: '/contact', icon: Phone },
+    ]
+  },
+  { 
     id: 'news', 
-    title: 'Tin tức', 
+    title: 'Tin tức - Sự kiện', 
     path: '/news/events', 
     icon: Newspaper,
     children: [
       { id: 'news-events', title: 'Tin tức – Sự kiện y tế', path: '/news/events', icon: Newspaper },
-      { id: 'alerts', title: 'Cảnh báo y tế – Truyền thông nguy cơ', path: '/news/alerts', icon: AlertTriangle },
+      { id: 'news-local', title: 'Tin hoạt động cơ sở', path: '/news/local', icon: Building2 },
+      { id: 'alerts', title: 'Cảnh báo dịch bệnh', path: '/news/alerts', icon: AlertTriangle },
       { id: 'good-deeds', title: 'Gương người tốt – việc tốt', path: '/news/good-deeds', icon: Award },
     ]
   },
-  { 
-    id: 'prevention', 
-    title: 'Phòng bệnh', 
-    path: '/news/prevention', 
-    icon: ShieldPlus 
-  },
-  { 
-    id: 'exam', 
-    title: 'Khám chữa bệnh', 
-    path: '/news/examination', 
-    icon: Stethoscope,
+  {
+    id: 'documents',
+    title: 'Chỉ đạo điều hành',
+    path: '/documents',
+    icon: FileText,
     children: [
-      { id: 'exam-general', title: 'Thông tin Khám chữa bệnh', path: '/news/examination', icon: Stethoscope },
-      { id: 'consulting', title: 'Tư vấn sức khỏe', path: '/consulting', icon: MessageCircleHeart },
-      { id: 'records', title: 'Hồ sơ sức khỏe toàn dân', path: '/health-records', icon: FileHeart, isDashboard: true },
+        { id: 'doc-legal', title: 'Văn bản quy phạm pháp luật', path: '/documents/legal', icon: FileText },
+        { id: 'doc-admin', title: 'Văn bản chỉ đạo điều hành', path: '/documents/admin', icon: Briefcase },
+        { id: 'doc-health', title: 'Thông tin Dược - Mỹ phẩm', path: '/documents/pharma', icon: Pill },
     ]
   },
   { 
-    id: 'policy', 
-    title: 'Chính sách – BHYT', 
-    path: '/news/policy', 
-    icon: FileText 
+    id: 'medical-pro', 
+    title: 'Chuyên môn', 
+    path: '/news/examination', 
+    icon: Stethoscope,
+    children: [
+      { id: 'exam-general', title: 'Khám chữa bệnh', path: '/news/examination', icon: Stethoscope },
+      { id: 'prevention', title: 'Y tế dự phòng', path: '/news/prevention', icon: ShieldPlus },
+      { id: 'food-safety', title: 'An toàn vệ sinh thực phẩm', path: '/news/food-safety', icon: Utensils },
+      { id: 'population', title: 'Dân số - KHHGĐ', path: '/news/population', icon: Users },
+    ]
   },
   { 
     id: 'system', 
@@ -179,32 +196,39 @@ export const MAIN_MENU: MenuItem[] = [
     icon: Building2,
     children: [
       { id: 'system-network', title: 'Mạng lưới cơ sở y tế', path: '/hanoi-system', icon: Building2 },
-      { id: 'emergency', title: 'Trung tâm cấp cứu thông minh', path: '/emergency', icon: Ambulance },
+      { id: 'emergency', title: 'Trung tâm cấp cứu 115', path: '/emergency', icon: Ambulance },
+      { id: 'private-practice', title: 'Hành nghề Y Dược tư nhân', path: '/private-practice', icon: Briefcase },
     ]
   },
   { 
     id: 'digital', 
     title: 'Chuyển đổi số', 
     path: '/digital', 
-    icon: Laptop2 
-  },
-  { 
-    id: 'social', 
-    title: 'An sinh xã hội', 
-    path: '/news/social', 
-    icon: HeartHandshake 
-  },
-  { 
-    id: 'about', 
-    title: 'Giới thiệu / Liên hệ', 
-    path: '/about', 
-    icon: Info,
+    icon: Laptop2,
     children: [
-      { id: 'intro', title: 'Giới thiệu chung', path: '/intro', icon: Info },
-      { id: 'contact', title: 'Liên hệ công tác', path: '/contact', icon: Phone },
+        { id: 'digital-news', title: 'Tin tức chuyển đổi số', path: '/digital', icon: Laptop2 },
+        { id: 'records', title: 'Hồ sơ sức khỏe điện tử', path: '/health-records', icon: FileHeart, isDashboard: true },
+        { id: 'consulting', title: 'Tư vấn khám chữa bệnh từ xa', path: '/consulting', icon: MessageCircleHeart },
     ]
   },
+  { 
+    id: 'guide', 
+    title: 'Hướng dẫn người dân', 
+    path: '/guide', 
+    icon: HeartHandshake,
+    children: [
+        { id: 'guide-exam', title: 'Quy trình khám bệnh', path: '/guide/exam', icon: FileText },
+        { id: 'guide-insurance', title: 'Bảo hiểm y tế', path: '/news/policy', icon: ShieldPlus },
+        { id: 'guide-vaccine', title: 'Lịch tiêm chủng', path: '/guide/vaccine', icon: Syringe },
+    ] 
+  }
 ];
+
+// Add Syringe to imports at top if not present, but it's used in MOCK_NEWS or others? 
+// Re-checking imports.
+// Syringe was not imported in the original file provided in prompt for constants.tsx, 
+// but used in the code above. I'll add it to imports.
+import { Syringe } from 'lucide-react';
 
 export const MOCK_NEWS: NewsItem[] = [
   {
