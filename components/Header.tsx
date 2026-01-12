@@ -140,7 +140,7 @@ const Header = () => {
                   SỨC KHỎE THỦ ĐÔ
                 </h1>
                 <p className="text-[11px] md:text-sm text-primary-800 font-bold italic">
-                  Chuyên nghiệp - Tận tâm - Vì sức khỏe nhân dân
+                  Kết nối thông tin, bảo vệ sức khỏe cộng đồng
                 </p>
               </div>
             </Link>

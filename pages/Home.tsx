@@ -4,16 +4,18 @@ import {
   ArrowRight,
   Activity,
   Phone,
-  Play,
-  Globe,
-  Trophy,
-  Music,
+  Play, 
+  Award,
+  FileText, 
   Radio,
+  Stethoscope,
+  Laptop2,
+  ShieldPlus,
+  HeartHandshake,
   List,
 } from "lucide-react";
-
-import anh1 from "./image/anh1.png";
-import anh2 from "./image/anh2.jpg";
+import anh1 from "@/assets/image/anh1.png";
+import anh2 from "@/assets/image/anh2.jpg";
 
 import {
   SERVICE_CATEGORIES,
@@ -24,11 +26,10 @@ import {
   MOCK_INTERNATIONAL,
 } from "../constants";
 
-const Home = () => { 
+const Home = () => {
   const newsList = MOCK_NEWS.slice(1, 5); // Take more items for the list
   const [activeChannel, setActiveChannel] = useState("H1");
-  const [currentVideo, setCurrentVideo] = useState(MOCK_VIDEOS[0]);
-
+  const [currentVideo, setCurrentVideo] = useState(MOCK_VIDEOS[0]); 
   const images = [anh1, anh2];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -55,7 +56,6 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 relative font-sans">
-      {/* --- EMERGENCY FLOATING BUTTON --- */}
       <div className="fixed bottom-8 right-6 z-50 flex flex-col items-end gap-2 group">
         <div className="bg-white px-4 py-2 rounded-xl shadow-xl border-l-4 border-red-600 mb-2 animate-bounce origin-bottom-right hidden md:block">
           <p className="text-red-700 font-bold text-sm uppercase">
@@ -76,7 +76,6 @@ const Home = () => {
         </Link>
       </div>
 
-      {/* Hero Banner Area */}
       <section className="relative bg-primary-900 text-white h-[500px] flex items-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
@@ -118,7 +117,6 @@ const Home = () => {
             </div>
           </div>
 
-          {/* Quick Stats Box */}
           <div className="hidden lg:col-span-5 lg:block">
             <div className="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-lg shadow-2xl">
               <h3 className="text-xl font-bold mb-4 flex items-center">
@@ -150,8 +148,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Image Slider */}
-      <section className="relative w-full h-[200px] overflow-hidden container mx-auto px-4">
+      <section className="relative w-full h-[200px] overflow-hidden mt-2">
         <img
           src={images[currentImageIndex]}
           alt="Slide"
@@ -160,22 +157,20 @@ const Home = () => {
         <div className="absolute inset-0 flex items-center justify-between p-4">
           <button
             onClick={goToPrevious}
-            className="bg-black/50 text-white p-2 rounded-full hover:bg-black/75 transition"
+            className="bg-black/50 text-white w-10 h-10 rounded-full hover:bg-black/75 transition ml-2"
           >
             ←
           </button>
           <button
             onClick={goToNext}
-            className="bg-black/50 text-white p-2 rounded-full hover:bg-black/75 transition"
+            className="bg-black/50 text-white w-10 h-10 rounded-full hover:bg-black/75 transition mr-2"
           >
             →
           </button>
         </div>
       </section>
 
-      {/* Service Menu Grid */}
-      <section className="py-6 relative z-20 bg-gray-50/50">
-        {" "}
+      <section className="py-2 relative z-20 bg-gray-50/50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-6">
             <h3 className="text-2xl font-bold text-primary-900 mb-2 uppercase">
@@ -217,7 +212,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* FOCUS & MULTIMEDIA SECTION (Redesigned with 1:2 Ratio) */}
       <section className="py-8 bg-white border-t border-gray-100">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
@@ -389,12 +383,11 @@ const Home = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 divide-y md:divide-y-0 md:divide-x divide-gray-100">
             <div className="pt-6 md:pt-0">
               <div className="mb-4 flex items-center gap-2">
-                <Music className="text-pink-600" size={20} />
+                <Stethoscope className="text-pink-600" size={20} />
                 <h3 className="text-lg font-bold text-primary-900 uppercase">
                   Khám bệnh - chữa bệnh
                 </h3>
-              </div>
-              {/* First item big */}
+              </div> 
               <div className="group mb-4 cursor-pointer">
                 <div className="aspect-[3/2] rounded overflow-hidden mb-2 bg-gray-100">
                   <img
@@ -422,7 +415,7 @@ const Home = () => {
 
             <div className="pt-6 md:pt-0 md:pl-8">
               <div className="mb-4 flex items-center gap-2">
-                <Trophy className="text-orange-500" size={20} />
+                <ShieldPlus className="text-orange-500" size={20} />
                 <h3 className="text-lg font-bold text-primary-900 uppercase">
                   Phòng bệnh - Nân cao sức khẻo
                 </h3>
@@ -453,7 +446,7 @@ const Home = () => {
 
             <div className="pt-6 md:pt-0 md:pl-8">
               <div className="mb-4 flex items-center gap-2">
-                <Globe className="text-blue-500" size={20} />
+                <HeartHandshake className="text-blue-500" size={20} />
                 <h3 className="text-lg font-bold text-primary-900 uppercase">
                   Bảo trợ xã hội
                 </h3>
@@ -483,7 +476,7 @@ const Home = () => {
             </div>
             <div className="pt-6 md:pt-0">
               <div className="mb-4 flex items-center gap-2">
-                <Music className="text-pink-600" size={20} />
+                <Laptop2 className="text-pink-600" size={20} />
                 <h3 className="text-lg font-bold text-primary-900 uppercase">
                   Chuyển đổi số y tế
                 </h3>
@@ -517,7 +510,7 @@ const Home = () => {
             {/* Column 2: THỂ THAO */}
             <div className="pt-6 md:pt-0 md:pl-8">
               <div className="mb-4 flex items-center gap-2">
-                <Trophy className="text-orange-500" size={20} />
+                <FileText className="text-orange-500" size={20} />
                 <h3 className="text-lg font-bold text-primary-900 uppercase">
                   Chính sách y tế - Bảo hiểm y tế
                 </h3>
@@ -548,7 +541,7 @@ const Home = () => {
 
             <div className="pt-6 md:pt-0 md:pl-8">
               <div className="mb-4 flex items-center gap-2">
-                <Globe className="text-blue-500" size={20} />
+                <Award className="text-blue-500" size={20} />
                 <h3 className="text-lg font-bold text-primary-900 uppercase">
                   Gương người tốt - việc tốt
                 </h3>

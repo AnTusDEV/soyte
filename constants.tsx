@@ -206,7 +206,7 @@ export const MAIN_MENU: MenuItem[] = [
       {
         id: "food-safety",
         title: "Tư vấn sức khỏe",
-        path: "/news/food-safety",
+        path: "/consulting",
         icon: Utensils,
       },
       {

@@ -1,225 +1,329 @@
-import React from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { MOCK_NEWS, MAIN_MENU } from '../constants';
-import { Calendar, ChevronRight, Share2, Clock, Eye, TrendingUp, Zap, FileText, ChevronRightCircle } from 'lucide-react';
-
+import React from "react";
+import { useParams, Link } from "react-router-dom";
+import { MOCK_NEWS, MAIN_MENU, MOCK_VIDEOS } from "../constants";
+import {
+  Calendar,
+  ChevronRight,
+  TrendingUp,
+  Clock,
+  FileText,
+  Play,
+  Home as HomeIcon,
+  ChevronRightCircle,
+  Share2,
+} from "lucide-react";
+import anh1 from '@/assets/image/banner.png';
 const NewsCategory = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
-  
+
   // Find category title logic
-  const categoryTitle = MAIN_MENU.find(m => m.path.includes(categoryId || ''))?.title || 
-                        MAIN_MENU.flatMap(m => m.children).find(c => c?.path.includes(categoryId || ''))?.title ||
-                        "Tin tức y tế";
+  const categoryTitle =
+    MAIN_MENU.find((m) => m.path.includes(categoryId || ""))?.title ||
+    MAIN_MENU.flatMap((m) => m.children).find((c) =>
+      c?.path.includes(categoryId || "")
+    )?.title ||
+    "Tin tức y tế";
 
-  // Data Safety Check
-  if (!MOCK_NEWS || MOCK_NEWS.length === 0) {
-      return (
-          <div className="min-h-screen flex items-center justify-center bg-gray-50">
-              <div className="text-center">
-                  <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                  <p className="text-gray-500">Đang tải dữ liệu tin tức...</p>
-              </div>
-          </div>
-      );
-  }
-
-  // Mock Data Logic
-  // Featured (Spotlight) Items: Use first 1 for big spotlight, next 3 for side list
   const spotlightItem = MOCK_NEWS[0];
-  const subSpotlightItems = MOCK_NEWS.slice(1, 4);
-  
-  // Main Stream Items: Use next 5 items
-  const mainStreamItems = MOCK_NEWS.slice(4, 9);
-  
-  // Sidebar "Most Read": Sort by ID descending (simulating latest/popular) and take 5
+  const hotNewsItems = MOCK_NEWS.slice(1, 5);
+  const streamItems = [...MOCK_NEWS, ...MOCK_NEWS].slice(2, 10);
   const mostReadItems = [...MOCK_NEWS].reverse().slice(0, 5);
 
-  return (
-    <div className="bg-white min-h-screen font-sans text-gray-800">
-      
-      {/* 1. Breadcrumb - Simple & Clean */}
-      <div className="bg-gray-100 border-b border-gray-200">
-        <div className="container mx-auto px-4 py-2.5">
-             <div className="flex items-center text-xs text-gray-600 font-medium">
-                <Link to="/" className="hover:text-primary-700 uppercase">Trang chủ</Link>
-                <ChevronRight size={12} className="mx-2 text-gray-400" />
-                <span className="text-primary-700 font-bold uppercase">{categoryTitle}</span>
+  // If NOT 'events', show a simpler standard layout
+  if (categoryId !== "events") {
+    return (
+      <div className="bg-white min-h-screen font-sans pb-12">
+        <div className="bg-gray-50 border-b border-gray-200">
+          <div className="container mx-auto px-4 py-3">
+            <div className="flex items-center text-xs text-gray-500 font-medium uppercase">
+              <Link
+                to="/"
+                className="hover:text-primary-700 flex items-center gap-1"
+              >
+                <HomeIcon size={14} /> Trang chủ
+              </Link>
+              <ChevronRight size={14} className="mx-2" />
+              <span className="font-bold text-primary-800">
+                {categoryTitle}
+              </span>
             </div>
+          </div>
+        </div>
+
+        <div className="container mx-auto px-4 py-8">
+          <h1 className="text-2xl font-bold border-l-4 border-primary-600 pl-4 mb-8 uppercase">
+            {categoryTitle}
+          </h1>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-8 space-y-6">
+              {streamItems.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="flex flex-col md:flex-row gap-4 border-b border-gray-100 pb-6 last:border-0 group cursor-pointer"
+                >
+                  <div className="w-full md:w-64 h-40 flex-shrink-0 overflow-hidden rounded shadow-sm">
+                    <img
+                      src={item.image}
+                      className="w-full h-full object-cover group-hover:scale-105 transition"
+                      alt=""
+                    />
+                  </div>
+                  <div className="flex-grow">
+                    <h3 className="text-lg font-bold text-gray-800 group-hover:text-primary-600 transition mb-2">
+                      <Link to={`/news/detail/${item.id}`}>{item.title}</Link>
+                    </h3>
+                    <p className="text-sm text-gray-500 line-clamp-3 mb-3">
+                      {item.excerpt}
+                    </p>
+                    <span className="text-xs text-gray-400 font-medium">
+                      {item.date}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="lg:col-span-4 space-y-8">
+              <div className="bg-primary-50 p-4 rounded-lg border border-primary-100">
+                <h3 className="font-bold text-primary-900 mb-4 flex items-center gap-2">
+                  <TrendingUp size={18} /> Đọc nhiều nhất
+                </h3>
+                <ul className="space-y-3">
+                  {mostReadItems.map((m, i) => (
+                    <li
+                      key={i}
+                      className="text-sm text-gray-700 hover:text-primary-700 cursor-pointer border-b border-primary-100 pb-2 last:border-0"
+                    >
+                      {m.title}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ELSE: Show the complex "Bao Quang Ninh" style layout for 'events'
+  return (
+    <div className="bg-white min-h-screen font-sans text-gray-800 pb-12">
+      {/* Breadcrumb */}
+      <div className="bg-gray-50 border-b border-gray-200">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex items-center text-xs text-gray-500 font-medium uppercase tracking-tight">
+            <Link
+              to="/"
+              className="hover:text-primary-700 flex items-center gap-1"
+            >
+              <HomeIcon size={14} /> TRANG CHỦ
+            </Link>
+            <ChevronRight size={14} className="mx-2 text-gray-400" />
+            <span className="text-red-700 font-bold">{categoryTitle}</span>
+          </div>
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-6">
-        
-        {/* 2. FOCUS SECTION (Khu vực Tiêu điểm) 
-            Layout: Left (Large Item) - Right (Vertical List of 3 items)
-        */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8 border-b border-gray-200 pb-8">
-            {/* Left: Main Spotlight */}
-            <div className="lg:col-span-8 group cursor-pointer">
-                <div className="overflow-hidden rounded-sm mb-3 relative bg-gray-200">
-                    <img 
-                        src={spotlightItem.image} 
-                        alt={spotlightItem.title} 
-                        className="w-full aspect-[16/9] object-cover transition-transform duration-700 group-hover:scale-105"
-                        loading="eager"
-                    />
+        {/* SPOTLIGHT SECTION */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-10">
+          <div className="lg:col-span-6 group cursor-pointer">
+            <div className="overflow-hidden rounded-sm mb-4 relative bg-gray-100 shadow-sm">
+              <img
+                src={spotlightItem.image}
+                alt={spotlightItem.title}
+                className="w-full aspect-[16/9] object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              <div className="absolute top-4 left-4">
+                <span className="bg-red-600 text-white text-[10px] font-black px-2 py-1 uppercase rounded-sm shadow-lg">
+                  Tin Nổi Bật
+                </span>
+              </div>
+            </div>
+            <h1 className="text-2xl md:text-3xl font-black text-gray-900 leading-tight hover:text-red-700 mb-3 transition-colors">
+              {spotlightItem.title}
+            </h1>
+            <p className="text-gray-600 text-base leading-relaxed mb-4 line-clamp-3">
+              {spotlightItem.excerpt}
+            </p>
+            <div className="flex items-center gap-4 text-xs text-gray-400 font-medium">
+              <span className="flex items-center gap-1 text-red-600 font-bold">
+                <Clock size={12} /> {spotlightItem.date}
+              </span>
+              <span className="flex items-center gap-1 hover:text-blue-600">
+                <Share2 size={12} /> Chia sẻ
+              </span>
+            </div>
+          </div>
+
+          <div className="lg:col-span-2 flex flex-col divide-y divide-gray-100">
+            <div className="bg-gray-900 text-white px-4 py-2 text-xs font-bold uppercase tracking-widest mb-4">
+              Tin Mới Nhận
+            </div>
+            {hotNewsItems.map((item, idx) => (
+              <Link
+                key={idx}
+                to={`/news/detail/${item.id}`}
+                className="group py-4 flex gap-4 first:pt-0"
+              >
+                <div className="w-24 h-16 flex-shrink-0 overflow-hidden rounded-sm bg-gray-100">
+                  <img
+                    src={item.image}
+                    alt=""
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  />
                 </div>
-                <h1 className="text-2xl md:text-3xl font-bold text-[#b71c1c] leading-tight hover:text-red-800 mb-3 font-sans">
-                    {spotlightItem.title}
-                </h1>
-                <p className="text-gray-700 text-base leading-relaxed mb-2 text-justify">
-                    {spotlightItem.excerpt}
-                </p>
-                <div className="flex items-center text-xs text-gray-500 space-x-3">
-                     <span className="flex items-center text-primary-700 font-bold uppercase">
-                        {spotlightItem.category}
-                     </span>
-                     <span>|</span>
-                     <span className="flex items-center">
-                        <Calendar size={12} className="mr-1" /> {spotlightItem.date}
-                     </span>
+                <h3 className="text-[14px] font-bold text-gray-800 leading-snug group-hover:text-red-600 transition-colors line-clamp-3">
+                  {item.title}
+                </h3>
+              </Link>
+            ))}
+          </div>
+
+          <div className="lg:col-span-4 bg-gray-50 border border-gray-200 rounded-sm overflow-hidden">
+            
+            <div className="ads-zone-group zonegroup-vertical" id="ads-zone-10" data-id="10" data-type="vertical" data-position="ads_sidebar_top" data-timeflip="1000">
+                <div className="ads-block-item text-center ">
+                    <Link href="https://baoquangninh.vn/ads-tracking?aid=166&amp;cmpid=166&amp;alink=166" target="">
+                        <img src={anh1} style={{height:'250px', width:'100%'}} alt="Quảng cáo" />
+                    </Link>
                 </div>
             </div>
 
-            {/* Right: Sub Focus List */}
-            <div className="lg:col-span-4 flex flex-col gap-5 border-l border-gray-100 pl-0 lg:pl-6">
-                {subSpotlightItems.map((item, idx) => (
-                    <div key={idx} className="flex gap-3 group cursor-pointer">
-                        <div className="w-1/3 aspect-[4/3] rounded-sm overflow-hidden flex-shrink-0 bg-gray-200">
-                             <img 
-                                src={item.image} 
-                                alt={item.title} 
-                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                             />
-                        </div>
-                        <div className="w-2/3 flex flex-col justify-start">
-                            <h3 className="text-sm md:text-[15px] font-bold text-gray-800 leading-snug group-hover:text-primary-700 line-clamp-3">
-                                {item.title}
-                            </h3>
-                            <div className="mt-2 text-[10px] text-gray-400 flex items-center">
-                                <Clock size={10} className="mr-1" /> {item.date}
-                            </div>
-                        </div>
-                    </div>
-                ))}
+
+            <div className="bg-red-700 px-4 py-2.5">
+              <h3 className="text-white text-xs font-black uppercase flex items-center gap-2">
+                <TrendingUp size={16} /> Tin đọc nhiều
+              </h3>
             </div>
+            <div className="p-4 flex flex-col gap-4">
+              {mostReadItems.map((item, idx) => (
+                <Link
+                  key={idx}
+                  to={`/news/detail/${item.id}`}
+                  className="group flex gap-3 items-start border-b border-gray-100 last:border-0 pb-3 last:pb-0"
+                >
+                  <span
+                    className={`flex-shrink-0 w-6 h-6 flex items-center justify-center rounded text-[11px] font-black italic ${
+                      idx < 3
+                        ? "text-red-600 bg-red-50"
+                        : "text-gray-400 bg-white"
+                    }`}
+                  >
+                    {idx + 1}
+                  </span>
+                  <h4 className="text-[13px] font-bold text-gray-800 group-hover:text-red-600 leading-snug transition-colors">
+                    {item.title}
+                  </h4>
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
 
-        {/* 3. MAIN STREAM & SIDEBAR */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            
-            {/* LEFT: LIST NEWS (Dòng sự kiện) */}
-            <div className="lg:col-span-9">
-                <div className="mb-4 flex items-center border-l-4 border-primary-600 pl-3">
-                    <h2 className="text-lg font-bold uppercase text-gray-800">Tin tức mới cập nhật</h2>
-                </div>
-
-                <div className="flex flex-col gap-6">
-                    {mainStreamItems.map((item, idx) => (
-                        <div key={idx} className="flex flex-col md:flex-row gap-5 pb-6 border-b border-gray-100 last:border-0 group">
-                            {/* Image */}
-                            <div className="w-full md:w-[260px] aspect-[16/10] flex-shrink-0 overflow-hidden rounded-sm bg-gray-200">
-                                 <img 
-                                    src={item.image} 
-                                    alt={item.title} 
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                 />
-                            </div>
-                            
-                            {/* Content */}
-                            <div className="flex-grow">
-                                <h3 className="text-lg md:text-xl font-bold text-gray-900 leading-snug group-hover:text-primary-700 mb-2">
-                                    <Link to={`/news/detail/${item.id}`}>
-                                        {item.title}
-                                    </Link>
-                                </h3>
-                                <div className="flex items-center text-xs text-gray-400 mb-3 space-x-2">
-                                    <span className="text-primary-600 font-bold uppercase">{item.category}</span>
-                                    <span>•</span>
-                                    <span>{item.date}</span>
-                                </div>
-                                <p className="text-gray-600 text-sm leading-relaxed line-clamp-2 md:line-clamp-3 text-justify">
-                                    {item.excerpt}
-                                </p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Pagination */}
-                <div className="mt-8 flex justify-center gap-2">
-                     <button className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm rounded">Trước</button>
-                     <button className="px-3 py-1 bg-primary-700 text-white text-sm font-bold rounded">1</button>
-                     <button className="px-3 py-1 bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 text-sm rounded">2</button>
-                     <button className="px-3 py-1 bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 text-sm rounded">3</button>
-                     <button className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm rounded">Tiếp</button>
-                </div>
+        {/* MAIN STREAM & SIDEBAR */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          <div className="lg:col-span-8">
+            <div className="mb-6 border-b-2 border-red-700 pb-1 flex justify-between items-end">
+              <h2 className="text-lg font-black uppercase text-gray-900 tracking-tighter">
+                {categoryTitle}
+              </h2>
             </div>
 
-            {/* RIGHT: SIDEBAR */}
-            <div className="lg:col-span-3 space-y-8 pl-0 lg:pl-2 border-l border-gray-100">
-                
-                {/* Widget 1: Most Read */}
-                <div>
-                     <div className="flex items-center justify-between mb-4 border-b border-gray-200 pb-1">
-                        <h3 className="text-base font-bold text-red-700 uppercase flex items-center gap-2">
-                            <TrendingUp size={18}/> Tin đọc nhiều
-                        </h3>
-                     </div>
-                     <div className="flex flex-col gap-4">
-                        {mostReadItems.map((item, idx) => (
-                            <div key={idx} className="group flex gap-3 cursor-pointer">
-                                <span className={`flex-shrink-0 w-6 h-6 flex items-center justify-center rounded text-xs font-bold ${idx < 3 ? 'bg-gray-200 text-gray-800' : 'bg-gray-100 text-gray-500'}`}>
-                                    {idx + 1}
-                                </span>
-                                <h4 className="text-sm font-semibold text-gray-800 group-hover:text-primary-700 leading-snug line-clamp-3">
-                                    {item.title}
-                                </h4>
-                            </div>
-                        ))}
-                     </div>
+            <div className="space-y-8">
+              {streamItems.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="flex flex-col md:flex-row gap-6 pb-8 border-b border-gray-100 last:border-0 group cursor-pointer"
+                >
+                  <div className="w-full md:w-[280px] aspect-[16/10] flex-shrink-0 overflow-hidden rounded-sm shadow-sm">
+                    <img
+                      src={item.image}
+                      alt=""
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+                  <div className="flex-grow">
+                    <h3 className="text-xl font-bold text-gray-900 leading-tight group-hover:text-red-700 transition-colors mb-3">
+                      <Link to={`/news/detail/${item.id}`}>{item.title}</Link>
+                    </h3>
+                    <div className="flex items-center gap-3 text-[11px] text-gray-400 font-bold uppercase mb-3">
+                      <span className="text-blue-600">{item.category}</span>
+                      <span className="text-gray-200">|</span>
+                      <span>{item.date}</span>
+                    </div>
+                    <p className="text-gray-600 text-sm leading-relaxed line-clamp-2 md:line-clamp-3">
+                      {item.excerpt}
+                    </p>
+                  </div>
                 </div>
-
-                {/* Widget 2: Document / Notice */}
-                <div className="bg-blue-50 p-4 rounded-sm border border-blue-100">
-                     <h3 className="text-base font-bold text-blue-800 uppercase mb-3 flex items-center gap-2">
-                         <FileText size={18}/> Văn bản chỉ đạo
-                     </h3>
-                     <ul className="space-y-3">
-                        <li className="text-xs text-gray-700 hover:text-blue-600 cursor-pointer border-b border-blue-100 pb-2">
-                            Công văn số 123/SYT-NVY về việc tăng cường phòng chống dịch sốt xuất huyết...
-                        </li>
-                        <li className="text-xs text-gray-700 hover:text-blue-600 cursor-pointer border-b border-blue-100 pb-2">
-                            Quyết định phê duyệt kế hoạch chuyển đổi số ngành Y tế Hà Nội năm 2024...
-                        </li>
-                        <li className="text-xs text-gray-700 hover:text-blue-600 cursor-pointer">
-                            Thông báo lịch tiếp công dân của Ban Giám đốc Sở Y tế tháng 05/2024...
-                        </li>
-                     </ul>
-                </div>
-
-                {/* Widget 3: Banners */}
-                <div className="space-y-4">
-                     <img 
-                        src="https://soyte.hanoi.gov.vn/uploads/image/2022/10/24/09304323.png" 
-                        alt="Banner CCHC" 
-                        className="w-full rounded shadow-sm hover:opacity-90 transition bg-gray-200"
-                        onError={(e) => {
-                            (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x100?text=Banner+Quang+Cao';
-                        }}
-                     />
-                     <img 
-                        src="https://soyte.hanoi.gov.vn/uploads/image/2022/10/24/09310626.png" 
-                        alt="Banner Dich vu cong" 
-                        className="w-full rounded shadow-sm hover:opacity-90 transition bg-gray-200"
-                        onError={(e) => {
-                            (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x100?text=Banner+Dich+Vu+Cong';
-                        }}
-                     />
-                </div>
-
+              ))}
             </div>
 
+            <div className="mt-12 flex items-center justify-center gap-1">
+              <button className="w-10 h-10 flex items-center justify-center rounded border border-gray-200 text-gray-400">
+                «
+              </button>
+              <button className="w-10 h-10 flex items-center justify-center rounded bg-red-700 text-white font-bold">
+                1
+              </button>
+              <button className="w-10 h-10 flex items-center justify-center rounded border border-gray-200 text-gray-700">
+                2
+              </button>
+              <button className="w-10 h-10 flex items-center justify-center rounded border border-gray-200 text-gray-400">
+                »
+              </button>
+            </div>
+          </div>
+
+          <div className="lg:col-span-4 space-y-10">
+            <div>
+              <div className="border-b-2 border-blue-800 pb-1 mb-4">
+                <h3 className="text-sm font-black text-blue-800 uppercase flex items-center gap-2">
+                  <FileText size={18} /> Văn bản chỉ đạo
+                </h3>
+              </div>
+              <ul className="space-y-4">
+                {[
+                  "Công văn 54/SYT về việc chủ động phòng chống rét đậm rét hại...",
+                  "Quyết định phê duyệt nhân sự tại Bệnh viện đa khoa Xanh Pôn...",
+                  "Thông báo tuyển dụng cán bộ y tế đợt 1 năm 2026...",
+                ].map((txt, i) => (
+                  <li
+                    key={i}
+                    className="flex gap-2 text-[13px] text-gray-600 hover:text-blue-700 cursor-pointer group"
+                  >
+                    <ChevronRightCircle
+                      size={14}
+                      className="flex-shrink-0 mt-0.5 text-blue-300 group-hover:text-blue-600"
+                    />
+                    <span className="font-medium line-clamp-2">{txt}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="bg-slate-900 rounded-sm overflow-hidden shadow-lg p-4">
+              <h3 className="text-white text-xs font-black uppercase mb-4 border-l-4 border-red-600 pl-3">
+                Media Highlight
+              </h3>
+              <div className="relative group cursor-pointer overflow-hidden rounded-sm mb-3">
+                <img
+                  src={MOCK_VIDEOS[0].thumbnail}
+                  className="w-full aspect-video object-cover opacity-80 group-hover:scale-105 transition duration-500"
+                  alt=""
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-12 h-12 bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg transform group-hover:scale-110 transition">
+                    <Play size={24} fill="white" className="ml-1" />
+                  </div>
+                </div>
+              </div>
+              <h4 className="text-white text-sm font-bold leading-snug line-clamp-2 hover:text-red-400 transition cursor-pointer">
+                {MOCK_VIDEOS[0].title}
+              </h4>
+            </div>
+          </div>
         </div>
       </div>
     </div>

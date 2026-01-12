@@ -1,14 +1,44 @@
-import React, { useEffect, useRef } from "react";
+
+import React, { useEffect, useRef, useState } from "react";
+import { 
+  Building2, 
+  Activity, 
+  HeartPulse, 
+  Building, 
+  Stethoscope, 
+  Home, 
+  MapPin, 
+  ChevronRight,
+  ShieldCheck,
+  Search
+} from "lucide-react";
+
 const HealthRecords = () => {
-  const initialized = useRef(false)
+  const initialized = useRef(false);
+  const [activeFacility, setActiveFacility] = useState<string | null>(null);
+
+  const facilities = [
+    { id: "xanh-pon", name: "Bệnh viện Đa khoa Xanh Pôn", icon: Building2, color: "text-red-600", bg: "bg-red-50" },
+    { id: "tim-hn", name: "Bệnh viện Tim Hà Nội", icon: HeartPulse, color: "text-rose-600", bg: "bg-rose-50" },
+    { id: "soc-son", name: "Bệnh viện Đa khoa Huyện Sóc Sơn", icon: Building, color: "text-blue-600", bg: "bg-blue-50" },
+    { id: "da-lieu", name: "Bệnh viện Da liễu Hà Nội", icon: Stethoscope, color: "text-cyan-600", bg: "bg-cyan-50" },
+    { id: "hang-ma", name: "Trạm Y tế Phường Hàng Mã", icon: Home, color: "text-emerald-600", bg: "bg-emerald-50" },
+    { id: "co-loa", name: "Trạm Y tế Xã Cổ Loa", icon: MapPin, color: "text-orange-600", bg: "bg-orange-50" },
+  ];
+
   useEffect(() => {
     if (initialized.current) {
       return;
     }
     initialized.current = true;
-    // Function to load the script
-    const loadScript = (src) => {
+
+    const loadScript = (src: string) => {
       return new Promise((resolve, reject) => {
+        const existingScript = document.querySelector(`script[src="${src}"]`);
+        if (existingScript) {
+          resolve(true);
+          return;
+        }
         const script = document.createElement('script');
         script.src = src;
         script.onload = resolve;
@@ -17,15 +47,17 @@ const HealthRecords = () => {
       });
     };
 
-    // Load the dashboard script
     loadScript("https://datahub.hanoi.gov.vn/js/visualcommon/publish-dashboard-drag.js")
       .then(() => {
-        // Once the script is loaded, execute dashboard commands
-        if (window.dashboard) {
-          window.dashboard.setUnit('');
-          window.dashboard.setUser('');
-          window.dashboard.domReady(() => {
-            window.dashboard.viewDashboard('https://datahub.hanoi.gov.vn/databox/ttksbt/tinyroute/1EBC83D81249F5F1.cpx?secrd=zZlJb2VFjTYo0sQ8vu0Tmk2K87v92uRv5VtEQsbYeQHWoRD9KmJ3AiWiHLfkBh1m', 'view-design');
+        const win = window as any;
+        if (win.dashboard) {
+          win.dashboard.setUnit('');
+          win.dashboard.setUser('');
+          win.dashboard.domReady(() => {
+            win.dashboard.viewDashboard(
+              'https://datahub.hanoi.gov.vn/databox/ttksbt/tinyroute/1EBC83D81249F5F1.cpx?secrd=zZlJb2VFjTYo0sQ8vu0Tmk2K87v92uRv5VtEQsbYeQHWoRD9KmJ3AiWiHLfkBh1m', 
+              'view-design'
+            );
           });
         }
       })
@@ -33,12 +65,10 @@ const HealthRecords = () => {
         console.error("Failed to load dashboard script:", error);
       });
 
-    // Cleanup function (optional, but good practice if script adds event listeners etc.)
     return () => {
-      // Remove the script if the component unmounts
       const scriptElement = document.querySelector('script[src="https://datahub.hanoi.gov.vn/js/visualcommon/publish-dashboard-drag.js"]');
       if (scriptElement) {
-        scriptElement.remove();
+        // We might want to keep it if multiple navigations happen, but cleanup is safer for POC
       }
       const viewDesign = document.getElementById('view-design');
       if(viewDesign) {
@@ -48,10 +78,90 @@ const HealthRecords = () => {
   }, []);
 
   return (
-    <div className="bg-slate-50 min-h-screen font-sans">  
-      <div className="p-4 md:p-6 max-w-[1600px] mx-auto"> 
-        <div id="view-design" className=" min-h-[600px]" style={{height: "500px",width: "100%"}}> 
+    <div className="bg-slate-50 min-h-screen font-sans pb-12">
+      {/* Header Area */}
+      <div className="bg-primary-900 text-white py-12 px-4 shadow-lg mb-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 opacity-10 pointer-events-none -translate-y-1/4 translate-x-1/4">
+          <Activity size={300} />
+        </div>
+        <div className="container mx-auto max-w-6xl relative z-10">
+          <div className="flex items-center gap-3 mb-4">
+            <ShieldCheck className="text-secondary-400" size={32} />
+            <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight">Hồ sơ Sức khỏe Toàn dân</h1>
+          </div>
+          <p className="text-primary-100 text-lg max-w-3xl leading-relaxed">
+            Hệ thống tích hợp dữ liệu sức khỏe thông minh, cho phép người dân tra cứu lịch sử khám bệnh, 
+            kết quả xét nghiệm và quản lý các thông số sinh tồn từ tất cả các cơ sở y tế trên địa bàn Thủ đô.
+          </p>
+        </div>
+      </div>
+
+      <div className="container mx-auto max-w-6xl px-4">
+        {/* Quick Access Grid - The 6 Requested Buttons */}
+        <div className="mb-10">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+              <Building2 className="text-primary-600" size={24} />
+              Truy cập nhanh cơ sở y tế
+            </h2>
+            <div className="flex items-center gap-2 text-sm text-primary-600 font-bold hover:underline cursor-pointer">
+              Tất cả cơ sở <ChevronRight size={16} />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {facilities.map((fac) => {
+              const Icon = fac.icon;
+              return (
+                <button
+                  key={fac.id}
+                  onClick={() => setActiveFacility(fac.id)}
+                  className={`
+                    group p-5 rounded-2xl border flex items-center gap-4 transition-all duration-300 text-left
+                    ${activeFacility === fac.id 
+                      ? 'bg-white border-primary-500 shadow-xl ring-2 ring-primary-100' 
+                      : 'bg-white border-gray-100 hover:border-primary-200 hover:shadow-lg'}
+                  `}
+                >
+                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110 ${fac.bg} ${fac.color}`}>
+                    <Icon size={28} />
+                  </div>
+                  <div className="flex-grow">
+                    <h3 className={`font-bold text-[15px] leading-tight ${activeFacility === fac.id ? 'text-primary-700' : 'text-gray-700'}`}>
+                      {fac.name}
+                    </h3>
+                    <p className="text-xs text-gray-400 mt-1 font-medium">Click để xem dữ liệu</p>
+                  </div>
+                  <ChevronRight size={18} className={`transition-transform ${activeFacility === fac.id ? 'text-primary-500 translate-x-1' : 'text-gray-300'}`} />
+                </button>
+              );
+            })}
+          </div>
         </div> 
+
+        {/* Dashboard Frame */}
+        <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden min-h-[650px] flex flex-col">
+          <div className="bg-gray-800 p-4 flex justify-between items-center text-white">
+            <div className="flex items-center gap-2">
+              <Activity className="text-secondary-400" size={18} />
+              <span className="text-sm font-bold uppercase tracking-widest">Dữ liệu thời gian thực</span>
+            </div>
+            <div className="flex gap-2">
+              <span className="w-3 h-3 rounded-full bg-red-500"></span>
+              <span className="w-3 h-3 rounded-full bg-yellow-500"></span>
+              <span className="w-3 h-3 rounded-full bg-green-500"></span>
+            </div>
+          </div>
+          <div className="flex-grow relative bg-slate-100">
+             <div 
+               id="view-design" 
+               className="w-full h-[600px]"
+               style={{ height: "600px", width: "100%" }}
+             >
+               {/* Dashboard script loads here */}
+             </div>
+          </div>
+        </div>
       </div>
     </div>
   );
