@@ -61,7 +61,7 @@ const Header = () => {
             <span className="opacity-30 hidden md:inline-block">|</span>
             <span className="flex items-center font-bold text-white hover:text-yellow-300 transition-colors cursor-pointer text-[10px] md:text-xs">
                 <Phone size={14} className="mr-1.5 animate-pulse" /> 
-                HOTLINE: 0243.998.5765
+                ĐƯỜNG DÂY NÓNG SỞ Y TẾ: 02439985765/ 0967981616
             </span>
           </div>
 
@@ -142,23 +142,75 @@ const Header = () => {
       </div>
 
       {/* Navigation */}
-      <nav className={`${isMenuOpen ? 'block' : 'hidden'} lg:block bg-primary-800 text-white border-t border-primary-700`}>
+      <nav className={`${isMenuOpen ? 'block' : 'hidden'} lg:block bg-gradient-to-r from-primary-800 to-primary-900 text-white transition-all duration-300 shadow-lg border-t border-primary-600`}>
         <div className="container mx-auto px-4">
-          <ul className="flex flex-col lg:flex-row justify-between">
+          <ul className="flex flex-col lg:flex-row lg:items-center justify-between py-2 lg:py-0">
             {MAIN_MENU.map((item) => {
-              const isActive = location.pathname.startsWith(item.path) && item.path !== '/';
-              const isHomeActive = item.path === '/' && location.pathname === '/';
-              return (
-                <li key={item.id} className="relative group">
-                  <Link 
-                    to={item.path}
-                    className={`block px-4 py-3.5 text-[12px] uppercase font-bold border-b-2 border-transparent hover:bg-white/10 hover:border-secondary-400 transition-all tracking-wide
-                    ${(isActive || isHomeActive) ? 'bg-white/10 border-secondary-500 text-secondary-300' : 'text-gray-100'}
-                    `}
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {item.title}
-                  </Link>
+               const isActive = location.pathname.startsWith(item.path) && item.path !== '/';
+               const isHomeActive = item.path === '/' && location.pathname === '/';
+               const hasChildren = item.children && item.children.length > 0;
+               
+               return (
+                <li key={item.id} className="relative group lg:static xl:relative">
+                  {hasChildren ? (
+                    <>
+                        <div 
+                            className={`
+                                flex items-center justify-between cursor-pointer px-3 py-3.5 text-[13px] uppercase font-bold border-b-4 border-transparent hover:bg-white/10 hover:border-secondary-400 transition-all
+                                ${(isActive || isHomeActive) ? 'bg-white/10 border-secondary-500 text-secondary-300' : 'text-gray-100'}
+                            `}
+                        >
+                             <Link 
+                                to={item.path} 
+                                className="flex-grow tracking-wide"
+                                onClick={() => setIsMenuOpen(false)}
+                             >
+                                {item.title}
+                             </Link>
+                             <ChevronDown size={14} className="ml-1 lg:block hidden group-hover:rotate-180 transition-transform duration-200 opacity-70" />
+                             <ChevronDown size={14} className="ml-1 lg:hidden opacity-70" />
+                        </div>
+                        
+                        {/* Dropdown Menu - Increased width (w-72) for better readability */}
+                        <div className="hidden lg:group-hover:block absolute left-0 top-full bg-white shadow-2xl rounded-b-lg w-72 z-50 animate-in fade-in slide-in-from-top-2 duration-200 border-t-4 border-secondary-500 ring-1 ring-black/5">
+                             <ul className="py-2">
+                                {item.children?.map(child => (
+                                    <li key={child.id}>
+                                        <Link 
+                                            to={child.path}
+                                            className="block px-4 py-3 text-sm font-medium text-gray-700 hover:bg-primary-50 hover:text-primary-700 border-l-4 border-transparent hover:border-primary-500 transition-all"
+                                        >
+                                            {child.title}
+                                        </Link>
+                                    </li>
+                                ))}
+                             </ul>
+                        </div>
+                        {/* Mobile Submenu */}
+                        <div className="lg:hidden pl-4 bg-black/20 border-l-2 border-white/10 ml-3 my-1">
+                            {item.children?.map(child => (
+                                <Link 
+                                    key={child.id}
+                                    to={child.path}
+                                    className="block px-3 py-2 text-xs text-gray-300 hover:text-white font-medium"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    {child.title}
+                                </Link>
+                            ))}
+                        </div>
+                    </>
+                  ) : (
+                    <Link 
+                        to={item.path} 
+                        className={`block px-3 py-3.5 text-[13px] uppercase font-bold border-b-4 border-transparent hover:bg-white/10 hover:border-secondary-400 transition-all tracking-wide
+                        ${(isActive || isHomeActive) ? 'bg-white/10 border-secondary-500 text-secondary-300' : 'text-gray-100'}
+                        `}
+                        onClick={() => setIsMenuOpen(false)}
+                    >
+                        {item.title}
+                    </Link>
+                  )}
                 </li>
               );
             })}
