@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
@@ -8,8 +7,6 @@ import HealthRecords from './pages/HealthRecords';
 import HanoiSystem from './pages/HanoiSystem';
 import EmergencyCenter from './pages/EmergencyCenter';
 import HealthConsultation from './pages/HealthConsultation';
-import Login from './pages/Login';
-import CreateNews from './pages/CreateNews';
 
 const App = () => {
   return (
@@ -17,10 +14,6 @@ const App = () => {
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
-          
-          {/* Admin & Auth Routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/admin/news/new" element={<CreateNews />} />
           
           {/* News Routes */}
           <Route path="/news/:categoryId" element={<NewsCategory />} />

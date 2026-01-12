@@ -2,12 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Lock, User, Eye, EyeOff, ArrowLeft, ShieldCheck, AlertCircle } from 'lucide-react';
+import { auth } from '../firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
@@ -17,24 +19,49 @@ const Login = () => {
     }
   }, [navigate]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
-    // Logic kiểm tra tài khoản theo yêu cầu: admin / 123456
-    setTimeout(() => {
-      if (username === 'admin' && password === '123456') {
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('userName', 'Quản trị viên');
-        // Kích hoạt sự kiện storage để các component khác biết
-        window.dispatchEvent(new Event('storage'));
-        navigate('/');
-      } else {
-        setError('Tên đăng nhập hoặc mật khẩu không chính xác.');
-        setIsLoading(false);
+    try {
+      // Tự động thêm domain nếu người dùng chỉ nhập username là 'admin'
+      const loginEmail = email.includes('@') ? email : `${email}@soyte.gov.vn`;
+      
+      const userCredential = await signInWithEmailAndPassword(auth, loginEmail, password);
+      const user = userCredential.user;
+
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('userName', user.email?.split('@')[0] || 'Quản trị viên');
+      
+      // Đồng bộ hóa trạng thái đăng nhập cho toàn ứng dụng
+      window.dispatchEvent(new Event('storage'));
+      navigate('/');
+    } catch (err: any) {
+      console.error("Firebase Login Error:", err.code, err.message);
+      
+      switch (err.code) {
+        case 'auth/invalid-credential':
+          setError('Tên đăng nhập hoặc mật khẩu không chính xác.');
+          break;
+        case 'auth/user-not-found':
+          setError('Tài khoản không tồn tại trên hệ thống.');
+          break;
+        case 'auth/wrong-password':
+          setError('Mật khẩu không chính xác.');
+          break;
+        case 'auth/too-many-requests':
+          setError('Tài khoản bị tạm khóa do nhập sai nhiều lần. Thử lại sau.');
+          break;
+        case 'auth/network-request-failed':
+          setError('Lỗi kết nối mạng. Vui lòng kiểm tra internet.');
+          break;
+        default:
+          setError('Lỗi hệ thống Firebase: ' + (err.message || 'Vui lòng thử lại.'));
       }
-    }, 1000);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -54,20 +81,20 @@ const Login = () => {
               alt="Logo Sở Y Tế" 
               className="w-20 h-20 mx-auto mb-4 drop-shadow-md bg-white rounded-full p-2"
             />
-            <h1 className="text-xl font-bold text-white uppercase tracking-wider">Đăng nhập Hệ thống</h1>
-            <p className="text-primary-100 text-sm mt-1 font-medium">Dành cho cán bộ Sở Y tế Hà Nội</p>
+            <h1 className="text-xl font-bold text-white uppercase tracking-wider">Hệ thống Xác thực</h1>
+            <p className="text-primary-100 text-sm mt-1 font-medium">Cổng thông tin nội bộ Sở Y tế</p>
           </div>
 
           <form onSubmit={handleLogin} className="p-8 space-y-5">
             {error && (
-              <div className="bg-red-50 border-l-4 border-red-500 p-4 flex items-center gap-3 text-red-700 text-sm animate-pulse">
+              <div className="bg-red-50 border-l-4 border-red-500 p-4 flex items-center gap-3 text-red-700 text-sm animate-shake">
                 <AlertCircle size={18} />
                 <p className="font-medium">{error}</p>
               </div>
             )}
 
             <div>
-              <label className="block text-xs font-bold text-gray-400 uppercase mb-2 tracking-widest">Tên đăng nhập</label>
+              <label className="block text-xs font-bold text-gray-400 uppercase mb-2 tracking-widest">Email / Tên đăng nhập</label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary-600 transition">
                   <User size={18} />
@@ -75,10 +102,10 @@ const Login = () => {
                 <input 
                   type="text" 
                   required
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="admin"
-                  className="block w-full pl-10 pr-3 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 focus:border-primary-500 transition text-sm"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="admin@soyte.gov.vn"
+                  className="block w-full pl-10 pr-3 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 focus:border-primary-500 transition text-sm font-medium"
                 />
               </div>
             </div>
@@ -97,7 +124,7 @@ const Login = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="123456"
+                  placeholder="••••••••"
                   className="block w-full pl-10 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 focus:border-primary-500 transition text-sm"
                 />
                 <button 
@@ -120,7 +147,7 @@ const Login = () => {
               {isLoading ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  ĐANG KIỂM TRA...
+                  ĐANG XÁC THỰC...
                 </>
               ) : 'ĐĂNG NHẬP NGAY'}
             </button>
@@ -128,7 +155,7 @@ const Login = () => {
 
           <div className="bg-gray-50 p-6 border-t border-gray-100 text-center">
              <p className="text-xs text-gray-400 font-medium italic">
-                Sử dụng tài khoản nội bộ do Trung tâm CNTT cấp phát.
+                Sử dụng hạ tầng Firebase: {auth.app.options.projectId}
              </p>
           </div>
         </div>

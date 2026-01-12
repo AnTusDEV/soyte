@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
   <head>
@@ -28,6 +29,15 @@
             },
             animation: {
               'bounce-slow': 'bounce 3s infinite',
+              'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
+            },
+            keyframes: {
+              shake: {
+                '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                '40%, 60%': { transform: 'translate3d(4px, 0, 0)' },
+              }
             }
           }
         }
@@ -38,20 +48,12 @@
       body {
         font-family: 'Roboto', sans-serif;
       }
-      /* Hide scrollbar for horizontal nav */
       .no-scrollbar::-webkit-scrollbar {
           display: none;
       }
       .no-scrollbar {
           -ms-overflow-style: none;
           scrollbar-width: none;
-      }
-      /* Map z-index fix */
-      .leaflet-pane {
-        z-index: 10;
-      }
-      .leaflet-top, .leaflet-bottom {
-        z-index: 20;
       }
     </style>
   <script type="importmap">
@@ -65,7 +67,10 @@
     "recharts": "https://esm.sh/recharts@2.12.7?external=react,react-dom",
     "lucide-react": "https://esm.sh/lucide-react@0.395.0?external=react",
     "leaflet": "https://esm.sh/leaflet@1.9.4",
-    "react-leaflet": "https://esm.sh/react-leaflet@4.2.1?external=react,react-dom,leaflet"
+    "react-leaflet": "https://esm.sh/react-leaflet@4.2.1?external=react,react-dom,leaflet",
+    "firebase/app": "https://esm.sh/firebase@10.7.1/app",
+    "firebase/auth": "https://esm.sh/firebase@10.7.1/auth",
+    "firebase/": "https://esm.sh/firebase@^12.7.0/"
   }
 }
 </script>

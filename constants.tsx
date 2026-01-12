@@ -212,8 +212,8 @@ export const MOCK_NEWS: NewsItem[] = [
     title: "Sở Y tế Hà Nội: Triển khai kế hoạch đảm bảo y tế phục vụ Tết Nguyên đán 2026",
     excerpt: "Giám đốc Sở Y tế yêu cầu các cơ sở khám chữa bệnh trực 24/24, chuẩn bị đầy đủ cơ số thuốc và phương án cấp cứu ngoại viện để phục vụ nhân dân đón Tết Bính Ngọ 2026...",
     date: "10/01/2026",
-    image: "https://images.unsplash.com/photo-1584362917165-526a968579e8?q=80&w=1000&auto=format&fit=crop", 
-    category: "Chỉ đạo điều hành",
+    image: "https://picsum.photos/seed/hanoi1/800/600", 
+    category: "Tiêu điểm",
     isFeatured: true
   },
   {
@@ -221,87 +221,132 @@ export const MOCK_NEWS: NewsItem[] = [
     title: "Tổng kết công tác Y tế năm 2025: Hà Nội hoàn thành 100% chỉ tiêu chuyển đổi số",
     excerpt: "Tại hội nghị tổng kết năm 2025, ngành Y tế Thủ đô được đánh giá cao nhờ việc đồng bộ hóa dữ liệu sức khỏe toàn dân và triển khai bệnh án điện tử tại tất cả các tuyến...",
     date: "05/01/2026",
-    image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=1000&auto=format&fit=crop",
-    category: "Tin tức - Sự kiện"
+    image: "https://picsum.photos/seed/hanoi2/800/600",
+    category: "Tiêu điểm"
   },
   {
     id: 3,
     title: "Cảnh báo gia tăng các bệnh đường hô hấp trong đợt rét đậm đầu năm 2026",
     excerpt: "CDC Hà Nội ghi nhận số ca mắc cúm A và viêm phổi tăng nhẹ tại các quận huyện ngoại thành do thời tiết chuyển lạnh sâu. Người dân cần chủ động giữ ấm và tiêm phòng...",
     date: "08/01/2026",
-    image: "https://images.unsplash.com/photo-1632053003050-2f928a38d601?q=80&w=1000&auto=format&fit=crop",
-    category: "Y tế dự phòng"
+    image: "https://picsum.photos/seed/hanoi3/800/600",
+    category: "Tiêu điểm"
   },
   {
     id: 4,
     title: "Bệnh viện Xanh Pôn phẫu thuật thành công ca ghép tạng thứ 100 trong năm 2025",
     excerpt: "Đánh dấu cột mốc quan trọng trong phát triển kỹ thuật cao, kíp mổ đã thực hiện thành công ca ghép thận từ người cho sống, bệnh nhân hồi phục tốt sau 1 tuần...",
     date: "28/12/2025",
-    image: "https://images.unsplash.com/photo-1551884170-09fb70a3a2ed?q=80&w=1000&auto=format&fit=crop",
-    category: "Y tế chuyên sâu"
+    image: "https://picsum.photos/seed/hanoi4/800/600",
+    category: "Tiêu điểm"
   },
   {
     id: 5,
-    title: "Tăng cường kiểm tra An toàn thực phẩm tại các lễ hội Xuân 2026",
-    excerpt: "Thành lập 05 đoàn kiểm tra liên ngành nhằm giám sát chặt chẽ các cơ sở kinh doanh thực phẩm quanh khu vực diễn ra lễ hội, kiên quyết xử lý vi phạm...",
-    date: "12/01/2026",
-    image: "https://images.unsplash.com/photo-1606787366850-de6330128bfc?q=80&w=1000&auto=format&fit=crop",
-    category: "An toàn thực phẩm"
-  },
-  {
-    id: 6,
-    title: "Hà Nội khánh thành thêm 03 trạm y tế phường đạt chuẩn Quốc gia giai đoạn mới",
-    excerpt: "Các trạm y tế mới tại quận Hoàng Mai và Long Biên được trang bị máy siêu âm, X-quang kỹ thuật số, nâng cao năng lực khám chữa bệnh ban đầu...",
-    date: "30/12/2025",
-    image: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=1000&auto=format&fit=crop",
-    category: "Y tế cơ sở"
-  },
-  {
-    id: 7,
-    title: "Cảnh báo ngộ độc rượu dịp cuối năm: Người dân cần thận trọng",
-    excerpt: "Khoa Chống độc các bệnh viện tiếp nhận nhiều ca ngộ độc Methanol trong tuần qua. Sở Y tế khuyến cáo người dân không sử dụng rượu không rõ nguồn gốc...",
-    date: "25/12/2025",
-    image: "https://images.unsplash.com/photo-1623674667230-22c608f5d023?q=80&w=1000&auto=format&fit=crop",
-    category: "Cảnh báo y tế"
-  },
-  {
-    id: 8,
-    title: "Chương trình 'Tết sum vầy - Xuân chia sẻ': Tặng quà bệnh nhân nghèo",
-    excerpt: "Công đoàn ngành Y tế Hà Nội tổ chức trao tặng 500 suất quà cho bệnh nhân có hoàn cảnh khó khăn đang điều trị tại các bệnh viện tuyến thành phố...",
-    date: "14/01/2026",
-    image: "https://images.unsplash.com/photo-1666214280557-f1b5022eb634?q=80&w=1000&auto=format&fit=crop",
-    category: "Gương người tốt"
-  },
-  {
-    id: 9,
-    title: "Hướng dẫn chăm sóc sức khỏe người cao tuổi trong những ngày Tết",
-    excerpt: "Chế độ dinh dưỡng hợp lý, kiểm soát huyết áp và đường huyết là những lưu ý quan trọng để người cao tuổi vui xuân đón Tết an toàn, khỏe mạnh...",
-    date: "11/01/2026",
-    image: "https://images.unsplash.com/photo-1504386106331-3e4e71712b38?q=80&w=1000&auto=format&fit=crop",
-    category: "Truyền thông GDSK"
-  },
-  {
-    id: 10,
-    title: "Kết quả chiến dịch tiêm vắc xin sởi - rubella bổ sung đợt cuối năm 2025",
-    excerpt: "Hơn 98% trẻ em trong độ tuổi rà soát đã được tiêm chủng đầy đủ, tạo miễn dịch cộng đồng vững chắc trước nguy cơ dịch bệnh mùa Đông Xuân...",
-    date: "20/12/2025",
-    image: "https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?q=80&w=1000&auto=format&fit=crop",
-    category: "Y tế dự phòng"
-  },
-  {
-    id: 11,
-    title: "Hệ thống cấp cứu 115 Hà Nội: Nâng cấp tổng đài thông minh, định vị chính xác",
-    excerpt: "Từ tháng 1/2026, Trung tâm 115 chính thức vận hành hệ thống điều phối xe cứu thương dựa trên AI, giúp rút ngắn thời gian tiếp cận hiện trường...",
-    date: "02/01/2026",
-    image: "https://images.unsplash.com/photo-1587351021759-3e566b92f1f3?q=80&w=1000&auto=format&fit=crop",
-    category: "Cải cách hành chính"
-  },
-  {
-    id: 12,
-    title: "Thông báo tuyển dụng viên chức ngành Y tế Hà Nội đợt 1 năm 2026",
-    excerpt: "Sở Y tế Hà Nội thông báo nhu cầu tuyển dụng 350 chỉ tiêu bác sĩ, điều dưỡng cho các bệnh viện mới thành lập và mở rộng quy mô...",
+    title: "Triển khai tiêm chủng mở rộng vắc xin 5 trong 1 đợt 1 năm 2026",
+    excerpt: "Sở Y tế Hà Nội thông báo kế hoạch tiêm chủng mở rộng cho trẻ em dưới 1 tuổi, đảm bảo an toàn và hiệu quả...",
     date: "15/01/2026",
-    image: "https://images.unsplash.com/photo-1581056771107-24ca5f033842?q=80&w=1000&auto=format&fit=crop",
-    category: "Thông báo"
+    image: "https://picsum.photos/seed/hanoi5/800/600",
+    category: "Tiêu điểm"
+  },
+];
+
+export const MOCK_VIDEOS = [
+  {
+    id: 'v1',
+    title: 'Bản tin Y tế Hà Nội: Toàn cảnh công tác phòng chống dịch tuần 1 tháng 1/2026',
+    duration: '05:30',
+    thumbnail: 'https://picsum.photos/seed/video1/800/450',
+    date: '07/01/2026'
+  },
+  {
+    id: 'v2',
+    title: 'Phóng sự: Những chiến sĩ áo trắng thầm lặng đêm Giao thừa Tết Bính Ngọ',
+    duration: '08:45',
+    thumbnail: 'https://picsum.photos/seed/video2/800/450',
+    date: '10/01/2026'
+  },
+  {
+    id: 'v3',
+    title: 'Hướng dẫn người dân sử dụng ứng dụng Hồ sơ sức khỏe điện tử',
+    duration: '03:15',
+    thumbnail: 'https://picsum.photos/seed/video3/800/450',
+    date: '02/01/2026'
+  },
+  {
+    id: 'v4',
+    title: 'Tọa đàm: Nâng cao chất lượng khám chữa bệnh tại y tế cơ sở',
+    duration: '15:20',
+    thumbnail: 'https://picsum.photos/seed/video4/800/450',
+    date: '28/12/2025'
+  },
+  {
+    id: 'v5',
+    title: 'Chuyên mục Sức khỏe: Phòng chống bệnh tiểu đường',
+    duration: '10:00',
+    thumbnail: 'https://picsum.photos/seed/video5/800/450',
+    date: '25/12/2025'
+  }
+];
+
+export const MOCK_CULTURE = [
+  {
+    id: 'c1',
+    title: 'Sôi nổi hội thi "Nét đẹp Văn hóa công sở ngành Y tế" chào xuân 2026',
+    date: '12/01/2026',
+    image: 'https://picsum.photos/seed/culture1/600/400'
+  },
+  {
+    id: 'c2',
+    title: 'Triển lãm ảnh "Thầy thuốc Hà Nội làm theo lời Bác" tại Phố đi bộ Hồ Gươm',
+    date: '05/01/2026',
+    image: 'https://picsum.photos/seed/culture2/600/400'
+  },
+  {
+    id: 'c3',
+    title: 'Chương trình nghệ thuật đặc biệt kỷ niệm ngày Thầy thuốc Việt Nam',
+    date: '15/01/2026',
+    image: 'https://picsum.photos/seed/culture3/600/400'
+  }
+];
+
+export const MOCK_SPORTS = [
+  {
+    id: 's1',
+    title: 'Giải bóng đá Cup Sức khỏe Thủ đô 2026: Bệnh viện Thanh Nhàn vô địch',
+    date: '14/01/2026',
+    image: 'https://picsum.photos/seed/sport1/600/400'
+  },
+  {
+    id: 's2',
+    title: 'Hội thao ngành Y tế: Hơn 2.000 vận động viên tham gia chạy việt dã',
+    date: '08/01/2026',
+    image: 'https://picsum.photos/seed/sport2/600/400'
+  },
+  {
+    id: 's3',
+    title: 'Phong trào rèn luyện sức khỏe "Mỗi người dân đi bộ 10.000 bước mỗi ngày"',
+    date: '01/01/2026',
+    image: 'https://picsum.photos/seed/sport3/600/400'
+  }
+];
+
+export const MOCK_INTERNATIONAL = [
+  {
+    id: 'i1',
+    title: 'WHO cảnh báo biến chủng cúm mới: Việt Nam chủ động giám sát ngay từ cửa khẩu',
+    date: '13/01/2026',
+    image: 'https://picsum.photos/seed/inter1/600/400'
+  },
+  {
+    id: 'i2',
+    title: 'Hợp tác y tế Việt - Nhật: Chuyển giao công nghệ phẫu thuật nội soi bằng Robot',
+    date: '09/01/2026',
+    image: 'https://picsum.photos/seed/inter2/600/400'
+  },
+  {
+    id: 'i3',
+    title: 'Các nước ASEAN thống nhất cơ chế "Hộ chiếu vắc xin" điện tử phiên bản 2.0',
+    date: '28/12/2025',
+    image: 'https://picsum.photos/seed/inter3/600/400'
   }
 ];
