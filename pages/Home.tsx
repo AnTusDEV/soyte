@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Activity, Calendar, Phone, Play, Volume2, Globe, Trophy, Music, Video, Radio, List, ChevronRight } from 'lucide-react';
@@ -170,7 +171,7 @@ const Home = () => {
                      <h3 className="text-xl font-bold text-red-600 uppercase flex items-center">
                        <Radio className="mr-2" size={20}/> Truyền hình - Phát thanh
                      </h3>
-                     <Link to="/media" className="text-xs text-gray-500 hover:text-red-600">Xem tất cả >></Link>
+                     <Link to="/media" className="text-xs text-gray-500 hover:text-red-600">Xem tất cả {'>>'}</Link>
                  </div>
 
                  {/* Dark Media Container */}
@@ -306,7 +307,7 @@ const Home = () => {
                     </ul>
                 </div>
 
-                {/* Column 3: QUỐC TẾ */}
+                {/* Column 2: QUỐC TẾ */}
                 <div className="pt-6 md:pt-0 md:pl-8">
                     <div className="mb-4 flex items-center gap-2">
                         <Globe className="text-blue-500" size={20}/>

@@ -1,9 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Lock, User, Eye, EyeOff, ArrowLeft, ShieldCheck, AlertCircle } from 'lucide-react';
-import { auth } from '../firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -24,42 +21,24 @@ const Login = () => {
     setError('');
     setIsLoading(true);
 
-    try {
-      // Tự động thêm domain nếu người dùng chỉ nhập username là 'admin'
-      const loginEmail = email.includes('@') ? email : `${email}@soyte.gov.vn`;
-      
-      const userCredential = await signInWithEmailAndPassword(auth, loginEmail, password);
-      const user = userCredential.user;
+    // Mô phỏng độ trễ của mạng
+    await new Promise(resolve => setTimeout(resolve, 800));
 
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('userName', user.email?.split('@')[0] || 'Quản trị viên');
-      
-      // Đồng bộ hóa trạng thái đăng nhập cho toàn ứng dụng
-      window.dispatchEvent(new Event('storage'));
-      navigate('/');
-    } catch (err: any) {
-      console.error("Firebase Login Error:", err.code, err.message);
-      
-      switch (err.code) {
-        case 'auth/invalid-credential':
-          setError('Tên đăng nhập hoặc mật khẩu không chính xác.');
-          break;
-        case 'auth/user-not-found':
-          setError('Tài khoản không tồn tại trên hệ thống.');
-          break;
-        case 'auth/wrong-password':
-          setError('Mật khẩu không chính xác.');
-          break;
-        case 'auth/too-many-requests':
-          setError('Tài khoản bị tạm khóa do nhập sai nhiều lần. Thử lại sau.');
-          break;
-        case 'auth/network-request-failed':
-          setError('Lỗi kết nối mạng. Vui lòng kiểm tra internet.');
-          break;
-        default:
-          setError('Lỗi hệ thống Firebase: ' + (err.message || 'Vui lòng thử lại.'));
+    // Logic đăng nhập theo "cách cũ" (Kiểm tra cứng cho bản demo)
+    if (email === 'admin' || email === 'admin@soyte.gov.vn') {
+      if (password === '123456') {
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('userName', 'Quản trị viên');
+        
+        // Thông báo cho toàn ứng dụng về trạng thái mới
+        window.dispatchEvent(new Event('storage'));
+        navigate('/');
+      } else {
+        setError('Mật khẩu không chính xác. Vui lòng thử lại.');
+        setIsLoading(false);
       }
-    } finally {
+    } else {
+      setError('Tài khoản không tồn tại trên hệ thống.');
       setIsLoading(false);
     }
   };
@@ -147,15 +126,15 @@ const Login = () => {
               {isLoading ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  ĐANG XÁC THỰC...
+                  ĐANG KIỂM TRA...
                 </>
-              ) : 'ĐĂNG NHẬP NGAY'}
+              ) : 'ĐĂNG NHẬP HỆ THỐNG'}
             </button>
           </form>
 
           <div className="bg-gray-50 p-6 border-t border-gray-100 text-center">
              <p className="text-xs text-gray-400 font-medium italic">
-                Sử dụng hạ tầng Firebase: {auth.app.options.projectId}
+                Sử dụng phương thức xác thực mô phỏng nội bộ
              </p>
           </div>
         </div>
