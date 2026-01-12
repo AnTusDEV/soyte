@@ -1,20 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
   Activity,
-  Calendar,
   Phone,
   Play,
-  Volume2,
   Globe,
   Trophy,
   Music,
-  Video,
   Radio,
   List,
-  ChevronRight,
 } from "lucide-react";
+
+import anh1 from "./image/anh1.png";
+import anh2 from "./image/anh2.jpg";
+
 import {
   SERVICE_CATEGORIES,
   MOCK_NEWS,
@@ -24,11 +24,34 @@ import {
   MOCK_INTERNATIONAL,
 } from "../constants";
 
-const Home = () => {
-  const featuredNews = MOCK_NEWS[0];
+const Home = () => { 
   const newsList = MOCK_NEWS.slice(1, 5); // Take more items for the list
   const [activeChannel, setActiveChannel] = useState("H1");
   const [currentVideo, setCurrentVideo] = useState(MOCK_VIDEOS[0]);
+
+  const images = [anh1, anh2];
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) =>
+        prevIndex === images.length - 1 ? 0 : prevIndex + 1
+      );
+    }, 5000); // Change image every 5 seconds
+    return () => clearInterval(interval);
+  }, [images.length]);
+
+  const goToPrevious = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === 0 ? images.length - 1 : prevIndex - 1
+    );
+  };
+
+  const goToNext = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === images.length - 1 ? 0 : prevIndex + 1
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 relative font-sans">
@@ -127,8 +150,32 @@ const Home = () => {
         </div>
       </section>
 
+      {/* Image Slider */}
+      <section className="relative w-full h-[200px] overflow-hidden container mx-auto px-4">
+        <img
+          src={images[currentImageIndex]}
+          alt="Slide"
+          className="w-full h-full object-cover transition-opacity duration-1000 ease-in-out"
+        />
+        <div className="absolute inset-0 flex items-center justify-between p-4">
+          <button
+            onClick={goToPrevious}
+            className="bg-black/50 text-white p-2 rounded-full hover:bg-black/75 transition"
+          >
+            ←
+          </button>
+          <button
+            onClick={goToNext}
+            className="bg-black/50 text-white p-2 rounded-full hover:bg-black/75 transition"
+          >
+            →
+          </button>
+        </div>
+      </section>
+
       {/* Service Menu Grid */}
       <section className="py-6 relative z-20 bg-gray-50/50">
+        {" "}
         <div className="container mx-auto px-4">
           <div className="text-center mb-6">
             <h3 className="text-2xl font-bold text-primary-900 mb-2 uppercase">

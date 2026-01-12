@@ -1,5 +1,11 @@
 import { LucideIcon } from "lucide-react";
 
+declare global {
+  interface Window {
+    dashboard: any; // Declare the global dashboard object
+  }
+}
+
 export interface MenuItem {
   id: string;
   title: string;
