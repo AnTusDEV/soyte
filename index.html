@@ -76,5 +76,13 @@
   <body class="bg-gray-50 text-slate-800 antialiased">
     <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
+   <script src="https://datahub.hanoi.gov.vn/js/visualcommon/publish-dashboard-drag.js"></script>
+          <script>
+            dashboard.setUnit('');
+            dashboard.setUser('');
+            dashboard.domReady(() => {
+              dashboard.viewDashboard('https://datahub.hanoi.gov.vn/databox/ttksbt/tinyroute/1EBC83D81249F5F1.cpx?secrd=zZlJb2VFjTYo0sQ8vu0Tmk2K87v92uRv5VtEQsbYeQHWoRD9KmJ3AiWiHLfkBh1m', 'view-design');
+            });
+          </script>
 </body>
 </html>
