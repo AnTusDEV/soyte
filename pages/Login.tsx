@@ -21,24 +21,22 @@ const Login = () => {
     setError('');
     setIsLoading(true);
 
-    // Mô phỏng độ trễ của mạng
     await new Promise(resolve => setTimeout(resolve, 800));
 
-    // Logic đăng nhập theo "cách cũ" (Kiểm tra cứng cho bản demo)
     if (email === 'admin' || email === 'admin@soyte.gov.vn') {
       if (password === '123456') {
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('userName', 'Quản trị viên');
         
-        // Thông báo cho toàn ứng dụng về trạng thái mới
-        window.dispatchEvent(new Event('storage'));
+        // Phát sự kiện tùy chỉnh để Header cập nhật ngay lập tức
+        window.dispatchEvent(new Event('auth-change'));
         navigate('/');
       } else {
-        setError('Mật khẩu không chính xác. Vui lòng thử lại.');
+        setError('Mật khẩu không chính xác.');
         setIsLoading(false);
       }
     } else {
-      setError('Tài khoản không tồn tại trên hệ thống.');
+      setError('Tài khoản không tồn tại.');
       setIsLoading(false);
     }
   };
@@ -83,7 +81,7 @@ const Login = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@soyte.gov.vn"
+                  placeholder="admin"
                   className="block w-full pl-10 pr-3 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 focus:border-primary-500 transition text-sm font-medium"
                 />
               </div>
@@ -134,7 +132,7 @@ const Login = () => {
 
           <div className="bg-gray-50 p-6 border-t border-gray-100 text-center">
              <p className="text-xs text-gray-400 font-medium italic">
-                Sử dụng phương thức xác thực mô phỏng nội bộ
+                Sử dụng tài khoản demo: <b>admin / 123456</b>
              </p>
           </div>
         </div>
