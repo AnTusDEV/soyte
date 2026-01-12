@@ -267,7 +267,7 @@ const Home = () => {
                 <div className="pt-6 md:pt-0">
                     <div className="mb-4 flex items-center gap-2">
                         <Music className="text-pink-600" size={20}/>
-                        <h3 className="text-lg font-bold text-primary-900 uppercase">Văn hóa</h3>
+                        <h3 className="text-lg font-bold text-primary-900 uppercase">Khám bệnh - chữa bệnh</h3>
                     </div>
                     {/* First item big */}
                     <div className="group mb-4 cursor-pointer">
@@ -290,7 +290,7 @@ const Home = () => {
                 <div className="pt-6 md:pt-0 md:pl-8">
                     <div className="mb-4 flex items-center gap-2">
                         <Trophy className="text-orange-500" size={20}/>
-                        <h3 className="text-lg font-bold text-primary-900 uppercase">Thể thao</h3>
+                        <h3 className="text-lg font-bold text-primary-900 uppercase">Phòng bệnh - Nâng cao sức khỏe</h3>
                     </div>
                     <div className="group mb-4 cursor-pointer">
                         <div className="aspect-[3/2] rounded overflow-hidden mb-2 bg-gray-100">
@@ -311,7 +311,72 @@ const Home = () => {
                 <div className="pt-6 md:pt-0 md:pl-8">
                     <div className="mb-4 flex items-center gap-2">
                         <Globe className="text-blue-500" size={20}/>
-                        <h3 className="text-lg font-bold text-primary-900 uppercase">Quốc tế</h3>
+                        <h3 className="text-lg font-bold text-primary-900 uppercase">Bảo trợ xã hội</h3>
+                    </div>
+                    <div className="group mb-4 cursor-pointer">
+                        <div className="aspect-[3/2] rounded overflow-hidden mb-2 bg-gray-100">
+                            <img src={MOCK_INTERNATIONAL[0].image} alt={MOCK_INTERNATIONAL[0].title} className="w-full h-full object-cover group-hover:scale-105 transition"/>
+                        </div>
+                        <h4 className="font-bold text-gray-800 leading-snug group-hover:text-blue-600">{MOCK_INTERNATIONAL[0].title}</h4>
+                    </div>
+                    <ul className="space-y-3">
+                        {MOCK_INTERNATIONAL.slice(1).map(item => (
+                            <li key={item.id} className="text-sm text-gray-600 border-t border-gray-100 pt-2 hover:text-blue-600 cursor-pointer line-clamp-2">
+                                • {item.title}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+
+                {/* Column 1: VĂN HÓA */}
+                <div className="pt-6 md:pt-0">
+                    <div className="mb-4 flex items-center gap-2">
+                        <Music className="text-pink-600" size={20}/>
+                        <h3 className="text-lg font-bold text-primary-900 uppercase">Chuyển đổi số y tế</h3>
+                    </div>
+                    {/* First item big */}
+                    <div className="group mb-4 cursor-pointer">
+                        <div className="aspect-[3/2] rounded overflow-hidden mb-2 bg-gray-100">
+                            <img src={MOCK_CULTURE[0].image} alt={MOCK_CULTURE[0].title} className="w-full h-full object-cover group-hover:scale-105 transition"/>
+                        </div>
+                        <h4 className="font-bold text-gray-800 leading-snug group-hover:text-pink-600">{MOCK_CULTURE[0].title}</h4>
+                    </div>
+                    {/* List */}
+                    <ul className="space-y-3">
+                        {MOCK_CULTURE.slice(1).map(item => (
+                            <li key={item.id} className="text-sm text-gray-600 border-t border-gray-100 pt-2 hover:text-pink-600 cursor-pointer line-clamp-2">
+                                • {item.title}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+
+                {/* Column 2: THỂ THAO */}
+                <div className="pt-6 md:pt-0 md:pl-8">
+                    <div className="mb-4 flex items-center gap-2">
+                        <Trophy className="text-orange-500" size={20}/>
+                        <h3 className="text-lg font-bold text-primary-900 uppercase">Chính sách y tế - Bảo hiểm y tế</h3>
+                    </div>
+                    <div className="group mb-4 cursor-pointer">
+                        <div className="aspect-[3/2] rounded overflow-hidden mb-2 bg-gray-100">
+                            <img src={MOCK_SPORTS[0].image} alt={MOCK_SPORTS[0].title} className="w-full h-full object-cover group-hover:scale-105 transition"/>
+                        </div>
+                        <h4 className="font-bold text-gray-800 leading-snug group-hover:text-orange-600">{MOCK_SPORTS[0].title}</h4>
+                    </div>
+                    <ul className="space-y-3">
+                        {MOCK_SPORTS.slice(1).map(item => (
+                            <li key={item.id} className="text-sm text-gray-600 border-t border-gray-100 pt-2 hover:text-orange-600 cursor-pointer line-clamp-2">
+                                • {item.title}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+
+                {/* Column 2: QUỐC TẾ */}
+                <div className="pt-6 md:pt-0 md:pl-8">
+                    <div className="mb-4 flex items-center gap-2">
+                        <Globe className="text-blue-500" size={20}/>
+                        <h3 className="text-lg font-bold text-primary-900 uppercase">Gương người tốt - việc tốt</h3>
                     </div>
                     <div className="group mb-4 cursor-pointer">
                         <div className="aspect-[3/2] rounded overflow-hidden mb-2 bg-gray-100">
