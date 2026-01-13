@@ -1,20 +1,21 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Search, 
   MapPin, 
   Phone, 
-  Navigation, 
-  Building2, 
-  Stethoscope, 
+  Navigation,  
   Activity, 
   Info,
-  X 
+  X,
+  HeartPulse,
+  Users,
+  Building, 
 } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import L from 'leaflet';
 
-// Fix for default Leaflet icon in React
+// Fix for default Leaflet icon
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -22,256 +23,217 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-// Hanoi Geofencing & Center
 const HANOI_CENTER: [number, number] = [21.0285, 105.8542];
-const HANOI_BOUNDS: L.LatLngBoundsExpression = [
-  [20.53, 105.28], // Southwest (Phu Xuyen/Ung Hoa area)
-  [21.39, 106.02]  // Northeast (Soc Son area)
-];
+const HANOI_BOUNDS: L.LatLngBoundsExpression = [[20.53, 105.28], [21.39, 106.02]];
 
-// Custom DivIcons for Map Markers
-const createCustomIcon = (type: string) => {
+// Custom Marker Icon with scaling effect
+const createCustomIcon = (type: string, isSelected: boolean = false) => {
   let colorClass = 'bg-gray-500';
   if (type === 'BV') colorClass = 'bg-red-600';
-  if (type === 'TTYT') colorClass = 'bg-blue-600';
-  if (type === 'TYT') colorClass = 'bg-green-600';
+  if (type === 'TT') colorClass = 'bg-blue-600';
+  if (type === 'BT') colorClass = 'bg-emerald-600';
+  if (type === 'PB') colorClass = 'bg-violet-600';
+
+  const size = isSelected ? 'w-10 h-10' : 'w-7 h-7';
+  const ring = isSelected ? 'ring-4 ring-white shadow-[0_0_20px_rgba(0,0,0,0.4)]' : 'border-2 border-white shadow-lg';
+  const zIndex = isSelected ? 'z-[1000]' : 'z-10';
 
   return L.divIcon({
-    className: 'custom-map-marker',
-    html: `<div class="${colorClass} w-6 h-6 rounded-full border-2 border-white shadow-lg flex items-center justify-center transition-transform hover:scale-125">
-            <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+    className: `custom-map-marker ${zIndex}`,
+    html: `<div class="${colorClass} ${size} ${ring} rounded-full flex items-center justify-center transition-all duration-300 ease-in-out">
+            <div class="w-1.5 h-1.5 bg-white rounded-full ${isSelected ? 'animate-ping' : ''}"></div>
            </div>`,
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
-    popupAnchor: [0, -12]
+    iconSize: isSelected ? [40, 40] : [28, 28],
+    iconAnchor: isSelected ? [20, 20] : [14, 14],
   });
 };
 
 interface Facility {
-  id: number;
+  id: string;
   name: string;
-  type: 'BV' | 'TTYT' | 'TYT';
+  type: 'BV' | 'TT' | 'BT' | 'PB'; 
   address: string;
   phone: string;
-  image: string;
-  coords: [number, number]; // Lat, Lng
+  coords: [number, number];
   description: string;
+  category: string;
 }
 
-const FACILITIES: Facility[] = [
-  {
-    id: 1,
-    name: "Bệnh viện Đa khoa Xanh Pôn",
-    type: "BV",
-    address: "12 Chu Văn An, Quận Ba Đình, Hà Nội",
-    phone: "024 3823 3075",
-    image: "https://picsum.photos/400/250?random=1",
-    coords: [21.0318, 105.8396],
-    description: "Bệnh viện hạng I của Thành phố Hà Nội, chuyên khoa đầu ngành về Ngoại khoa, Nhi khoa, Gây mê hồi sức."
-  },
-  {
-    id: 2,
-    name: "Bệnh viện Thanh Nhàn",
-    type: "BV",
-    address: "42 Thanh Nhàn, Hai Bà Trưng, Hà Nội",
-    phone: "024 3971 4363",
-    image: "https://picsum.photos/400/250?random=2",
-    coords: [21.0028, 105.8569],
-    description: "Bệnh viện đa khoa hạng I, mũi nhọn về Nội khoa, Hồi sức cấp cứu và Ung bướu."
-  },
-  {
-    id: 3,
-    name: "Trung tâm Y tế Quận Hoàn Kiếm",
-    type: "TTYT",
-    address: "26 Lương Ngọc Quyến, Hàng Buồm, Hoàn Kiếm",
-    phone: "024 3825 2445",
-    image: "https://picsum.photos/400/250?random=3",
-    coords: [21.0345, 105.8521],
-    description: "Đơn vị y tế dự phòng và chăm sóc sức khỏe ban đầu cho người dân quận trung tâm."
-  },
-  {
-    id: 4,
-    name: "Bệnh viện Phụ Sản Hà Nội",
-    type: "BV",
-    address: "929 Đ. La Thành, Ngọc Khánh, Ba Đình",
-    phone: "1900 6922",
-    image: "https://picsum.photos/400/250?random=4",
-    coords: [21.0268, 105.8099],
-    description: "Bệnh viện chuyên khoa hạng I của thành phố trong lĩnh vực Sản Phụ Khoa và Kế hoạch hóa gia đình."
-  },
-  {
-    id: 5,
-    name: "Trạm Y tế Phường Hàng Bài",
-    type: "TYT",
-    address: "15 Vọng Đức, Hàng Bài, Hoàn Kiếm",
-    phone: "024 3825 4321",
-    image: "https://picsum.photos/400/250?random=5",
-    coords: [21.0221, 105.8505],
-    description: "Trạm y tế cơ sở thực hiện tiêm chủng mở rộng và sơ cấp cứu ban đầu."
-  },
-  {
-    id: 6,
-    name: "Bệnh viện Tim Hà Nội",
-    type: "BV",
-    address: "92 Trần Hưng Đạo, Cửa Nam, Hoàn Kiếm",
-    phone: "024 3942 2430",
-    image: "https://picsum.photos/400/250?random=6",
-    coords: [21.0245, 105.8432],
-    description: "Bệnh viện chuyên khoa đầu ngành Tim mạch của Thủ đô Hà Nội."
-  },
-  {
-    id: 7,
-    name: "Trung tâm Y tế Quận Đống Đa",
-    type: "TTYT",
-    address: "107 Tôn Đức Thắng, Hàng Bột, Đống Đa",
-    phone: "024 3511 2345",
-    image: "https://picsum.photos/400/250?random=7",
-    coords: [21.0263, 105.8341],
-    description: "Trung tâm y tế thực hiện chức năng y tế dự phòng, dân số và khám chữa bệnh."
-  },
-  {
-    id: 8,
-    name: "Trạm Y tế Phường Láng Hạ",
-    type: "TYT",
-    address: "Ngõ 5 Láng Hạ, Đống Đa, Hà Nội",
-    phone: "024 3835 1234",
-    image: "https://picsum.photos/400/250?random=8",
-    coords: [21.0152, 105.8165],
-    description: "Chăm sóc sức khỏe nhân dân trên địa bàn phường Láng Hạ."
-  }
+const ALL_FACILITIES: Facility[] = [
+  // 1. CÁC PHÒNG VÀ TƯƠNG ĐƯƠNG THUỘC SỞ (Trụ sở số 4 Sơn Tây)
+  ...[
+    { name: "Văn phòng Sở", id: "pb-1" },
+    { name: "Phòng Tổ chức cán bộ", id: "pb-2" },
+    { name: "Phòng Kế hoạch – Tài chính", id: "pb-3" },
+    { name: "Phòng Nghiệp vụ Y", id: "pb-4" },
+    { name: "Phòng Nghiệp vụ Dược", id: "pb-5" },
+    { name: "Phòng Quản lý BHYT và CNTT", id: "pb-6" },
+    { name: "Phòng Bảo trợ xã hội", id: "pb-7" },
+    { name: "Phòng Kiểm tra lĩnh vực y tế", id: "pb-8" },
+    { name: "Chi cục An toàn vệ sinh thực phẩm", id: "cc-1" },
+    { name: "Chi cục Dân số, Trẻ em và PC tệ nạn xã hội", id: "cc-2" }
+  ].map((item, i) => ({
+    id: item.id,
+    name: item.name,
+    type: 'PB' as const,
+    category: i < 8 ? 'Phòng ban thuộc Sở' : 'Chi cục thuộc Sở',
+    address: 'Số 04 Sơn Tây, Phường Điện Biên, Quận Ba Đình, Hà Nội',
+    phone: '024 3998 5765',
+    coords: [21.0312 + (i * 0.00005), 105.8315 + (i * 0.00005)] as [number, number],
+    description: 'Cơ quan tham mưu, giúp việc cho Giám đốc Sở trong công tác quản lý nhà nước về y tế trên địa bàn Thủ đô.'
+  })),
+
+  // 3a. KHỐI BỆNH VIỆN (42 đơn vị)
+  { id: 'bv-1', name: 'Bệnh viện đa khoa Xanh Pôn', type: 'BV', category: 'Bệnh viện Hạng I', address: 'Số 12 Chu Văn An, Quận Ba Đình, Hà Nội', phone: '024 3823 3075', coords: [21.0318, 105.8396], description: 'Bệnh viện đa khoa đầu ngành Ngoại khoa và Nhi khoa của Thủ đô.' },
+  { id: 'bv-2', name: 'Bệnh viện Thanh Nhàn', type: 'BV', category: 'Bệnh viện Hạng I', address: 'Số 42 Thanh Nhàn, Quận Hai Bà Trưng, Hà Nội', phone: '024 3971 4363', coords: [21.0028, 105.8569], description: 'Bệnh viện đa khoa hạng I, mũi nhọn về Nội khoa và hồi sức cấp cứu.' },
+  { id: 'bv-3', name: 'Bệnh viện đa khoa Đức Giang', type: 'BV', category: 'Bệnh viện Hạng I', address: 'Số 54 Trường Lâm, Quận Long Biên, Hà Nội', phone: '024 3827 1515', coords: [21.0528, 105.8969], description: 'Cơ sở y tế hạng I khu vực phía Đông thành phố.' },
+  { id: 'bv-4', name: 'Bệnh viện đa khoa Hà Đông', type: 'BV', category: 'Bệnh viện Hạng I', address: 'Số 02 Bế Văn Đàn, Quận Hà Đông, Hà Nội', phone: '024 3382 4220', coords: [20.9721, 105.7765], description: 'Bệnh viện đa khoa hạng I khu vực phía Tây Nam Thủ đô.' },
+  { id: 'bv-5', name: 'Bệnh viện đa khoa Đống Đa', type: 'BV', category: 'Bệnh viện Hạng I', address: 'Số 180 Nguyễn Lương Bằng, Quận Đống Đa, Hà Nội', phone: '024 3851 7140', coords: [21.0125, 105.8285], description: 'Bệnh viện đầu ngành về Truyền nhiễm và các bệnh nhiệt đới.' },
+  { id: 'bv-6', name: 'Bệnh viện đa khoa Sơn Tây', type: 'BV', category: 'Bệnh viện Hạng I', address: 'Số 304A Lê Lợi, Thị xã Sơn Tây, Hà Nội', phone: '024 3383 2341', coords: [21.1415, 105.5021], description: 'Bệnh viện đa khoa hạng I phục vụ nhân dân khu vực phía Tây thành phố.' },
+  { id: 'bv-7', name: 'Bệnh viện Phụ sản Hà Nội', type: 'BV', category: 'Bệnh viện Chuyên khoa', address: 'Số 929 La Thành, Quận Ba Đình, Hà Nội', phone: '1900 6922', coords: [21.0268, 105.8099], description: 'Bệnh viện chuyên khoa Sản phụ khoa hạng I, đầu ngành sản phụ khoa Thủ đô.' },
+  { id: 'bv-8', name: 'Bệnh viện Tim Hà Nội', type: 'BV', category: 'Bệnh viện Chuyên khoa', address: 'Số 92 Trần Hưng Đạo, Quận Hoàn Kiếm, Hà Nội', phone: '024 3942 2430', coords: [21.0245, 105.8432], description: 'Bệnh viện chuyên khoa Tim mạch tuyến cuối của thành phố.' },
+  { id: 'bv-9', name: 'Bệnh viện Ung bướu Hà Nội', type: 'BV', category: 'Bệnh viện Chuyên khoa', address: 'Số 42A Thanh Nhàn, Quận Hai Bà Trưng, Hà Nội', phone: '024 3821 7997', coords: [21.0035, 105.8575], description: 'Bệnh viện chuyên khoa Ung thư hạng I.' },
+  { id: 'bv-10', name: 'Bệnh viện Thận Hà Nội', type: 'BV', category: 'Bệnh viện Chuyên khoa', address: 'Số 70 Nguyễn Lương Bằng, Quận Đống Đa, Hà Nội', phone: '024 3513 4922', coords: [21.0118, 105.8275], description: 'Bệnh viện chuyên khoa Thận và lọc máu hàng đầu.' },
+  { id: 'bv-11', name: 'Bệnh viện Mắt Hà Nội', type: 'BV', category: 'Bệnh viện Chuyên khoa', address: 'Số 37 Hai Bà Trưng, Quận Hoàn Kiếm, Hà Nội', phone: '024 3825 2125', coords: [21.0255, 105.8521], description: 'Chuyên khoa Mắt đầu ngành thành phố.' },
+  { id: 'bv-12', name: 'Bệnh viện Da liễu Hà Nội', type: 'BV', category: 'Bệnh viện Chuyên khoa', address: 'Số 79B Nguyễn Khuyến, Quận Đống Đa, Hà Nội', phone: '024 3825 2588', coords: [21.0289, 105.8365], description: 'Điều trị các bệnh lý về da và thẩm mỹ da liễu.' },
+  
+  // Các BV Huyện (Mô phỏng vị trí theo địa giới hành chính)
+  { id: 'bv-h1', name: 'Bệnh viện đa khoa huyện Ba Vì', type: 'BV', category: 'Bệnh viện Huyện', address: 'Thị trấn Tây Đằng, Huyện Ba Vì, Hà Nội', phone: '024 3386 3144', coords: [21.2352, 105.4125], description: 'Phục vụ khám chữa bệnh cho nhân dân huyện Ba Vì.' },
+  { id: 'bv-h2', name: 'Bệnh viện đa khoa huyện Phú Xuyên', type: 'BV', category: 'Bệnh viện Huyện', address: 'Thị trấn Phú Xuyên, Huyện Phú Xuyên, Hà Nội', phone: '024 3385 4252', coords: [20.7385, 105.9012], description: 'Cơ sở y tế khu vực cửa ngõ phía Nam Thủ đô.' },
+  { id: 'bv-h3', name: 'Bệnh viện đa khoa huyện Sóc Sơn', type: 'BV', category: 'Bệnh viện Huyện', address: 'Thị trấn Sóc Sơn, Huyện Sóc Sơn, Hà Nội', phone: '024 3885 1251', coords: [21.2685, 105.8512], description: 'Bệnh viện đa khoa hạng II khu vực phía Bắc.' },
+  { id: 'bv-h4', name: 'Bệnh viện đa khoa huyện Mỹ Đức', type: 'BV', category: 'Bệnh viện Huyện', address: 'Thị trấn Đại Nghĩa, Huyện Mỹ Đức, Hà Nội', phone: '024 3384 7212', coords: [20.7125, 105.7425], description: 'Bệnh viện huyện phục vụ khu vực phía Tây Nam.' },
+  
+  // 3b. KHỐI TRUNG TÂM CHUYÊN KHOA (5 đơn vị)
+  { id: 'tt-1', name: 'Trung tâm Kiểm soát bệnh tật (CDC) Hà Nội', type: 'TT', category: 'Trung tâm chuyên khoa', address: 'Số 70 Nguyễn Chí Thanh, Quận Đống Đa, Hà Nội', phone: '024 3834 3520', coords: [21.0225, 105.8085], description: 'Đơn vị đầu ngành về y tế dự phòng và kiểm soát dịch bệnh.' },
+  { id: 'tt-2', name: 'Trung tâm Cấp cứu 115 Hà Nội', type: 'TT', category: 'Trung tâm chuyên khoa', address: 'Số 11 Phan Chu Trinh, Quận Hoàn Kiếm, Hà Nội', phone: '115', coords: [21.0215, 105.8565], description: 'Hệ thống cấp cứu ngoại viện chuyên nghiệp toàn thành phố.' },
+  { id: 'tt-3', name: 'Trung tâm Kiểm nghiệm thuốc, mỹ phẩm, thực phẩm', type: 'TT', category: 'Trung tâm chuyên khoa', address: 'Số 07 Đặng Tiến Đông, Quận Đống Đa, Hà Nội', phone: '024 3851 1212', coords: [21.0115, 105.8215], description: 'Kiểm tra, giám sát chất lượng dược phẩm, thực phẩm.' },
+  
+  // 3c. KHỐI CƠ SỞ TRỢ GIÚP XÃ HỘI (11 đơn vị)
+  { id: 'bt-1', name: 'Làng trẻ em SOS Hà Nội', type: 'BT', category: 'Cơ sở bảo trợ', address: 'Số 02 Doãn Kế Thiện, Quận Cầu Giấy, Hà Nội', phone: '024 3764 4022', coords: [21.0385, 105.7812], description: 'Nuôi dưỡng và chăm sóc trẻ em mồ côi, có hoàn cảnh đặc biệt.' },
+  { id: 'bt-2', name: 'Làng trẻ em Birla Hà Nội', type: 'BT', category: 'Cơ sở bảo trợ', address: 'Số 04 Doãn Kế Thiện, Quận Cầu Giấy, Hà Nội', phone: '024 3764 4022', coords: [21.0392, 105.7825], description: 'Cơ sở chăm sóc trẻ em mồ côi uy tín của thành phố.' },
+  { id: 'bt-3', name: 'Trung tâm Bảo trợ xã hội 3 Hà Nội', type: 'BT', category: 'Cơ sở bảo trợ', address: 'Miêu Nha, Tây Mỗ, Quận Nam Từ Liêm, Hà Nội', phone: '024 3839 0368', coords: [21.0085, 105.7412], description: 'Chăm sóc và nuôi dưỡng người già cô đơn và trẻ em lang thang.' },
 ];
 
-// Component to fly to location on click
-const MapFlyTo = ({ coords }: { coords: [number, number] | null }) => {
+// Sub-component to handle map resize and fly-to
+const MapEventHandler = ({ coords }: { coords: [number, number] | null }) => {
   const map = useMap();
-  if (coords) {
-    map.flyTo(coords, 16, { duration: 1.5 });
-  }
+  
+  useEffect(() => {
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 250);
+  }, [map]);
+
+  useEffect(() => {
+    if (coords) map.flyTo(coords, 16, { duration: 1.5 });
+  }, [coords, map]);
+
   return null;
 };
 
 const HanoiSystem = () => {
   const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
-  const [filterType, setFilterType] = useState<'ALL' | 'BV' | 'TTYT' | 'TYT'>('ALL');
+  const [filterType, setFilterType] = useState<'ALL' | 'BV' | 'TT' | 'BT' | 'PB'>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Filter Logic
-  const filteredFacilities = FACILITIES.filter(item => {
-    const matchType = filterType === 'ALL' || item.type === filterType;
-    const matchSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                        item.address.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchType && matchSearch;
-  });
+  const filteredFacilities = useMemo(() => {
+    return ALL_FACILITIES.filter(item => {
+      const matchType = filterType === 'ALL' || item.type === filterType;
+      const matchSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          item.address.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchType && matchSearch;
+    });
+  }, [filterType, searchTerm]);
 
-  const getTypeColor = (type: string) => {
+  const getTypeStyle = (type: string) => {
     switch(type) {
-      case 'BV': return 'bg-red-600 text-white border-red-700';
-      case 'TTYT': return 'bg-blue-600 text-white border-blue-700';
-      case 'TYT': return 'bg-green-600 text-white border-green-700';
-      default: return 'bg-gray-500 text-white';
-    }
-  };
-
-  const getTypeLabel = (type: string) => {
-    switch(type) {
-      case 'BV': return 'Bệnh viện';
-      case 'TTYT': return 'Trung tâm Y tế';
-      case 'TYT': return 'Trạm Y tế';
-      default: return 'Cơ sở y tế';
-    }
-  };
-
-  const getTypeIcon = (type: string) => {
-    switch(type) {
-      case 'BV': return <Building2 size={14} />;
-      case 'TTYT': return <Activity size={14} />;
-      case 'TYT': return <Stethoscope size={14} />;
-      default: return <Info size={14} />;
+      case 'BV': return { color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200', label: 'Bệnh viện', icon: <HeartPulse size={14}/> };
+      case 'TT': return { color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200', label: 'TT Chuyên khoa', icon: <Activity size={14}/> };
+      case 'BT': return { color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200', label: 'Cơ sở Trợ giúp', icon: <Users size={14}/> };
+      case 'PB': return { color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-200', label: 'Phòng/Chi cục', icon: <Building size={14}/> };
+      default: return { color: 'text-gray-600', bg: 'bg-gray-50', border: 'border-gray-200', label: 'Khác', icon: <Info size={14}/> };
     }
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)] bg-gray-50 overflow-hidden">
-      {/* Page Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center shadow-sm z-10">
-        <div>
-          <h1 className="text-lg md:text-xl font-black text-primary-900 uppercase flex items-center gap-2">
-            <div className="bg-red-600 p-1.5 rounded shadow-md text-white">
-                <MapPin size={18} />
-            </div>
-            Bản đồ Y tế Thủ đô Hà Nội
-          </h1>
-          <p className="text-[10px] md:text-xs text-gray-500 font-medium tracking-tight">Hệ thống tra cứu mạng lưới y tế chính thống khu vực Hà Nội</p>
+    <div className="flex flex-col h-[calc(100vh-64px)] bg-gray-50 overflow-hidden font-sans">
+      <div className="bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center shadow-sm z-20">
+        <div className="flex items-center gap-4">
+          <div className="bg-primary-700 p-2 rounded-xl text-white shadow-lg">
+             <MapPin size={24} />
+          </div>
+          <div>
+            <h1 className="text-xl font-black text-primary-900 uppercase">Mạng lưới Y tế & An sinh Hà Nội</h1>
+            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">Dữ liệu địa điểm chi tiết Sở Y tế Hà Nội (68 cơ sở)</p>
+          </div>
         </div>
       </div>
 
       <div className="flex flex-grow overflow-hidden relative">
-        
-        {/* LEFT SIDEBAR: LIST & SEARCH */}
-        <div className="w-full md:w-[320px] bg-white border-r border-gray-200 flex flex-col z-30 shadow-lg md:shadow-none absolute md:relative h-full transition-transform transform md:translate-x-0 -translate-x-full">
-            
-            {/* Search & Filter */}
-            <div className="p-3 border-b border-gray-100 bg-gray-50 space-y-3">
+        {/* SIDEBAR */}
+        <div className="w-full md:w-[420px] bg-white border-r border-gray-200 flex flex-col z-30 absolute md:relative h-full transition-transform">
+            <div className="p-4 border-b border-gray-100 bg-gray-50 space-y-3">
                 <div className="relative">
                     <Search className="absolute left-3 top-2.5 text-gray-400" size={16}/>
                     <input 
                         type="text" 
-                        placeholder="Tìm bệnh viện..."
-                        className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-500 text-xs font-medium transition-all"
+                        placeholder="Tìm theo tên hoặc địa chỉ..."
+                        className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-primary-100 outline-none text-xs font-bold"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
                 <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
-                    <button onClick={() => setFilterType('ALL')} className={`px-2.5 py-1 rounded-md text-[10px] font-bold whitespace-nowrap border transition ${filterType === 'ALL' ? 'bg-primary-900 text-white border-primary-900' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'}`}>
-                        Tất cả
-                    </button>
-                    <button onClick={() => setFilterType('BV')} className={`px-2.5 py-1 rounded-md text-[10px] font-bold whitespace-nowrap border transition ${filterType === 'BV' ? 'bg-red-600 text-white border-red-600' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'}`}>
-                        Bệnh viện
-                    </button>
-                    <button onClick={() => setFilterType('TTYT')} className={`px-2.5 py-1 rounded-md text-[10px] font-bold whitespace-nowrap border transition ${filterType === 'TTYT' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'}`}>
-                        TT Y tế
-                    </button>
-                    <button onClick={() => setFilterType('TYT')} className={`px-2.5 py-1 rounded-md text-[10px] font-bold whitespace-nowrap border transition ${filterType === 'TYT' ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'}`}>
-                        Trạm Y tế
-                    </button>
-                </div>
-                <div className="text-[9px] text-gray-400 font-bold uppercase tracking-widest px-1">
-                    Hiển thị <span className="text-primary-700">{filteredFacilities.length}</span> cơ sở
+                    {[
+                      { id: 'ALL', label: 'Tất cả' },
+                      { id: 'PB', label: 'Quản lý' },
+                      { id: 'BV', label: 'Bệnh viện' },
+                      { id: 'TT', label: 'TT Chuyên khoa' },
+                      { id: 'BT', label: 'Trợ giúp' },
+                    ].map(btn => (
+                      <button 
+                        key={btn.id}
+                        onClick={() => setFilterType(btn.id as any)} 
+                        className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter border transition-all whitespace-nowrap
+                        ${filterType === btn.id ? 'bg-primary-900 text-white border-primary-900 shadow-md' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-100'}`}
+                      >
+                        {btn.label}
+                      </button>
+                    ))}
                 </div>
             </div>
 
-            {/* List */}
             <div className="flex-grow overflow-y-auto no-scrollbar bg-white">
-                {filteredFacilities.length > 0 ? (
-                    filteredFacilities.map(fac => (
-                        <div 
-                            key={fac.id}
-                            onClick={() => setSelectedFacility(fac)}
-                            className={`p-3 border-b border-gray-50 cursor-pointer hover:bg-blue-50 transition-all flex gap-3 ${selectedFacility?.id === fac.id ? 'bg-blue-50/80 border-l-4 border-l-blue-600' : 'border-l-4 border-l-transparent'}`}
-                        >
-                             <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm transition-transform ${selectedFacility?.id === fac.id ? 'scale-105' : ''} ${getTypeColor(fac.type)}`}>
-                                 {getTypeIcon(fac.type)}
+                {filteredFacilities.map(fac => {
+                  const style = getTypeStyle(fac.type);
+                  return (
+                    <div 
+                        key={fac.id}
+                        onClick={() => setSelectedFacility(fac)}
+                        className={`p-4 border-b border-gray-50 cursor-pointer hover:bg-primary-50 transition-all flex gap-4 ${selectedFacility?.id === fac.id ? 'bg-primary-50 border-l-4 border-l-primary-600' : 'border-l-4 border-l-transparent'}`}
+                    >
+                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm transition-all duration-300 ${selectedFacility?.id === fac.id ? 'scale-110 shadow-lg' : ''} ${style.bg} ${style.color}`}>
+                             {style.icon}
+                         </div>
+                         <div className="flex-grow min-w-0">
+                             <h3 className="text-[13px] font-black text-gray-800 leading-tight mb-1">{fac.name}</h3>
+                             <p className="text-[11px] text-gray-400 line-clamp-2 mb-2 italic leading-tight">{fac.address}</p>
+                             <div className="flex items-center justify-between">
+                                <span className={`inline-block text-[9px] px-2 py-0.5 rounded font-black uppercase tracking-tighter border ${style.color} ${style.border} ${style.bg}`}>
+                                    {fac.category}
+                                </span>
                              </div>
-                             <div className="flex-grow min-w-0">
-                                 <h3 className="text-xs font-bold text-gray-800 leading-tight mb-0.5 truncate">{fac.name}</h3>
-                                 <p className="text-[10px] text-gray-500 line-clamp-1 mb-1">{fac.address}</p>
-                                 <span className={`inline-block text-[9px] px-1.5 py-0.5 rounded font-black uppercase tracking-tighter border ${fac.type === 'BV' ? 'text-red-600 border-red-200 bg-red-50' : fac.type === 'TTYT' ? 'text-blue-600 border-blue-200 bg-blue-50' : 'text-green-600 border-green-200 bg-green-50'}`}>
-                                    {getTypeLabel(fac.type)}
-                                 </span>
-                             </div>
-                        </div>
-                    ))
-                ) : (
-                    <div className="p-10 text-center">
-                        <MapPin className="mx-auto text-gray-200 mb-4" size={32} />
-                        <p className="text-xs text-gray-400 font-medium">Không tìm thấy cơ sở.</p>
+                         </div>
                     </div>
+                  );
+                })}
+                {filteredFacilities.length === 0 && (
+                  <div className="p-10 text-center text-gray-400 italic text-sm">Không tìm thấy kết quả phù hợp</div>
                 )}
             </div>
         </div>
 
-        {/* RIGHT AREA: GEOCONFINED MAP */}
+        {/* MAP CONTAINER */}
         <div className="flex-grow relative bg-slate-200 overflow-hidden h-full z-10">
             <MapContainer 
               center={HANOI_CENTER} 
@@ -281,80 +243,84 @@ const HanoiSystem = () => {
               maxBounds={HANOI_BOUNDS}
               maxBoundsViscosity={1.0}
               style={{ height: '100%', width: '100%' }}
-              zoomControl={true}
             >
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
+              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
               
-              <MapFlyTo coords={selectedFacility?.coords || null} />
+              <MapEventHandler coords={selectedFacility?.coords || null} />
 
               {filteredFacilities.map(fac => (
                 <Marker 
                   key={fac.id} 
                   position={fac.coords}
-                  icon={createCustomIcon(fac.type)}
-                  eventHandlers={{
-                    click: () => setSelectedFacility(fac),
-                  }}
+                  icon={createCustomIcon(fac.type, selectedFacility?.id === fac.id)}
+                  eventHandlers={{ click: () => setSelectedFacility(fac) }}
                 />
               ))}
             </MapContainer>
 
-            {/* DETAIL POPUP CARD (SHRUNKEN) */}
+            {/* FLOATING DETAIL PANEL */}
             {selectedFacility && (
-                <div className="absolute top-3 left-3 md:left-auto md:right-3 w-[85%] md:w-72 bg-white rounded-xl shadow-2xl overflow-hidden z-[1000] animate-in fade-in zoom-in-95 duration-300 border border-gray-100">
-                    <div className="relative h-32">
-                        <img src={selectedFacility.image} alt={selectedFacility.name} className="w-full h-full object-cover" />
-                        <button 
-                            onClick={() => setSelectedFacility(null)}
-                            className="absolute top-2 right-2 w-7 h-7 bg-white/90 hover:bg-white text-gray-900 rounded-full flex items-center justify-center shadow-md transition"
-                        >
-                            <X size={14} />
-                        </button>
-                        <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
-                             <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-sm text-white shadow-md ${selectedFacility.type === 'BV' ? 'bg-red-600' : selectedFacility.type === 'TTYT' ? 'bg-blue-600' : 'bg-green-600'}`}>
-                                {getTypeLabel(selectedFacility.type)}
+                <div className="absolute bottom-6 right-6 w-80 md:w-96 bg-white rounded-2xl shadow-2xl overflow-hidden z-[1000] animate-in slide-in-from-bottom-5 border border-gray-100 ring-4 ring-primary-900/10">
+                    <div className="bg-primary-900 p-4 text-white">
+                        <div className="flex justify-between items-start">
+                             <span className="text-[10px] font-black uppercase tracking-widest bg-white/20 px-2 py-1 rounded">
+                                {selectedFacility.category}
                              </span>
+                             <button onClick={() => setSelectedFacility(null)} className="hover:bg-white/20 rounded-full p-1"><X size={16}/></button>
                         </div>
+                        <h2 className="text-lg font-black mt-2 leading-tight uppercase">{selectedFacility.name}</h2>
                     </div>
-                    <div className="p-4">
-                        <h2 className="text-base font-black text-gray-900 mb-2 leading-tight uppercase tracking-tight">{selectedFacility.name}</h2>
-                        
-                        <div className="space-y-2 text-[11px] text-gray-600">
-                            <div className="flex items-start gap-2">
-                                <MapPin size={14} className="text-primary-600 flex-shrink-0 mt-0.5" />
-                                <span className="font-medium text-gray-700">{selectedFacility.address}</span>
+                    <div className="p-5 space-y-4">
+                        <div className="space-y-4 text-[13px] text-gray-700">
+                            <div className="flex items-start gap-3">
+                                <MapPin size={18} className="text-red-600 shrink-0 mt-0.5" />
+                                <div className="space-y-1">
+                                   <p className="font-bold leading-tight text-gray-900">{selectedFacility.address}</p>
+                                   <p className="text-[11px] text-gray-400 font-mono tracking-tight">Tọa độ: {selectedFacility.coords[0].toFixed(6)}, {selectedFacility.coords[1].toFixed(6)}</p>
+                                </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <Phone size={14} className="text-primary-600 flex-shrink-0" />
-                                <span className="font-black text-primary-900 text-sm">{selectedFacility.phone}</span>
+                            <div className="flex items-center gap-3">
+                                <Phone size={18} className="text-primary-600 shrink-0" />
+                                <span className="font-black text-primary-900 text-base">{selectedFacility.phone}</span>
                             </div>
-                            <div className="p-2 bg-slate-50 rounded-md border border-slate-100">
-                                <p className="text-[10px] leading-relaxed text-gray-600 italic">
-                                    "{selectedFacility.description}"
-                                </p>
+                            <div className="bg-gray-50 p-4 rounded-xl text-[12px] italic text-gray-600 leading-relaxed border border-gray-100 shadow-inner">
+                                <div className="flex items-center gap-2 mb-2 text-primary-600 not-italic font-bold">
+                                   <Info size={14} /> GIỚI THIỆU ĐƠN VỊ
+                                </div>
+                                {selectedFacility.description}
                             </div>
                         </div>
-
-                        <div className="mt-4 grid grid-cols-2 gap-2">
-                            <button className="flex items-center justify-center gap-1 bg-primary-700 hover:bg-primary-800 text-white py-2 rounded-lg font-black text-[10px] uppercase tracking-wider transition">
-                                <Navigation size={12} /> Chỉ đường
+                        <div className="grid grid-cols-2 gap-3">
+                            <button className="flex items-center justify-center gap-2 bg-primary-700 hover:bg-primary-800 text-white py-3.5 rounded-xl font-bold text-[11px] uppercase transition shadow-lg shadow-primary-200">
+                                <Navigation size={16} /> Chỉ đường
                             </button>
-                            <button className="flex items-center justify-center gap-1 bg-white border-2 border-slate-200 hover:border-primary-600 hover:text-primary-600 text-slate-700 py-2 rounded-lg font-black text-[10px] uppercase tracking-wider transition">
-                                <Phone size={12} /> Gọi
-                            </button>
+                            <a 
+                               href={`tel:${selectedFacility.phone}`}
+                               className="flex items-center justify-center gap-2 bg-white border-2 border-gray-100 hover:border-primary-600 hover:text-primary-600 text-gray-700 py-3.5 rounded-xl font-bold text-[11px] uppercase transition"
+                            >
+                                <Phone size={16} /> Gọi điện
+                            </a>
                         </div>
                     </div>
                 </div>
             )}
-
-            {/* Hanoi Info Label Overlay */}
-            <div className="absolute bottom-3 left-3 z-[1000] pointer-events-none">
-                <div className="bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md border border-white/50 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse"></span>
-                    <span className="text-[9px] font-black text-gray-800 uppercase tracking-widest">Khu vực TP. Hà Nội</span>
+            
+            {/* LEGEND Overlay */}
+            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-xl z-[1000] border border-white hidden md:block w-52">
+                <h4 className="text-[10px] font-black uppercase text-gray-400 mb-3 border-b border-gray-100 pb-2 tracking-widest">Mạng lưới Y tế</h4>
+                <div className="space-y-2.5">
+                    <div className="flex items-center gap-3 text-[11px] font-bold text-gray-700">
+                        <div className="w-3.5 h-3.5 bg-violet-600 rounded-full shadow-sm"></div> Cơ quan quản lý
+                    </div>
+                    <div className="flex items-center gap-3 text-[11px] font-bold text-gray-700">
+                        <div className="w-3.5 h-3.5 bg-red-600 rounded-full shadow-sm"></div> Khối Bệnh viện
+                    </div>
+                    <div className="flex items-center gap-3 text-[11px] font-bold text-gray-700">
+                        <div className="w-3.5 h-3.5 bg-blue-600 rounded-full shadow-sm"></div> TT Chuyên khoa
+                    </div>
+                    <div className="flex items-center gap-3 text-[11px] font-bold text-gray-700">
+                        <div className="w-3.5 h-3.5 bg-emerald-600 rounded-full shadow-sm"></div> Cơ sở An sinh
+                    </div>
                 </div>
             </div>
         </div>

@@ -96,23 +96,22 @@ const HospitalSlider = () => {
                 style={{ width: `${100 / visibleCount}%` }}
               >
                 <div className="bg-white border border-gray-100 rounded-2xl p-6 h-56 flex flex-col items-center justify-center text-center group hover:shadow-2xl hover:border-primary-200 transition-all duration-500 cursor-pointer">
-                  <div className="w-28 h-28 mb-4 flex items-center justify-center grayscale group-hover:grayscale-0 transition-all duration-700 transform group-hover:scale-110">
+                  <div className="w-28 h-28 mb-4 flex items-center justify-center transition-all duration-700 transform group-hover:scale-110">
                     <img 
                       src={hospital.logo} 
                       alt={hospital.name} 
                       className="max-w-full max-h-full object-contain"
                       loading="lazy"
                       onError={(e) => {
-                        // Fallback generic medical logo if hospital site blocks hotlinking
+                        // Ảnh dự phòng nếu link chính bị lỗi
                         e.currentTarget.src = "https://storage-vnportal.vnpt.vn/gov-hni/6749/soyte.png";
-                        e.currentTarget.classList.add('opacity-50');
                       }}
                     />
                   </div>
-                  <h4 className="text-xs font-black text-gray-500 group-hover:text-primary-800 transition-colors uppercase tracking-tight leading-tight px-2">
+                  <h4 className="text-[13px] font-black text-gray-700 group-hover:text-primary-800 transition-colors uppercase tracking-tight leading-tight px-2">
                     {hospital.name}
                   </h4>
-                  <div className="mt-2 w-0 group-hover:w-8 h-0.5 bg-primary-500 transition-all duration-500 rounded-full"></div>
+                  <div className="mt-3 w-8 h-1 bg-gray-100 group-hover:bg-primary-500 transition-all duration-500 rounded-full"></div>
                 </div>
               </div>
             ))}
