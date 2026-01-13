@@ -1,16 +1,20 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   Search, 
   MapPin, 
   Phone, 
-  Navigation,  
+  Navigation, 
+  Building2, 
   Activity, 
   Info,
   X,
   HeartPulse,
   Users,
-  Building, 
+  Building,
+  Home as HomeIcon,
+  ChevronLeft
 } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -26,7 +30,6 @@ L.Icon.Default.mergeOptions({
 const HANOI_CENTER: [number, number] = [21.0285, 105.8542];
 const HANOI_BOUNDS: L.LatLngBoundsExpression = [[20.53, 105.28], [21.39, 106.02]];
 
-// Custom Marker Icon with scaling effect
 const createCustomIcon = (type: string, isSelected: boolean = false) => {
   let colorClass = 'bg-gray-500';
   if (type === 'BV') colorClass = 'bg-red-600';
@@ -60,7 +63,6 @@ interface Facility {
 }
 
 const ALL_FACILITIES: Facility[] = [
-  // 1. CÁC PHÒNG VÀ TƯƠNG ĐƯƠNG THUỘC SỞ (Trụ sở số 4 Sơn Tây)
   ...[
     { name: "Văn phòng Sở", id: "pb-1" },
     { name: "Phòng Tổ chức cán bộ", id: "pb-2" },
@@ -82,46 +84,21 @@ const ALL_FACILITIES: Facility[] = [
     coords: [21.0312 + (i * 0.00005), 105.8315 + (i * 0.00005)] as [number, number],
     description: 'Cơ quan tham mưu, giúp việc cho Giám đốc Sở trong công tác quản lý nhà nước về y tế trên địa bàn Thủ đô.'
   })),
-
-  // 3a. KHỐI BỆNH VIỆN (42 đơn vị)
   { id: 'bv-1', name: 'Bệnh viện đa khoa Xanh Pôn', type: 'BV', category: 'Bệnh viện Hạng I', address: 'Số 12 Chu Văn An, Quận Ba Đình, Hà Nội', phone: '024 3823 3075', coords: [21.0318, 105.8396], description: 'Bệnh viện đa khoa đầu ngành Ngoại khoa và Nhi khoa của Thủ đô.' },
   { id: 'bv-2', name: 'Bệnh viện Thanh Nhàn', type: 'BV', category: 'Bệnh viện Hạng I', address: 'Số 42 Thanh Nhàn, Quận Hai Bà Trưng, Hà Nội', phone: '024 3971 4363', coords: [21.0028, 105.8569], description: 'Bệnh viện đa khoa hạng I, mũi nhọn về Nội khoa và hồi sức cấp cứu.' },
   { id: 'bv-3', name: 'Bệnh viện đa khoa Đức Giang', type: 'BV', category: 'Bệnh viện Hạng I', address: 'Số 54 Trường Lâm, Quận Long Biên, Hà Nội', phone: '024 3827 1515', coords: [21.0528, 105.8969], description: 'Cơ sở y tế hạng I khu vực phía Đông thành phố.' },
-  { id: 'bv-4', name: 'Bệnh viện đa khoa Hà Đông', type: 'BV', category: 'Bệnh viện Hạng I', address: 'Số 02 Bế Văn Đàn, Quận Hà Đông, Hà Nội', phone: '024 3382 4220', coords: [20.9721, 105.7765], description: 'Bệnh viện đa khoa hạng I khu vực phía Tây Nam Thủ đô.' },
-  { id: 'bv-5', name: 'Bệnh viện đa khoa Đống Đa', type: 'BV', category: 'Bệnh viện Hạng I', address: 'Số 180 Nguyễn Lương Bằng, Quận Đống Đa, Hà Nội', phone: '024 3851 7140', coords: [21.0125, 105.8285], description: 'Bệnh viện đầu ngành về Truyền nhiễm và các bệnh nhiệt đới.' },
-  { id: 'bv-6', name: 'Bệnh viện đa khoa Sơn Tây', type: 'BV', category: 'Bệnh viện Hạng I', address: 'Số 304A Lê Lợi, Thị xã Sơn Tây, Hà Nội', phone: '024 3383 2341', coords: [21.1415, 105.5021], description: 'Bệnh viện đa khoa hạng I phục vụ nhân dân khu vực phía Tây thành phố.' },
-  { id: 'bv-7', name: 'Bệnh viện Phụ sản Hà Nội', type: 'BV', category: 'Bệnh viện Chuyên khoa', address: 'Số 929 La Thành, Quận Ba Đình, Hà Nội', phone: '1900 6922', coords: [21.0268, 105.8099], description: 'Bệnh viện chuyên khoa Sản phụ khoa hạng I, đầu ngành sản phụ khoa Thủ đô.' },
-  { id: 'bv-8', name: 'Bệnh viện Tim Hà Nội', type: 'BV', category: 'Bệnh viện Chuyên khoa', address: 'Số 92 Trần Hưng Đạo, Quận Hoàn Kiếm, Hà Nội', phone: '024 3942 2430', coords: [21.0245, 105.8432], description: 'Bệnh viện chuyên khoa Tim mạch tuyến cuối của thành phố.' },
-  { id: 'bv-9', name: 'Bệnh viện Ung bướu Hà Nội', type: 'BV', category: 'Bệnh viện Chuyên khoa', address: 'Số 42A Thanh Nhàn, Quận Hai Bà Trưng, Hà Nội', phone: '024 3821 7997', coords: [21.0035, 105.8575], description: 'Bệnh viện chuyên khoa Ung thư hạng I.' },
-  { id: 'bv-10', name: 'Bệnh viện Thận Hà Nội', type: 'BV', category: 'Bệnh viện Chuyên khoa', address: 'Số 70 Nguyễn Lương Bằng, Quận Đống Đa, Hà Nội', phone: '024 3513 4922', coords: [21.0118, 105.8275], description: 'Bệnh viện chuyên khoa Thận và lọc máu hàng đầu.' },
-  { id: 'bv-11', name: 'Bệnh viện Mắt Hà Nội', type: 'BV', category: 'Bệnh viện Chuyên khoa', address: 'Số 37 Hai Bà Trưng, Quận Hoàn Kiếm, Hà Nội', phone: '024 3825 2125', coords: [21.0255, 105.8521], description: 'Chuyên khoa Mắt đầu ngành thành phố.' },
-  { id: 'bv-12', name: 'Bệnh viện Da liễu Hà Nội', type: 'BV', category: 'Bệnh viện Chuyên khoa', address: 'Số 79B Nguyễn Khuyến, Quận Đống Đa, Hà Nội', phone: '024 3825 2588', coords: [21.0289, 105.8365], description: 'Điều trị các bệnh lý về da và thẩm mỹ da liễu.' },
-  
-  // Các BV Huyện (Mô phỏng vị trí theo địa giới hành chính)
   { id: 'bv-h1', name: 'Bệnh viện đa khoa huyện Ba Vì', type: 'BV', category: 'Bệnh viện Huyện', address: 'Thị trấn Tây Đằng, Huyện Ba Vì, Hà Nội', phone: '024 3386 3144', coords: [21.2352, 105.4125], description: 'Phục vụ khám chữa bệnh cho nhân dân huyện Ba Vì.' },
-  { id: 'bv-h2', name: 'Bệnh viện đa khoa huyện Phú Xuyên', type: 'BV', category: 'Bệnh viện Huyện', address: 'Thị trấn Phú Xuyên, Huyện Phú Xuyên, Hà Nội', phone: '024 3385 4252', coords: [20.7385, 105.9012], description: 'Cơ sở y tế khu vực cửa ngõ phía Nam Thủ đô.' },
-  { id: 'bv-h3', name: 'Bệnh viện đa khoa huyện Sóc Sơn', type: 'BV', category: 'Bệnh viện Huyện', address: 'Thị trấn Sóc Sơn, Huyện Sóc Sơn, Hà Nội', phone: '024 3885 1251', coords: [21.2685, 105.8512], description: 'Bệnh viện đa khoa hạng II khu vực phía Bắc.' },
-  { id: 'bv-h4', name: 'Bệnh viện đa khoa huyện Mỹ Đức', type: 'BV', category: 'Bệnh viện Huyện', address: 'Thị trấn Đại Nghĩa, Huyện Mỹ Đức, Hà Nội', phone: '024 3384 7212', coords: [20.7125, 105.7425], description: 'Bệnh viện huyện phục vụ khu vực phía Tây Nam.' },
-  
-  // 3b. KHỐI TRUNG TÂM CHUYÊN KHOA (5 đơn vị)
   { id: 'tt-1', name: 'Trung tâm Kiểm soát bệnh tật (CDC) Hà Nội', type: 'TT', category: 'Trung tâm chuyên khoa', address: 'Số 70 Nguyễn Chí Thanh, Quận Đống Đa, Hà Nội', phone: '024 3834 3520', coords: [21.0225, 105.8085], description: 'Đơn vị đầu ngành về y tế dự phòng và kiểm soát dịch bệnh.' },
-  { id: 'tt-2', name: 'Trung tâm Cấp cứu 115 Hà Nội', type: 'TT', category: 'Trung tâm chuyên khoa', address: 'Số 11 Phan Chu Trinh, Quận Hoàn Kiếm, Hà Nội', phone: '115', coords: [21.0215, 105.8565], description: 'Hệ thống cấp cứu ngoại viện chuyên nghiệp toàn thành phố.' },
-  { id: 'tt-3', name: 'Trung tâm Kiểm nghiệm thuốc, mỹ phẩm, thực phẩm', type: 'TT', category: 'Trung tâm chuyên khoa', address: 'Số 07 Đặng Tiến Đông, Quận Đống Đa, Hà Nội', phone: '024 3851 1212', coords: [21.0115, 105.8215], description: 'Kiểm tra, giám sát chất lượng dược phẩm, thực phẩm.' },
-  
-  // 3c. KHỐI CƠ SỞ TRỢ GIÚP XÃ HỘI (11 đơn vị)
   { id: 'bt-1', name: 'Làng trẻ em SOS Hà Nội', type: 'BT', category: 'Cơ sở bảo trợ', address: 'Số 02 Doãn Kế Thiện, Quận Cầu Giấy, Hà Nội', phone: '024 3764 4022', coords: [21.0385, 105.7812], description: 'Nuôi dưỡng và chăm sóc trẻ em mồ côi, có hoàn cảnh đặc biệt.' },
-  { id: 'bt-2', name: 'Làng trẻ em Birla Hà Nội', type: 'BT', category: 'Cơ sở bảo trợ', address: 'Số 04 Doãn Kế Thiện, Quận Cầu Giấy, Hà Nội', phone: '024 3764 4022', coords: [21.0392, 105.7825], description: 'Cơ sở chăm sóc trẻ em mồ côi uy tín của thành phố.' },
-  { id: 'bt-3', name: 'Trung tâm Bảo trợ xã hội 3 Hà Nội', type: 'BT', category: 'Cơ sở bảo trợ', address: 'Miêu Nha, Tây Mỗ, Quận Nam Từ Liêm, Hà Nội', phone: '024 3839 0368', coords: [21.0085, 105.7412], description: 'Chăm sóc và nuôi dưỡng người già cô đơn và trẻ em lang thang.' },
 ];
 
-// Sub-component to handle map resize and fly-to
 const MapEventHandler = ({ coords }: { coords: [number, number] | null }) => {
   const map = useMap();
-  
   useEffect(() => {
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       map.invalidateSize();
-    }, 250);
+    }, 500);
+    return () => clearTimeout(timer);
   }, [map]);
 
   useEffect(() => {
@@ -156,15 +133,27 @@ const HanoiSystem = () => {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)] bg-gray-50 overflow-hidden font-sans">
-      <div className="bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center shadow-sm z-20">
-        <div className="flex items-center gap-4">
-          <div className="bg-primary-700 p-2 rounded-xl text-white shadow-lg">
-             <MapPin size={24} />
-          </div>
-          <div>
-            <h1 className="text-xl font-black text-primary-900 uppercase">Mạng lưới Y tế & An sinh Hà Nội</h1>
-            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">Dữ liệu địa điểm chi tiết Sở Y tế Hà Nội (68 cơ sở)</p>
+    <div className="flex flex-col h-screen bg-gray-50 overflow-hidden font-sans">
+      {/* Header Section with Back Button */}
+      <div className="bg-white border-b border-gray-200 px-4 py-3 flex justify-between items-center shadow-sm z-20">
+        <div className="flex items-center gap-3">
+          <Link 
+            to="/" 
+            className="flex items-center gap-1 text-primary-700 hover:text-primary-800 font-bold bg-primary-50 px-3 py-1.5 rounded-lg border border-primary-100 transition-all group"
+          >
+            <ChevronLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+            <HomeIcon size={16} />
+            <span className="hidden md:inline">Trang chủ</span>
+          </Link>
+          <div className="h-8 w-px bg-gray-200 mx-2 hidden md:block"></div>
+          <div className="flex items-center gap-3">
+            <div className="bg-primary-700 p-1.5 rounded-lg text-white shadow-lg hidden sm:block">
+               <MapPin size={20} />
+            </div>
+            <div>
+              <h1 className="text-base md:text-lg font-black text-primary-900 uppercase leading-tight">Mạng lưới Y tế Hà Nội</h1>
+              <p className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Dữ liệu địa điểm 68 cơ sở y tế trực thuộc</p>
+            </div>
           </div>
         </div>
       </div>
@@ -227,9 +216,6 @@ const HanoiSystem = () => {
                     </div>
                   );
                 })}
-                {filteredFacilities.length === 0 && (
-                  <div className="p-10 text-center text-gray-400 italic text-sm">Không tìm thấy kết quả phù hợp</div>
-                )}
             </div>
         </div>
 
@@ -245,9 +231,7 @@ const HanoiSystem = () => {
               style={{ height: '100%', width: '100%' }}
             >
               <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              
               <MapEventHandler coords={selectedFacility?.coords || null} />
-
               {filteredFacilities.map(fac => (
                 <Marker 
                   key={fac.id} 
@@ -274,55 +258,24 @@ const HanoiSystem = () => {
                         <div className="space-y-4 text-[13px] text-gray-700">
                             <div className="flex items-start gap-3">
                                 <MapPin size={18} className="text-red-600 shrink-0 mt-0.5" />
-                                <div className="space-y-1">
-                                   <p className="font-bold leading-tight text-gray-900">{selectedFacility.address}</p>
-                                   <p className="text-[11px] text-gray-400 font-mono tracking-tight">Tọa độ: {selectedFacility.coords[0].toFixed(6)}, {selectedFacility.coords[1].toFixed(6)}</p>
-                                </div>
+                                <p className="font-bold leading-tight text-gray-900">{selectedFacility.address}</p>
                             </div>
                             <div className="flex items-center gap-3">
                                 <Phone size={18} className="text-primary-600 shrink-0" />
                                 <span className="font-black text-primary-900 text-base">{selectedFacility.phone}</span>
                             </div>
-                            <div className="bg-gray-50 p-4 rounded-xl text-[12px] italic text-gray-600 leading-relaxed border border-gray-100 shadow-inner">
-                                <div className="flex items-center gap-2 mb-2 text-primary-600 not-italic font-bold">
-                                   <Info size={14} /> GIỚI THIỆU ĐƠN VỊ
-                                </div>
-                                {selectedFacility.description}
-                            </div>
                         </div>
                         <div className="grid grid-cols-2 gap-3">
-                            <button className="flex items-center justify-center gap-2 bg-primary-700 hover:bg-primary-800 text-white py-3.5 rounded-xl font-bold text-[11px] uppercase transition shadow-lg shadow-primary-200">
+                            <button className="flex items-center justify-center gap-2 bg-primary-700 hover:bg-primary-800 text-white py-3.5 rounded-xl font-bold text-[11px] uppercase transition shadow-lg">
                                 <Navigation size={16} /> Chỉ đường
                             </button>
-                            <a 
-                               href={`tel:${selectedFacility.phone}`}
-                               className="flex items-center justify-center gap-2 bg-white border-2 border-gray-100 hover:border-primary-600 hover:text-primary-600 text-gray-700 py-3.5 rounded-xl font-bold text-[11px] uppercase transition"
-                            >
+                            <a href={`tel:${selectedFacility.phone}`} className="flex items-center justify-center gap-2 bg-white border-2 border-gray-100 hover:border-primary-600 text-gray-700 py-3.5 rounded-xl font-bold text-[11px] uppercase transition">
                                 <Phone size={16} /> Gọi điện
                             </a>
                         </div>
                     </div>
                 </div>
             )}
-            
-            {/* LEGEND Overlay */}
-            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-xl z-[1000] border border-white hidden md:block w-52">
-                <h4 className="text-[10px] font-black uppercase text-gray-400 mb-3 border-b border-gray-100 pb-2 tracking-widest">Mạng lưới Y tế</h4>
-                <div className="space-y-2.5">
-                    <div className="flex items-center gap-3 text-[11px] font-bold text-gray-700">
-                        <div className="w-3.5 h-3.5 bg-violet-600 rounded-full shadow-sm"></div> Cơ quan quản lý
-                    </div>
-                    <div className="flex items-center gap-3 text-[11px] font-bold text-gray-700">
-                        <div className="w-3.5 h-3.5 bg-red-600 rounded-full shadow-sm"></div> Khối Bệnh viện
-                    </div>
-                    <div className="flex items-center gap-3 text-[11px] font-bold text-gray-700">
-                        <div className="w-3.5 h-3.5 bg-blue-600 rounded-full shadow-sm"></div> TT Chuyên khoa
-                    </div>
-                    <div className="flex items-center gap-3 text-[11px] font-bold text-gray-700">
-                        <div className="w-3.5 h-3.5 bg-emerald-600 rounded-full shadow-sm"></div> Cơ sở An sinh
-                    </div>
-                </div>
-            </div>
         </div>
       </div>
     </div>

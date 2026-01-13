@@ -9,20 +9,24 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const location = useLocation(); 
-  const isCMSPage = location.pathname.startsWith('/admin') || location.pathname.startsWith('/login');
+  const location = useLocation();
+  
+  // Danh sách các trang không hiển thị Header/Footer chung
+  const isSpecialPage = 
+    location.pathname.startsWith('/admin') || 
+    location.pathname.startsWith('/login') ||
+    location.pathname === '/hanoi-system' ||
+    location.pathname === '/emergency';
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Chỉ hiển thị Header nếu KHÔNG phải là trang CMS */}
-      {!isCMSPage && <Header />}
+      {!isSpecialPage && <Header />}
       
-      <main className={`flex-grow ${isCMSPage ? 'bg-gray-50' : ''}`}>
+      <main className={`flex-grow ${isSpecialPage ? 'bg-gray-50' : ''}`}>
         {children}
       </main>
       
-      {/* Chỉ hiển thị Footer nếu KHÔNG phải là trang CMS */}
-      {!isCMSPage && <Footer />}
+      {!isSpecialPage && <Footer />}
     </div>
   );
 };
