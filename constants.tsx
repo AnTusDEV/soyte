@@ -240,7 +240,7 @@ export const MAIN_MENU: MenuItem[] = [
         title: "Trung tâm cấp cứu thông minh",
         path: "/emergency",
         icon: Ambulance,
-      }, 
+      },
     ],
   },
   {
@@ -361,6 +361,42 @@ export const MOCK_NEWS: NewsItem[] = [
     image: "https://picsum.photos/seed/hanoi5/800/600",
     category: "Tiêu điểm",
   },
+  {
+    id: 6,
+    title: "Triển khai tiêm chủng mở rộng vắc xin 5 trong 1 đợt 1 năm 2026",
+    excerpt:
+      "Sở Y tế Hà Nội thông báo kế hoạch tiêm chủng mở rộng cho trẻ em dưới 1 tuổi, đảm bảo an toàn và hiệu quả...",
+    date: "15/01/2026",
+    image: "https://picsum.photos/seed/hanoi5/800/600",
+    category: "Tiêu điểm",
+  },
+  {
+    id: 7,
+    title: "Triển khai tiêm chủng mở rộng vắc xin 5 trong 1 đợt 1 năm 2026",
+    excerpt:
+      "Sở Y tế Hà Nội thông báo kế hoạch tiêm chủng mở rộng cho trẻ em dưới 1 tuổi, đảm bảo an toàn và hiệu quả...",
+    date: "15/01/2026",
+    image: "https://picsum.photos/seed/hanoi5/800/600",
+    category: "Tiêu điểm",
+  },
+  {
+    id: 8,
+    title: "Triển khai tiêm chủng mở rộng vắc xin 5 trong 1 đợt 1 năm 2026",
+    excerpt:
+      "Sở Y tế Hà Nội thông báo kế hoạch tiêm chủng mở rộng cho trẻ em dưới 1 tuổi, đảm bảo an toàn và hiệu quả...",
+    date: "15/01/2026",
+    image: "https://picsum.photos/seed/hanoi5/800/600",
+    category: "Tiêu điểm",
+  },
+  {
+    id: 9,
+    title: "Triển khai tiêm chủng mở rộng vắc xin 5 trong 1 đợt 1 năm 2026",
+    excerpt:
+      "Sở Y tế Hà Nội thông báo kế hoạch tiêm chủng mở rộng cho trẻ em dưới 1 tuổi, đảm bảo an toàn và hiệu quả...",
+    date: "15/01/2026",
+    image: "https://picsum.photos/seed/hanoi5/800/600",
+    category: "Tiêu điểm",
+  },
 ];
 
 export const MOCK_VIDEOS = [
@@ -471,4 +507,4 @@ export const MOCK_INTERNATIONAL = [
     date: "28/12/2025",
     image: "https://picsum.photos/seed/inter3/600/400",
   },
-];
+]; 

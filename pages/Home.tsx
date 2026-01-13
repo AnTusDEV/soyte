@@ -4,9 +4,9 @@ import {
   ArrowRight,
   Activity,
   Phone,
-  Play, 
+  Play,
   Award,
-  FileText, 
+  FileText,
   Radio,
   Stethoscope,
   Laptop2,
@@ -17,6 +17,13 @@ import {
 import anh1 from "@/assets/image/anh1.png";
 import anh2 from "@/assets/image/anh2.jpg";
 
+import khambenh from "@/assets/image/kham benh.png";
+import phongbenh from "@/assets/image/phong benh.png";
+import baotro from "@/assets/image/bao tro XH.png";
+import chuyendoiso from "@/assets/image/chuyen doi so.png";
+import chinhsach from "@/assets/image/chinh sach y te.png";
+import guongnguoitot from "@/assets/image/guong nguoi tot.png";
+
 import {
   SERVICE_CATEGORIES,
   MOCK_NEWS,
@@ -24,12 +31,13 @@ import {
   MOCK_CULTURE,
   MOCK_SPORTS,
   MOCK_INTERNATIONAL,
+  MOCK_HOMEPAGE_12,
 } from "../constants";
+import HospitalSlider from "@/components/HospitalSlider";
 
 const Home = () => {
-  const newsList = MOCK_NEWS.slice(1, 5); // Take more items for the list
   const [activeChannel, setActiveChannel] = useState("H1");
-  const [currentVideo, setCurrentVideo] = useState(MOCK_VIDEOS[0]); 
+  const [currentVideo, setCurrentVideo] = useState(MOCK_VIDEOS[0]);
   const images = [anh1, anh2];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -387,12 +395,11 @@ const Home = () => {
                 <h3 className="text-lg font-bold text-primary-900 uppercase">
                   Khám bệnh - chữa bệnh
                 </h3>
-              </div> 
+              </div>
               <div className="group mb-4 cursor-pointer">
                 <div className="aspect-[3/2] rounded overflow-hidden mb-2 bg-gray-100">
                   <img
-                    src={MOCK_CULTURE[0].image}
-                    alt={MOCK_CULTURE[0].title}
+                    src={khambenh}
                     className="w-full h-full object-cover group-hover:scale-105 transition"
                   />
                 </div>
@@ -423,8 +430,7 @@ const Home = () => {
               <div className="group mb-4 cursor-pointer">
                 <div className="aspect-[3/2] rounded overflow-hidden mb-2 bg-gray-100">
                   <img
-                    src={MOCK_SPORTS[0].image}
-                    alt={MOCK_SPORTS[0].title}
+                    src={phongbenh}
                     className="w-full h-full object-cover group-hover:scale-105 transition"
                   />
                 </div>
@@ -454,8 +460,7 @@ const Home = () => {
               <div className="group mb-4 cursor-pointer">
                 <div className="aspect-[3/2] rounded overflow-hidden mb-2 bg-gray-100">
                   <img
-                    src={MOCK_INTERNATIONAL[0].image}
-                    alt={MOCK_INTERNATIONAL[0].title}
+                    src={baotro}
                     className="w-full h-full object-cover group-hover:scale-105 transition"
                   />
                 </div>
@@ -485,8 +490,7 @@ const Home = () => {
               <div className="group mb-4 cursor-pointer">
                 <div className="aspect-[3/2] rounded overflow-hidden mb-2 bg-gray-100">
                   <img
-                    src={MOCK_CULTURE[0].image}
-                    alt={MOCK_CULTURE[0].title}
+                    src={chuyendoiso}
                     className="w-full h-full object-cover group-hover:scale-105 transition"
                   />
                 </div>
@@ -518,8 +522,7 @@ const Home = () => {
               <div className="group mb-4 cursor-pointer">
                 <div className="aspect-[3/2] rounded overflow-hidden mb-2 bg-gray-100">
                   <img
-                    src={MOCK_SPORTS[0].image}
-                    alt={MOCK_SPORTS[0].title}
+                    src={chinhsach}
                     className="w-full h-full object-cover group-hover:scale-105 transition"
                   />
                 </div>
@@ -549,8 +552,7 @@ const Home = () => {
               <div className="group mb-4 cursor-pointer">
                 <div className="aspect-[3/2] rounded overflow-hidden mb-2 bg-gray-100">
                   <img
-                    src={MOCK_INTERNATIONAL[0].image}
-                    alt={MOCK_INTERNATIONAL[0].title}
+                    src={guongnguoitot}
                     className="w-full h-full object-cover group-hover:scale-105 transition"
                   />
                 </div>
@@ -572,6 +574,8 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      <HospitalSlider />
     </div>
   );
 };

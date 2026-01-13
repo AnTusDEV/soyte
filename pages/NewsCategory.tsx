@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { MOCK_NEWS, MAIN_MENU, MOCK_VIDEOS } from "../constants";
@@ -12,7 +13,7 @@ import {
   ChevronRightCircle,
   Share2,
 } from "lucide-react";
-import anh1 from '@/assets/image/banner.png';
+
 const NewsCategory = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
 
@@ -184,9 +185,10 @@ const NewsCategory = () => {
             
             <div className="ads-zone-group zonegroup-vertical" id="ads-zone-10" data-id="10" data-type="vertical" data-position="ads_sidebar_top" data-timeflip="1000">
                 <div className="ads-block-item text-center ">
-                    <Link href="https://baoquangninh.vn/ads-tracking?aid=166&amp;cmpid=166&amp;alink=166" target="">
-                        <img src={anh1} style={{height:'250px', width:'100%'}} alt="Quảng cáo" />
-                    </Link>
+                    {/* Fix: replaced Link with anchor tag for external advertisement link as Link component does not support href property */}
+                    <a href="https://baoquangninh.vn/ads-tracking?aid=166&amp;cmpid=166&amp;alink=166" target="">
+                        <img src="https://media.baoquangninh.vn/upload/image/202411/medium/2283484_qn_diem_den_4_mua_11174221.jpg" width="" height="" alt="Quảng cáo" />
+                    </a>
                 </div>
             </div>
 

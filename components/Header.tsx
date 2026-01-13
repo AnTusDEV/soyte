@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
@@ -8,50 +9,41 @@ import {
   ChevronDown,
   LogOut,
   User,
-  PlusCircle,
-  Send,
+  LayoutDashboard,
 } from "lucide-react";
 import { MAIN_MENU } from "../constants";
+import { auth } from "../firebase";
+import { signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName, setUserName] = useState("");
-  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Kiểm tra trạng thái đăng nhập
-  const checkAuth = () => {
-    const loggedIn = localStorage.getItem("isLoggedIn") === "true";
-    setIsLoggedIn(loggedIn);
-    setUserName(localStorage.getItem("userName") || "");
-  };
-
   useEffect(() => {
-    checkAuth();
-
-    // Lắng nghe sự kiện thay đổi auth từ Login.tsx
-    window.addEventListener("auth-change", checkAuth);
-    // Lắng nghe sự kiện storage (cho các tab khác)
-    window.addEventListener("storage", checkAuth);
+    // Lắng nghe trạng thái đăng nhập từ Firebase
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setCurrentUser(user);
+    });
 
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
 
     return () => {
-      window.removeEventListener("auth-change", checkAuth);
-      window.removeEventListener("storage", checkAuth);
+      unsubscribe();
       clearInterval(timer);
     };
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("userName");
-    setIsLoggedIn(false);
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   const getFormattedDateTime = (date: Date) => {
@@ -86,17 +78,17 @@ const Header = () => {
           </div>
 
           <div className="flex items-center space-x-3 md:space-x-4 font-medium">
-            {isLoggedIn ? (
+            {currentUser ? (
               <div className="flex items-center gap-3">
                 <span className="flex items-center gap-1.5 bg-white/10 px-2 py-0.5 rounded text-secondary-300">
-                  <User size={12} /> Chào, {userName}
+                  <User size={12} /> {currentUser.email?.split('@')[0]}
                 </span>
-                <button
-                  onClick={() => setIsPostModalOpen(true)}
+                <Link
+                  to="/admin"
                   className="flex items-center gap-1 bg-secondary-500 hover:bg-secondary-600 px-2.5 py-1 rounded font-bold text-white transition-all shadow-lg text-[10px] md:text-xs"
                 >
-                  <PlusCircle size={14} /> ĐĂNG TIN
-                </button>
+                  <LayoutDashboard size={14} /> QUẢN TRỊ
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="flex items-center gap-1 hover:text-red-300 transition text-[10px] md:text-xs"
@@ -144,28 +136,7 @@ const Header = () => {
                 </p>
               </div>
             </Link>
-            <div
-              className="ads-zone-group zonegroup-vertical"
-              id="ads-zone-37"
-              data-id="37"
-              data-type="vertical"
-              data-position="mangset"
-              data-timeflip="2000"
-            >
-              <div className="ads-block-item text-center ">
-                <a
-                  href="https://baoquangninh.vn/ads-tracking?aid=284&amp;cmpid=284&amp;alink=284"
-                  target=""
-                >
-                  <img
-                    src="https://media.baoquangninh.vn/upload/image/202511/original/b38ecbf2b29402f0ee5f03bbf4eb102d.gif"
-                    width=""
-                    height=""
-                    alt="Advertisement"
-                  />
-                </a>
-              </div>
-            </div>
+            
             <div className="hidden lg:flex items-center flex-1 max-w-sm justify-end">
               <div className="relative w-full group">
                 <input
@@ -232,13 +203,8 @@ const Header = () => {
                           size={14}
                           className="ml-1 lg:block hidden group-hover:rotate-180 transition-transform duration-200 opacity-70"
                         />
-                        <ChevronDown
-                          size={14}
-                          className="ml-1 lg:hidden opacity-70"
-                        />
                       </div>
 
-                      {/* Dropdown Menu - Increased width (w-72) for better readability */}
                       <div className="hidden lg:group-hover:block absolute left-0 top-full bg-white shadow-2xl rounded-b-lg w-72 z-50 animate-in fade-in slide-in-from-top-2 duration-200 border-t-4 border-secondary-500 ring-1 ring-black/5">
                         <ul className="py-2">
                           {item.children?.map((child) => (
@@ -252,19 +218,6 @@ const Header = () => {
                             </li>
                           ))}
                         </ul>
-                      </div>
-                      {/* Mobile Submenu */}
-                      <div className="lg:hidden pl-4 bg-black/20 border-l-2 border-white/10 ml-3 my-1">
-                        {item.children?.map((child) => (
-                          <Link
-                            key={child.id}
-                            to={child.path}
-                            className="block px-3 py-2 text-xs text-gray-300 hover:text-white font-medium"
-                            onClick={() => setIsMenuOpen(false)}
-                          >
-                            {child.title}
-                          </Link>
-                        ))}
                       </div>
                     </>
                   ) : (
@@ -288,95 +241,6 @@ const Header = () => {
           </ul>
         </div>
       </nav>
-
-      {/* Quick Post Modal */}
-      {isPostModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="bg-primary-700 p-4 flex justify-between items-center text-white">
-              <h3 className="font-bold flex items-center gap-2">
-                <PlusCircle size={20} /> SOẠN THẢO TIN TỨC MỚI
-              </h3>
-              <button
-                onClick={() => setIsPostModalOpen(false)}
-                className="hover:bg-white/20 p-1 rounded-full"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
-                  Tiêu đề bài viết
-                </label>
-                <input
-                  type="text"
-                  placeholder="Nhập tiêu đề tin tức..."
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-100 outline-none font-medium"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
-                    Chuyên mục
-                  </label>
-                  <select className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg outline-none">
-                    <option>Tin tức - Sự kiện</option>
-                    <option>Cảnh báo y tế</option>
-                    <option>Chuyển đổi số</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
-                    Hình ảnh đại diện
-                  </label>
-                  <input
-                    type="file"
-                    className="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
-                  Nội dung tóm tắt
-                </label>
-                <textarea
-                  rows={2}
-                  placeholder="Mô tả ngắn gọn về tin tức..."
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg outline-none"
-                ></textarea>
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
-                  Nội dung chi tiết
-                </label>
-                <textarea
-                  rows={6}
-                  placeholder="Nội dung đầy đủ của bài viết..."
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg outline-none"
-                ></textarea>
-              </div>
-              <div className="flex gap-3 pt-2">
-                <button
-                  onClick={() => {
-                    alert("Đã gửi bài viết lên hệ thống chờ phê duyệt!");
-                    setIsPostModalOpen(false);
-                  }}
-                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg"
-                >
-                  <Send size={18} /> ĐĂNG BÀI NGAY
-                </button>
-                <button
-                  onClick={() => setIsPostModalOpen(false)}
-                  className="px-6 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-3 rounded-xl transition-all"
-                >
-                  HỦY BỎ
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </header>
   );
 };

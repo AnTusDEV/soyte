@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   Search, 
@@ -10,7 +11,7 @@ import {
   Info,
   X 
 } from 'lucide-react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import L from 'leaflet';
 
 // Fix for default Leaflet icon in React
@@ -21,8 +22,12 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-// Coordinate Center of Hanoi
+// Hanoi Geofencing & Center
 const HANOI_CENTER: [number, number] = [21.0285, 105.8542];
+const HANOI_BOUNDS: L.LatLngBoundsExpression = [
+  [20.53, 105.28], // Southwest (Phu Xuyen/Ung Hoa area)
+  [21.39, 106.02]  // Northeast (Soc Son area)
+];
 
 // Custom DivIcons for Map Markers
 const createCustomIcon = (type: string) => {
@@ -33,8 +38,8 @@ const createCustomIcon = (type: string) => {
 
   return L.divIcon({
     className: 'custom-map-marker',
-    html: `<div class="${colorClass} w-6 h-6 rounded-full border-2 border-white shadow-lg flex items-center justify-center">
-            <div class="w-2 h-2 bg-white rounded-full"></div>
+    html: `<div class="${colorClass} w-6 h-6 rounded-full border-2 border-white shadow-lg flex items-center justify-center transition-transform hover:scale-125">
+            <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
            </div>`,
     iconSize: [24, 24],
     iconAnchor: [12, 12],
@@ -140,7 +145,7 @@ const FACILITIES: Facility[] = [
 const MapFlyTo = ({ coords }: { coords: [number, number] | null }) => {
   const map = useMap();
   if (coords) {
-    map.flyTo(coords, 15, { duration: 2 });
+    map.flyTo(coords, 16, { duration: 1.5 });
   }
   return null;
 };
@@ -178,94 +183,108 @@ const HanoiSystem = () => {
 
   const getTypeIcon = (type: string) => {
     switch(type) {
-      case 'BV': return <Building2 size={16} />;
-      case 'TTYT': return <Activity size={16} />;
-      case 'TYT': return <Stethoscope size={16} />;
-      default: return <Info size={16} />;
+      case 'BV': return <Building2 size={14} />;
+      case 'TTYT': return <Activity size={14} />;
+      case 'TYT': return <Stethoscope size={14} />;
+      default: return <Info size={14} />;
     }
   };
 
   return (
     <div className="flex flex-col h-[calc(100vh-64px)] bg-gray-50 overflow-hidden">
       {/* Page Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm z-10">
+      <div className="bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center shadow-sm z-10">
         <div>
-          <h1 className="text-2xl font-bold text-primary-900 uppercase flex items-center gap-2">
-            <MapPin className="text-red-600" /> Bản đồ Hệ thống Y tế Hà Nội
+          <h1 className="text-lg md:text-xl font-black text-primary-900 uppercase flex items-center gap-2">
+            <div className="bg-red-600 p-1.5 rounded shadow-md text-white">
+                <MapPin size={18} />
+            </div>
+            Bản đồ Y tế Thủ đô Hà Nội
           </h1>
-          <p className="text-sm text-gray-500">Tra cứu thông tin mạng lưới khám chữa bệnh trên địa bàn thành phố</p>
+          <p className="text-[10px] md:text-xs text-gray-500 font-medium tracking-tight">Hệ thống tra cứu mạng lưới y tế chính thống khu vực Hà Nội</p>
         </div>
       </div>
 
       <div className="flex flex-grow overflow-hidden relative">
         
         {/* LEFT SIDEBAR: LIST & SEARCH */}
-        <div className="w-full md:w-[400px] bg-white border-r border-gray-200 flex flex-col z-30 shadow-lg md:shadow-none absolute md:relative h-full transition-transform transform md:translate-x-0 -translate-x-full">
+        <div className="w-full md:w-[320px] bg-white border-r border-gray-200 flex flex-col z-30 shadow-lg md:shadow-none absolute md:relative h-full transition-transform transform md:translate-x-0 -translate-x-full">
             
             {/* Search & Filter */}
-            <div className="p-4 border-b border-gray-100 bg-gray-50 space-y-3">
+            <div className="p-3 border-b border-gray-100 bg-gray-50 space-y-3">
                 <div className="relative">
-                    <Search className="absolute left-3 top-2.5 text-gray-400" size={18}/>
+                    <Search className="absolute left-3 top-2.5 text-gray-400" size={16}/>
                     <input 
                         type="text" 
-                        placeholder="Tìm bệnh viện, trạm y tế..."
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+                        placeholder="Tìm bệnh viện..."
+                        className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-500 text-xs font-medium transition-all"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-                <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-                    <button onClick={() => setFilterType('ALL')} className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap border transition ${filterType === 'ALL' ? 'bg-primary-900 text-white border-primary-900' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'}`}>
+                <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
+                    <button onClick={() => setFilterType('ALL')} className={`px-2.5 py-1 rounded-md text-[10px] font-bold whitespace-nowrap border transition ${filterType === 'ALL' ? 'bg-primary-900 text-white border-primary-900' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'}`}>
                         Tất cả
                     </button>
-                    <button onClick={() => setFilterType('BV')} className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap border transition ${filterType === 'BV' ? 'bg-red-600 text-white border-red-600' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'}`}>
+                    <button onClick={() => setFilterType('BV')} className={`px-2.5 py-1 rounded-md text-[10px] font-bold whitespace-nowrap border transition ${filterType === 'BV' ? 'bg-red-600 text-white border-red-600' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'}`}>
                         Bệnh viện
                     </button>
-                    <button onClick={() => setFilterType('TTYT')} className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap border transition ${filterType === 'TTYT' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'}`}>
+                    <button onClick={() => setFilterType('TTYT')} className={`px-2.5 py-1 rounded-md text-[10px] font-bold whitespace-nowrap border transition ${filterType === 'TTYT' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'}`}>
                         TT Y tế
                     </button>
-                    <button onClick={() => setFilterType('TYT')} className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap border transition ${filterType === 'TYT' ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'}`}>
+                    <button onClick={() => setFilterType('TYT')} className={`px-2.5 py-1 rounded-md text-[10px] font-bold whitespace-nowrap border transition ${filterType === 'TYT' ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'}`}>
                         Trạm Y tế
                     </button>
                 </div>
-                <div className="text-xs text-gray-500 font-medium px-1">
-                    Tìm thấy <span className="font-bold text-primary-700">{filteredFacilities.length}</span> cơ sở y tế
+                <div className="text-[9px] text-gray-400 font-bold uppercase tracking-widest px-1">
+                    Hiển thị <span className="text-primary-700">{filteredFacilities.length}</span> cơ sở
                 </div>
             </div>
 
             {/* List */}
-            <div className="flex-grow overflow-y-auto">
-                {filteredFacilities.map(fac => (
-                    <div 
-                        key={fac.id}
-                        onClick={() => setSelectedFacility(fac)}
-                        className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-blue-50 transition flex gap-3 ${selectedFacility?.id === fac.id ? 'bg-blue-50 border-l-4 border-l-blue-600' : 'border-l-4 border-l-transparent'}`}
-                    >
-                         <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm ${getTypeColor(fac.type)}`}>
-                             {getTypeIcon(fac.type)}
-                         </div>
-                         <div>
-                             <h3 className="text-sm font-bold text-gray-800 leading-tight mb-1">{fac.name}</h3>
-                             <p className="text-xs text-gray-500 line-clamp-1 mb-1">{fac.address}</p>
-                             <span className={`inline-block text-[10px] px-2 py-0.5 rounded border ${fac.type === 'BV' ? 'text-red-600 border-red-200 bg-red-50' : fac.type === 'TTYT' ? 'text-blue-600 border-blue-200 bg-blue-50' : 'text-green-600 border-green-200 bg-green-50'}`}>
-                                {getTypeLabel(fac.type)}
-                             </span>
-                         </div>
+            <div className="flex-grow overflow-y-auto no-scrollbar bg-white">
+                {filteredFacilities.length > 0 ? (
+                    filteredFacilities.map(fac => (
+                        <div 
+                            key={fac.id}
+                            onClick={() => setSelectedFacility(fac)}
+                            className={`p-3 border-b border-gray-50 cursor-pointer hover:bg-blue-50 transition-all flex gap-3 ${selectedFacility?.id === fac.id ? 'bg-blue-50/80 border-l-4 border-l-blue-600' : 'border-l-4 border-l-transparent'}`}
+                        >
+                             <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm transition-transform ${selectedFacility?.id === fac.id ? 'scale-105' : ''} ${getTypeColor(fac.type)}`}>
+                                 {getTypeIcon(fac.type)}
+                             </div>
+                             <div className="flex-grow min-w-0">
+                                 <h3 className="text-xs font-bold text-gray-800 leading-tight mb-0.5 truncate">{fac.name}</h3>
+                                 <p className="text-[10px] text-gray-500 line-clamp-1 mb-1">{fac.address}</p>
+                                 <span className={`inline-block text-[9px] px-1.5 py-0.5 rounded font-black uppercase tracking-tighter border ${fac.type === 'BV' ? 'text-red-600 border-red-200 bg-red-50' : fac.type === 'TTYT' ? 'text-blue-600 border-blue-200 bg-blue-50' : 'text-green-600 border-green-200 bg-green-50'}`}>
+                                    {getTypeLabel(fac.type)}
+                                 </span>
+                             </div>
+                        </div>
+                    ))
+                ) : (
+                    <div className="p-10 text-center">
+                        <MapPin className="mx-auto text-gray-200 mb-4" size={32} />
+                        <p className="text-xs text-gray-400 font-medium">Không tìm thấy cơ sở.</p>
                     </div>
-                ))}
+                )}
             </div>
         </div>
 
-        {/* RIGHT AREA: REAL MAP */}
-        <div className="flex-grow relative bg-slate-200 overflow-hidden group h-full z-10">
+        {/* RIGHT AREA: GEOCONFINED MAP */}
+        <div className="flex-grow relative bg-slate-200 overflow-hidden h-full z-10">
             <MapContainer 
               center={HANOI_CENTER} 
               zoom={13} 
+              minZoom={10}
+              maxZoom={18}
+              maxBounds={HANOI_BOUNDS}
+              maxBoundsViscosity={1.0}
               style={{ height: '100%', width: '100%' }}
-              zoomControl={false} // We will add custom if needed or use default top-left
+              zoomControl={true}
             >
               <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
               
@@ -283,52 +302,61 @@ const HanoiSystem = () => {
               ))}
             </MapContainer>
 
-            {/* DETAIL POPUP CARD (Floating on Map) */}
+            {/* DETAIL POPUP CARD (SHRUNKEN) */}
             {selectedFacility && (
-                <div className="absolute top-4 left-4 md:left-auto md:right-4 w-[90%] md:w-80 bg-white rounded-lg shadow-2xl overflow-hidden z-[1000] animate-in fade-in zoom-in-95 duration-200 border border-gray-200">
-                    <div className="relative h-40">
+                <div className="absolute top-3 left-3 md:left-auto md:right-3 w-[85%] md:w-72 bg-white rounded-xl shadow-2xl overflow-hidden z-[1000] animate-in fade-in zoom-in-95 duration-300 border border-gray-100">
+                    <div className="relative h-32">
                         <img src={selectedFacility.image} alt={selectedFacility.name} className="w-full h-full object-cover" />
                         <button 
                             onClick={() => setSelectedFacility(null)}
-                            className="absolute top-2 right-2 w-8 h-8 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center backdrop-blur-sm transition"
+                            className="absolute top-2 right-2 w-7 h-7 bg-white/90 hover:bg-white text-gray-900 rounded-full flex items-center justify-center shadow-md transition"
                         >
-                            <X size={16} />
+                            <X size={14} />
                         </button>
-                        <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
-                             <span className={`text-[10px] font-bold px-2 py-0.5 rounded text-white ${selectedFacility.type === 'BV' ? 'bg-red-600' : selectedFacility.type === 'TTYT' ? 'bg-blue-600' : 'bg-green-600'}`}>
+                        <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
+                             <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-sm text-white shadow-md ${selectedFacility.type === 'BV' ? 'bg-red-600' : selectedFacility.type === 'TTYT' ? 'bg-blue-600' : 'bg-green-600'}`}>
                                 {getTypeLabel(selectedFacility.type)}
                              </span>
                         </div>
                     </div>
                     <div className="p-4">
-                        <h2 className="text-lg font-bold text-gray-900 mb-2 leading-tight">{selectedFacility.name}</h2>
+                        <h2 className="text-base font-black text-gray-900 mb-2 leading-tight uppercase tracking-tight">{selectedFacility.name}</h2>
                         
-                        <div className="space-y-3 text-sm text-gray-600">
-                            <div className="flex items-start gap-3">
-                                <MapPin size={16} className="mt-0.5 text-primary-600 flex-shrink-0" />
-                                <span>{selectedFacility.address}</span>
+                        <div className="space-y-2 text-[11px] text-gray-600">
+                            <div className="flex items-start gap-2">
+                                <MapPin size={14} className="text-primary-600 flex-shrink-0 mt-0.5" />
+                                <span className="font-medium text-gray-700">{selectedFacility.address}</span>
                             </div>
-                            <div className="flex items-center gap-3">
-                                <Phone size={16} className="text-primary-600 flex-shrink-0" />
-                                <span className="font-bold text-gray-800">{selectedFacility.phone}</span>
+                            <div className="flex items-center gap-2">
+                                <Phone size={14} className="text-primary-600 flex-shrink-0" />
+                                <span className="font-black text-primary-900 text-sm">{selectedFacility.phone}</span>
                             </div>
-                            <div className="flex items-start gap-3">
-                                <Info size={16} className="mt-0.5 text-primary-600 flex-shrink-0" />
-                                <p className="text-xs italic bg-gray-50 p-2 rounded border border-gray-100">{selectedFacility.description}</p>
+                            <div className="p-2 bg-slate-50 rounded-md border border-slate-100">
+                                <p className="text-[10px] leading-relaxed text-gray-600 italic">
+                                    "{selectedFacility.description}"
+                                </p>
                             </div>
                         </div>
 
-                        <div className="mt-5 grid grid-cols-2 gap-3">
-                            <button className="flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 text-white py-2 rounded font-bold text-sm transition shadow-md">
-                                <Navigation size={16} /> Chỉ đường
+                        <div className="mt-4 grid grid-cols-2 gap-2">
+                            <button className="flex items-center justify-center gap-1 bg-primary-700 hover:bg-primary-800 text-white py-2 rounded-lg font-black text-[10px] uppercase tracking-wider transition">
+                                <Navigation size={12} /> Chỉ đường
                             </button>
-                            <button className="flex items-center justify-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 py-2 rounded font-bold text-sm transition">
-                                <Phone size={16} /> Gọi điện
+                            <button className="flex items-center justify-center gap-1 bg-white border-2 border-slate-200 hover:border-primary-600 hover:text-primary-600 text-slate-700 py-2 rounded-lg font-black text-[10px] uppercase tracking-wider transition">
+                                <Phone size={12} /> Gọi
                             </button>
                         </div>
                     </div>
                 </div>
             )}
+
+            {/* Hanoi Info Label Overlay */}
+            <div className="absolute bottom-3 left-3 z-[1000] pointer-events-none">
+                <div className="bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md border border-white/50 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse"></span>
+                    <span className="text-[9px] font-black text-gray-800 uppercase tracking-widest">Khu vực TP. Hà Nội</span>
+                </div>
+            </div>
         </div>
       </div>
     </div>
