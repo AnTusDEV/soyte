@@ -79,17 +79,17 @@ const ALL_FACILITIES: Facility[] = [
     name: item.name,
     type: 'PB' as const,
     category: i < 8 ? 'Phòng ban thuộc Sở' : 'Chi cục thuộc Sở',
-    address: 'Số 04 Sơn Tây, Phường Điện Biên, Quận Ba Đình, Hà Nội',
+    address: 'Số 04 Sơn Tây,  Điện Biên,  Ba Đình, Hà Nội',
     phone: '024 3998 5765',
     coords: [21.0312 + (i * 0.00005), 105.8315 + (i * 0.00005)] as [number, number],
     description: 'Cơ quan tham mưu, giúp việc cho Giám đốc Sở trong công tác quản lý nhà nước về y tế trên địa bàn Thủ đô.'
   })),
-  { id: 'bv-1', name: 'Bệnh viện đa khoa Xanh Pôn', type: 'BV', category: 'Bệnh viện', address: 'Số 12 Chu Văn An, Quận Ba Đình, Hà Nội', phone: '024 3823 3075', coords: [21.0318, 105.8396], description: 'Bệnh viện đa khoa đầu ngành Ngoại khoa và Nhi khoa của Thủ đô.' },
-  { id: 'bv-2', name: 'Bệnh viện Thanh Nhàn', type: 'BV', category: 'Bệnh viện', address: 'Số 42 Thanh Nhàn, Quận Hai Bà Trưng, Hà Nội', phone: '024 3971 4363', coords: [21.0028, 105.8569], description: 'Bệnh viện đa khoa hạng I, mũi nhọn về Nội khoa và hồi sức cấp cứu.' },
-  { id: 'bv-3', name: 'Bệnh viện đa khoa Đức Giang', type: 'BV', category: 'Bệnh viện', address: 'Số 54 Trường Lâm, Quận Long Biên, Hà Nội', phone: '024 3827 1515', coords: [21.0528, 105.8969], description: 'Cơ sở y tế hạng I khu vực phía Đông thành phố.' },
+  { id: 'bv-1', name: 'Bệnh viện đa khoa Xanh Pôn', type: 'BV', category: 'Bệnh viện', address: 'Số 12 Chu Văn An,  Ba Đình, Hà Nội', phone: '024 3823 3075', coords: [21.0318, 105.8396], description: 'Bệnh viện đa khoa đầu ngành Ngoại khoa và Nhi khoa của Thủ đô.' },
+  { id: 'bv-2', name: 'Bệnh viện Thanh Nhàn', type: 'BV', category: 'Bệnh viện', address: 'Số 42 Thanh Nhàn,  Hai Bà Trưng, Hà Nội', phone: '024 3971 4363', coords: [21.0028, 105.8569], description: 'Bệnh viện đa khoa hạng I, mũi nhọn về Nội khoa và hồi sức cấp cứu.' },
+  { id: 'bv-3', name: 'Bệnh viện đa khoa Đức Giang', type: 'BV', category: 'Bệnh viện', address: 'Số 54 Trường Lâm,  Long Biên, Hà Nội', phone: '024 3827 1515', coords: [21.0528, 105.8969], description: 'Cơ sở y tế hạng I khu vực phía Đông thành phố.' },
   { id: 'bv-h1', name: 'Bệnh viện đa khoa huyện Ba Vì', type: 'BV', category: 'Bệnh viện', address: 'Thị trấn Tây Đằng, Huyện Ba Vì, Hà Nội', phone: '024 3386 3144', coords: [21.2352, 105.4125], description: 'Phục vụ khám chữa bệnh cho nhân dân huyện Ba Vì.' },
-  { id: 'tt-1', name: 'Trung tâm Kiểm soát bệnh tật (CDC) Hà Nội', type: 'TT', category: 'Trung tâm chuyên khoa', address: 'Số 70 Nguyễn Chí Thanh, Quận Đống Đa, Hà Nội', phone: '024 3834 3520', coords: [21.0225, 105.8085], description: 'Đơn vị đầu ngành về y tế dự phòng và kiểm soát dịch bệnh.' },
-  { id: 'bt-1', name: 'Làng trẻ em SOS Hà Nội', type: 'BT', category: 'Cơ sở bảo trợ', address: 'Số 02 Doãn Kế Thiện, Quận Cầu Giấy, Hà Nội', phone: '024 3764 4022', coords: [21.0385, 105.7812], description: 'Nuôi dưỡng và chăm sóc trẻ em mồ côi, có hoàn cảnh đặc biệt.' },
+  { id: 'tt-1', name: 'Trung tâm Kiểm soát bệnh tật (CDC) Hà Nội', type: 'TT', category: 'Trung tâm chuyên khoa', address: 'Số 70 Nguyễn Chí Thanh,  Đống Đa, Hà Nội', phone: '024 3834 3520', coords: [21.0225, 105.8085], description: 'Đơn vị đầu ngành về y tế dự phòng và kiểm soát dịch bệnh.' },
+  { id: 'bt-1', name: 'Làng trẻ em SOS Hà Nội', type: 'BT', category: 'Cơ sở bảo trợ', address: 'Số 02 Doãn Kế Thiện,  Cầu Giấy, Hà Nội', phone: '024 3764 4022', coords: [21.0385, 105.7812], description: 'Nuôi dưỡng và chăm sóc trẻ em mồ côi, có hoàn cảnh đặc biệt.' },
 ];
 
 const MapEventHandler = ({ coords }: { coords: [number, number] | null }) => {

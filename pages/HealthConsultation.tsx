@@ -112,7 +112,7 @@ const DOCTORS: Doctor[] = [
     name: "Vũ Thị Lan",
     title: "BSCKI",
     specialty: "Nhi khoa",
-    hospital: "TTYT Quận Đống Đa",
+    hospital: "TTYT  Đống Đa",
     avatar: "https://img.freepik.com/free-photo/female-doctor-hospital-with-stethoscope_23-2148827776.jpg",
     rating: 4.5,
     reviewCount: 30,

@@ -49,7 +49,7 @@ const HealthRecords = () => {
     },
     {
       id: "hang-ma",
-      name: "Trạm Y tế Phường Hàng Mã",
+      name: "Trạm Y tế  Hàng Mã",
       icon: Home,
       color: "text-emerald-600",
       bg: "bg-emerald-50",
