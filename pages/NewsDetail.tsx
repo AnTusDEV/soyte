@@ -1,8 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { db } from '../firebase';
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { supabase } from '../supabase';
 import { Calendar, User, Share2, Printer, ChevronRight, Home, ArrowLeft, Clock } from 'lucide-react';
 import { SERVICE_CATEGORIES } from '../constants';
 
@@ -15,11 +14,14 @@ const NewsDetail = () => {
     const fetchPost = async () => {
       if (!id) return;
       try {
-        const docRef = doc(db, 'posts', id);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setPost({ id: docSnap.id, ...docSnap.data() });
-        }
+        const { data, error } = await supabase
+          .from('posts')
+          .select('*')
+          .eq('id', id)
+          .single();
+        
+        if (error) throw error;
+        setPost(data);
       } catch (error) {
         console.error("Error fetching post detail:", error);
       } finally {
@@ -86,11 +88,11 @@ const NewsDetail = () => {
                </span>
                <div className="flex items-center gap-1.5 text-xs text-gray-400 font-medium">
                   <Calendar size={14} />
-                  <span>{post.createdAt?.toDate ? post.createdAt.toDate().toLocaleDateString('vi-VN') : '---'}</span>
+                  <span>{new Date(post.createdAt).toLocaleDateString('vi-VN')}</span>
                </div>
                <div className="flex items-center gap-1.5 text-xs text-gray-400 font-medium">
                   <Clock size={14} />
-                  <span>{post.createdAt?.toDate ? post.createdAt.toDate().toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'}) : ''}</span>
+                  <span>{new Date(post.createdAt).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})}</span>
                </div>
             </div>
 
@@ -155,7 +157,7 @@ const NewsDetail = () => {
                   <Clock size={20} />
                 </div>
                 <p className="text-xs text-blue-800 font-medium">
-                  Lưu ý: Bài viết này được cài đặt tự động lưu trữ vào ngày <b>{post.expireAt?.toDate ? post.expireAt.toDate().toLocaleDateString('vi-VN') : new Date(post.expireAt).toLocaleDateString('vi-VN')}</b>.
+                  Lưu ý: Bài viết này được cài đặt tự động lưu trữ vào ngày <b>{new Date(post.expireAt).toLocaleDateString('vi-VN')}</b>.
                 </p>
              </div>
           </footer>

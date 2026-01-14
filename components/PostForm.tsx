@@ -2,9 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Send, Save, Image as ImageIcon, Link as LinkIcon, Upload, AlertCircle, Loader2, Clock } from 'lucide-react';
 import { SERVICE_CATEGORIES } from '../constants';
-import { db, storage, auth } from '../firebase';
-import { collection, addDoc, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+import { supabase } from '../supabase';
 
 interface PostFormProps {
   initialData?: any;
@@ -51,36 +49,31 @@ const PostForm: React.FC<PostFormProps> = ({ initialData, onClose, onSave }) => 
       return;
     }
 
-    if (!file.type.startsWith('image/')) {
-      alert("Chỉ chấp nhận tệp tin hình ảnh.");
-      return;
-    }
-
     setUploading(true);
-    setUploadProgress(0);
+    setUploadProgress(10);
 
     try {
-      const storageRef = ref(storage, `posts/${Date.now()}_${file.name}`);
-      const uploadTask = uploadBytesResumable(storageRef, file);
+      const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+      const filePath = `post-images/${fileName}`;
 
-      uploadTask.on('state_changed', 
-        (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setUploadProgress(progress);
-        }, 
-        (error) => {
-          console.error("Upload error:", error);
-          alert("Lỗi tải ảnh: " + error.message + ". Hãy kiểm tra quyền ghi (Rules) trên Storage.");
-          setUploading(false);
-        }, 
-        async () => {
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          setFormData(prev => ({ ...prev, imageUrl: downloadURL }));
-          setUploading(false);
-        }
-      );
+      const { data, error } = await supabase.storage
+        .from('posts')
+        .upload(filePath, file, { cacheControl: '3600', upsert: false });
+
+      if (error) throw error;
+
+      setUploadProgress(90);
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('posts')
+        .getPublicUrl(filePath);
+
+      setFormData(prev => ({ ...prev, imageUrl: publicUrl }));
+      setUploadProgress(100);
+      setUploading(false);
     } catch (err: any) {
-      alert("Lỗi khởi tạo upload: " + err.message);
+      console.error("Upload error:", err);
+      alert("Lỗi tải ảnh: " + err.message);
       setUploading(false);
     }
   };
@@ -98,43 +91,47 @@ const PostForm: React.FC<PostFormProps> = ({ initialData, onClose, onSave }) => 
     if (!validate()) return;
     if (uploading) return;
     
-    if (!auth.currentUser) {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
       alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
       return;
     }
 
     setLoading(true);
     try {
-      // Tính toán ngày hết hạn (hiện tại + 1 tháng)
       const now = new Date();
       const expireDate = new Date();
       expireDate.setMonth(now.getMonth() + 1);
 
-      const postData = {
+      const postData: any = {
         title: formData.title.trim(),
         summary: formData.summary.trim(),
         content: formData.content.trim(),
         category: formData.category,
         status: formData.status,
         imageUrl: formData.imageUrl,
-        authorEmail: auth.currentUser.email,
-        updatedAt: serverTimestamp(),
-        expireAt: expireDate, // Trường dùng để Firebase tự động xóa (TTL)
+        authorEmail: session.user.email,
+        updatedAt: new Date().toISOString(),
+        expireAt: expireDate.toISOString(),
       };
 
       if (initialData?.id) {
-        const postRef = doc(db, 'posts', initialData.id);
-        await updateDoc(postRef, postData);
+        const { error } = await supabase
+          .from('posts')
+          .update(postData)
+          .eq('id', initialData.id);
+        if (error) throw error;
       } else {
-        await addDoc(collection(db, 'posts'), {
-          ...postData,
-          createdAt: serverTimestamp()
-        });
+        postData.createdAt = new Date().toISOString();
+        const { error } = await supabase
+          .from('posts')
+          .insert([postData]);
+        if (error) throw error;
       }
       onSave();
     } catch (error: any) {
       console.error("Error saving post:", error);
-      alert(`Lỗi lưu bài viết (${error.code || 'unknown'}): ${error.message}`);
+      alert(`Lỗi lưu bài viết: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -156,7 +153,6 @@ const PostForm: React.FC<PostFormProps> = ({ initialData, onClose, onSave }) => 
         <div className="flex flex-col lg:flex-row overflow-hidden flex-grow">
           <form onSubmit={handleSubmit} id="post-form" className="flex-grow p-6 space-y-4 overflow-y-auto no-scrollbar">
             <div className="bg-blue-50 border border-blue-100 p-3 rounded-lg mb-4">
-               {/* Fixed: Added Clock to lucide-react imports */}
                <p className="text-[11px] text-blue-700 font-bold flex items-center gap-2">
                   <Clock size={14} /> TỰ ĐỘNG XÓA: Bài viết này sẽ tự động gỡ bỏ sau 30 ngày kể từ khi xuất bản để đảm bảo tính cập nhật của hệ thống.
                </p>
@@ -279,7 +275,6 @@ const PostForm: React.FC<PostFormProps> = ({ initialData, onClose, onSave }) => 
                     src={formData.imageUrl} 
                     alt="Preview" 
                     className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                    onError={(e) => (e.currentTarget.src = 'https://via.placeholder.com/400x250?text=Loi+Anh')}
                   />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center text-gray-300">

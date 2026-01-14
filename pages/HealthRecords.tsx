@@ -140,7 +140,7 @@ const HealthRecords = () => {
         </div>
       </div>
 
-      <div className="container mx-auto max-w-6xl px-4">
+      <div className="w-full px-4">
         {/* Quick Access Grid - The 6 Requested Buttons */}
         <div className="mb-10">
           <div className="flex items-center justify-between mb-6">

@@ -12,18 +12,25 @@ import HealthConsultation from './pages/HealthConsultation';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import HealthRecordsDetail from './pages/HealthRecordsDetail';
-import { auth } from './firebase';
+import { supabase } from './supabase';
 
 const App = () => {
-  const [user, setUser] = useState<any>(null);
+  const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUser(user);
+    // Lấy session hiện tại
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
       setLoading(false);
     });
-    return () => unsubscribe();
+
+    // Lắng nghe thay đổi trạng thái auth
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   if (loading) {
@@ -39,35 +46,20 @@ const App = () => {
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
-
-          {/* Authentication Route */}
           <Route path="/login" element={<Login />} />
-          <Route
-            path="/health-records/detail"
-            element={<HealthRecordsDetail />}
-          />
-          {/* Admin Dashboard Protected Route */}
+          <Route path="/health-records/detail" element={<HealthRecordsDetail />} />
+          
           <Route
             path="/admin"
-            element={user ? <AdminDashboard /> : <Navigate to="/login" replace />}
+            element={session ? <AdminDashboard /> : <Navigate to="/login" replace />}
           />
 
-          {/* News Routes */}
           <Route path="/news/:categoryId" element={<NewsCategory />} />
           <Route path="/news/detail/:id" element={<NewsDetail />} />
-
-          {/* Dashboard Routes */}
           <Route path="/health-records" element={<HealthRecords />} />
-
-          {/* Hanoi Healthcare System Map */}
           <Route path="/hanoi-system" element={<HanoiSystem />} />
-
-          {/* Smart Emergency Operations Center */}
           <Route path="/emergency" element={<EmergencyCenter />} />
-
-          {/* Online Health Consultation */}
           <Route path="/consulting" element={<HealthConsultation />} />
-
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Layout>
