@@ -12,6 +12,7 @@ import HealthConsultation from './pages/HealthConsultation';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import HealthRecordsDetail from './pages/HealthRecordsDetail';
+import WorkSchedule from './pages/WorkSchedule';
 import { supabase } from './supabase';
 
 const App = () => {
@@ -48,6 +49,7 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/health-records/detail" element={<HealthRecordsDetail />} />
+          <Route path="/schedule" element={<WorkSchedule />} />
           
           <Route
             path="/admin"

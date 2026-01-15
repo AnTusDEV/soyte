@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   Video, 
@@ -13,7 +14,10 @@ import {
   User,
   Clock,
   CheckCircle2,
-  X
+  X,
+  ArrowRight,
+  Phone,
+  ChevronRight
 } from 'lucide-react';
 
 // --- Mock Data ---
@@ -112,7 +116,7 @@ const DOCTORS: Doctor[] = [
     name: "Vũ Thị Lan",
     title: "BSCKI",
     specialty: "Nhi khoa",
-    hospital: "TTYT  Đống Đa",
+    hospital: "TTYT Quận Đống Đa",
     avatar: "https://img.freepik.com/free-photo/female-doctor-hospital-with-stethoscope_23-2148827776.jpg",
     rating: 4.5,
     reviewCount: 30,
@@ -126,6 +130,14 @@ const HealthConsultation = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [bookingForm, setBookingForm] = useState({
+    name: '',
+    phone: '',
+    specialty: '',
+    date: '',
+    reason: ''
+  });
 
   // Filter Logic
   const filteredDoctors = DOCTORS.filter(doc => {
@@ -164,6 +176,11 @@ const HealthConsultation = () => {
           </span>
         );
     }
+  };
+
+  const handleOpenBooking = (doc: Doctor) => {
+    setBookingForm({ ...bookingForm, specialty: doc.specialty });
+    setShowBookingModal(true);
   };
 
   return (
@@ -258,7 +275,10 @@ const HealthConsultation = () => {
 
                     {/* Bottom: Actions */}
                     <div className="mt-auto p-4 border-t border-gray-100 grid grid-cols-2 gap-3">
-                        <button className="flex items-center justify-center gap-2 border border-teal-600 text-teal-700 py-2 rounded-lg font-bold hover:bg-teal-50 transition text-sm">
+                        <button 
+                            onClick={() => handleOpenBooking(doctor)}
+                            className="flex items-center justify-center gap-2 border border-teal-600 text-teal-700 py-2 rounded-lg font-bold hover:bg-teal-50 transition text-sm"
+                        >
                             <Calendar size={16} /> Đặt lịch
                         </button>
                         {doctor.status === 'ONLINE' ? (
@@ -279,8 +299,8 @@ const HealthConsultation = () => {
         </div>
       </div>
 
-      {/* 4. Connection Simulation Modal */}
-      {selectedDoctor && (
+      {/* 4. Connection Simulation Modal (Video Call) */}
+      {selectedDoctor && !showBookingModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
                 <div className="bg-teal-600 p-4 flex justify-between items-center text-white">
@@ -319,6 +339,107 @@ const HealthConsultation = () => {
                             Bằng việc bắt đầu, bạn đồng ý với quy định khám chữa bệnh từ xa của Bộ Y tế.
                         </p>
                     </div>
+                </div>
+            </div>
+        </div>
+      )}
+
+      {/* 5. Booking Appointment Modal (NEW - Based on requested image) */}
+      {showBookingModal && (
+        <div className="fixed inset-0 bg-primary-900/90 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+            <div className="w-full max-w-4xl animate-in fade-in zoom-in-95 duration-300 relative">
+                {/* Close Button */}
+                <button 
+                  onClick={() => setShowBookingModal(false)}
+                  className="absolute -top-12 right-0 text-white hover:text-secondary-400 transition flex items-center gap-2 font-bold uppercase tracking-widest text-sm"
+                >
+                  <X size={24} /> Đóng
+                </button>
+
+                <div className="p-8 md:p-12 text-white">
+                  <h2 className="text-4xl md:text-5xl font-black mb-10 tracking-tight">Đặt lịch khám</h2>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                    {/* Họ và tên */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold opacity-80">Họ và tên <span className="text-red-500">*</span></label>
+                      <input 
+                        type="text" 
+                        placeholder="Vui lòng nhập tên bạn tại đây"
+                        className="w-full bg-white px-5 py-4 rounded-md text-gray-800 outline-none focus:ring-4 focus:ring-secondary-500/30 transition placeholder:text-gray-400 font-medium shadow-inner"
+                      />
+                    </div>
+
+                    {/* Số điện thoại */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold opacity-80">Số điện thoại <span className="text-red-500">*</span></label>
+                      <input 
+                        type="tel" 
+                        placeholder="Vui lòng nhập số điện thoại"
+                        className="w-full bg-white px-5 py-4 rounded-md text-gray-800 outline-none focus:ring-4 focus:ring-secondary-500/30 transition placeholder:text-gray-400 font-medium shadow-inner"
+                      />
+                    </div>
+
+                    {/* Chuyên khoa */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold opacity-80">Chuyên khoa <span className="text-red-500">*</span></label>
+                      <div className="relative">
+                        <select 
+                          className="w-full bg-white px-5 py-4 rounded-md text-gray-800 outline-none appearance-none focus:ring-4 focus:ring-secondary-500/30 transition font-medium shadow-inner"
+                          value={bookingForm.specialty}
+                          onChange={(e) => setBookingForm({...bookingForm, specialty: e.target.value})}
+                        >
+                          <option value="">Vui lòng chọn chuyên khoa</option>
+                          <option value="Tim mạch">Tim mạch</option>
+                          <option value="Nhi khoa">Nhi khoa</option>
+                          <option value="Nội khoa">Nội khoa</option>
+                          <option value="Da liễu">Da liễu</option>
+                          <option value="Sản phụ khoa">Sản phụ khoa</option>
+                        </select>
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                          <ChevronRight size={20} className="rotate-90" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Ngày đặt lịch khám */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold opacity-80">Ngày đặt lịch khám</label>
+                      <div className="relative">
+                        <input 
+                          type="date" 
+                          className="w-full bg-white px-5 py-4 rounded-md text-gray-800 outline-none focus:ring-4 focus:ring-secondary-500/30 transition font-medium shadow-inner"
+                          defaultValue={new Date().toISOString().split('T')[0]}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Lý do khám */}
+                    <div className="md:col-span-2 space-y-2">
+                      <label className="text-sm font-bold opacity-80">Lý do khám</label>
+                      <textarea 
+                        rows={4}
+                        placeholder="Vui lòng nhập tình trạng sức khỏe/nhu cầu thăm khám (nếu có)"
+                        className="w-full bg-white px-5 py-4 rounded-md text-gray-800 outline-none focus:ring-4 focus:ring-secondary-500/30 transition placeholder:text-gray-400 font-medium shadow-inner resize-none"
+                      ></textarea>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="mt-12 flex flex-col md:flex-row items-center justify-between gap-6">
+                    <button className="flex items-center gap-2 font-bold text-lg hover:text-secondary-400 transition-colors">
+                      <ArrowRight size={20} /> Đặt Lịch Hẹn Chi Tiết
+                    </button>
+                    <button 
+                      onClick={() => {
+                        alert("Hệ thống đã ghi nhận lịch hẹn của bạn. Nhân viên y tế sẽ liên hệ lại sớm nhất.");
+                        setShowBookingModal(false);
+                      }}
+                      className="w-full md:w-auto px-16 py-4 border-2 border-white rounded-full text-xl font-bold hover:bg-white hover:text-primary-900 transition-all duration-300 shadow-xl"
+                    >
+                      Đặt lịch khám
+                    </button>
+                  </div>
                 </div>
             </div>
         </div>

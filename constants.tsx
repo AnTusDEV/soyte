@@ -13,13 +13,11 @@ import {
   HeartHandshake,
   Award,
   Home,
-  Info,
-  Phone,
-  Briefcase,
-  Users,
-  Pill,
+  Info, 
+  Users, 
   Utensils,
   Syringe,
+  CalendarDays
 } from "lucide-react";
 import { MenuItem, NewsItem } from "./types";
 
@@ -175,9 +173,10 @@ export const MAIN_MENU: MenuItem[] = [
   {
     id: "guide",
     title: "Giới thiệu/Liên hệ",
-    path: "/guide",
+    path: "/schedule",
     icon: HeartHandshake,
     children: [
+      { id: "work-schedule", title: "Lịch công tác", path: "/schedule", icon: CalendarDays },
       { id: "guide-exam", title: "Quy trình khám bệnh", path: "/guide/exam", icon: FileText },
       { id: "guide-insurance", title: "Bảo hiểm y tế", path: "/news/policy", icon: ShieldPlus },
       { id: "guide-vaccine", title: "Lịch tiêm chủng", path: "/guide/vaccine", icon: Syringe },
