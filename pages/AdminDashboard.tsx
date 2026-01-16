@@ -15,12 +15,10 @@ import {
   Image as ImageIcon, 
   Home, 
   LogOut, 
-  AlertCircle,
   Loader2,
-  // Fix: Added missing Calendar import
   Calendar
 } from 'lucide-react';
-import { supabase } from '../supabase';
+import { api } from '../api';
 import { SERVICE_CATEGORIES } from '../constants';
 import PostForm from '../components/PostForm';
 
@@ -36,18 +34,25 @@ const AdminDashboard = () => {
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      let query = supabase
-        .from('posts')
-        .select('*')
-        .order('createdAt', { ascending: false });
-
+      let endpoint = '/posts?order=createdAt.desc';
       if (filterCategory !== 'all') {
-        query = query.eq('category', filterCategory);
+        endpoint += `&category_id=${filterCategory}`;
       }
 
-      const { data, error } = await query;
-      if (error) throw error;
-      setPosts(data || []);
+      const response = await api.get(endpoint);
+      
+      // Xử lý dữ liệu từ wrapper { data: [...] }
+      if (response && response.data && Array.isArray(response.data)) {
+        const mapped = response.data.map((p: any) => ({
+          ...p,
+          imageUrl: p.image_url,
+          createdAt: p.created_at,
+          category: p.category_id
+        }));
+        setPosts(mapped);
+      } else {
+        setPosts([]);
+      }
     } catch (error) {
       console.error("Error fetching posts:", error);
     } finally {
@@ -63,12 +68,7 @@ const AdminDashboard = () => {
     if (!window.confirm('Bạn có chắc chắn muốn xóa bài viết này?')) return;
     
     try {
-      const { error } = await supabase
-        .from('posts')
-        .delete()
-        .eq('id', id);
-      
-      if (error) throw error;
+      await api.delete(`/posts/${id}`);
       setPosts(posts.filter(p => p.id !== id));
     } catch (error) {
       alert('Lỗi khi xóa bài viết');
@@ -76,8 +76,9 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
+  const handleLogout = () => {
+    localStorage.removeItem('auth_token');
+    window.dispatchEvent(new Event('auth-change'));
     navigate('/login');
   };
 
@@ -88,7 +89,6 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
-      {/* Sidebar / Header Navigation */}
       <div className="bg-primary-900 text-white px-6 py-4 flex justify-between items-center shadow-lg sticky top-0 z-[100]">
         <div className="flex items-center gap-4">
           <div className="bg-white/10 p-2 rounded-lg">
@@ -96,20 +96,14 @@ const AdminDashboard = () => {
           </div>
           <div>
             <h1 className="text-xl font-black uppercase tracking-tight">Hệ thống Quản trị Nội dung</h1>
-            <p className="text-[10px] text-primary-200 font-bold uppercase tracking-widest">Sở Y tế Hà Nội • Supabase Cloud</p>
+            <p className="text-[10px] text-primary-200 font-bold uppercase tracking-widest">Sở Y tế Hà Nội • Local API</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <button 
-            onClick={() => navigate('/')}
-            className="hidden md:flex items-center gap-2 hover:bg-white/10 px-4 py-2 rounded-lg transition text-sm font-bold"
-          >
+          <button onClick={() => navigate('/')} className="hidden md:flex items-center gap-2 hover:bg-white/10 px-4 py-2 rounded-lg transition text-sm font-bold">
             <Home size={18} /> Trang chủ
           </button>
-          <button 
-            onClick={handleLogout}
-            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition text-sm font-bold shadow-lg"
-          >
+          <button onClick={handleLogout} className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition text-sm font-bold shadow-lg">
             <LogOut size={18} /> Thoát
           </button>
         </div>
@@ -221,7 +215,7 @@ const AdminDashboard = () => {
                       </td>
                       <td className="px-6 py-4">
                         <span className="text-[10px] font-black uppercase px-2 py-1 rounded bg-primary-50 text-primary-700 border border-primary-100">
-                           {category?.title || post.category}
+                           {category?.title || post.category || 'Tin tức'}
                         </span>
                       </td>
                       <td className="px-6 py-4">

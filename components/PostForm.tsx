@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Send, Save, Image as ImageIcon, Link as LinkIcon, Upload, AlertCircle, Loader2, Clock } from 'lucide-react';
+import { X, Send, Save, Image as ImageIcon, Link as LinkIcon, Upload, Clock, Loader2 } from 'lucide-react';
 import { SERVICE_CATEGORIES } from '../constants';
-import { supabase } from '../supabase';
+import { api } from '../api';
 
 interface PostFormProps {
   initialData?: any;
@@ -33,9 +33,9 @@ const PostForm: React.FC<PostFormProps> = ({ initialData, onClose, onSave }) => 
         title: initialData.title || '',
         summary: initialData.summary || '',
         content: initialData.content || '',
-        category: initialData.category || '',
+        category: initialData.category || initialData.category_id || '',
         status: initialData.status || 'draft',
-        imageUrl: initialData.imageUrl || ''
+        imageUrl: initialData.imageUrl || initialData.image_url || ''
       });
     }
   }, [initialData]);
@@ -50,26 +50,12 @@ const PostForm: React.FC<PostFormProps> = ({ initialData, onClose, onSave }) => 
     }
 
     setUploading(true);
-    setUploadProgress(10);
+    setUploadProgress(20);
 
     try {
-      const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
-      const filePath = `post-images/${fileName}`;
-
-      const { data, error } = await supabase.storage
-        .from('posts')
-        .upload(filePath, file, { cacheControl: '3600', upsert: false });
-
-      if (error) throw error;
-
-      setUploadProgress(90);
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('posts')
-        .getPublicUrl(filePath);
-
-      setFormData(prev => ({ ...prev, imageUrl: publicUrl }));
+      const data = await api.upload(file);
       setUploadProgress(100);
+      setFormData(prev => ({ ...prev, imageUrl: data.url }));
       setUploading(false);
     } catch (err: any) {
       console.error("Upload error:", err);
@@ -91,42 +77,21 @@ const PostForm: React.FC<PostFormProps> = ({ initialData, onClose, onSave }) => 
     if (!validate()) return;
     if (uploading) return;
     
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
-      return;
-    }
-
     setLoading(true);
     try {
-      const now = new Date();
-      const expireDate = new Date();
-      expireDate.setMonth(now.getMonth() + 1);
-
       const postData: any = {
         title: formData.title.trim(),
         summary: formData.summary.trim(),
         content: formData.content.trim(),
-        category: formData.category,
+        category_id: formData.category, // map to snake_case for API
         status: formData.status,
-        imageUrl: formData.imageUrl,
-        authorEmail: session.user.email,
-        updatedAt: new Date().toISOString(),
-        expireAt: expireDate.toISOString(),
+        image_url: formData.imageUrl,   // map to snake_case for API
       };
 
       if (initialData?.id) {
-        const { error } = await supabase
-          .from('posts')
-          .update(postData)
-          .eq('id', initialData.id);
-        if (error) throw error;
+        await api.put(`/posts/${initialData.id}`, postData);
       } else {
-        postData.createdAt = new Date().toISOString();
-        const { error } = await supabase
-          .from('posts')
-          .insert([postData]);
-        if (error) throw error;
+        await api.post('/posts', postData);
       }
       onSave();
     } catch (error: any) {
@@ -154,7 +119,7 @@ const PostForm: React.FC<PostFormProps> = ({ initialData, onClose, onSave }) => 
           <form onSubmit={handleSubmit} id="post-form" className="flex-grow p-6 space-y-4 overflow-y-auto no-scrollbar">
             <div className="bg-blue-50 border border-blue-100 p-3 rounded-lg mb-4">
                <p className="text-[11px] text-blue-700 font-bold flex items-center gap-2">
-                  <Clock size={14} /> TỰ ĐỘNG XÓA: Bài viết này sẽ tự động gỡ bỏ sau 30 ngày kể từ khi xuất bản để đảm bảo tính cập nhật của hệ thống.
+                  <Clock size={14} /> LƯU Ý: Bài viết cần tuân thủ quy định về phát ngôn và bảo mật thông tin ngành y tế.
                </p>
             </div>
 
@@ -209,7 +174,7 @@ const PostForm: React.FC<PostFormProps> = ({ initialData, onClose, onSave }) => 
                     type="text"
                     value={formData.imageUrl}
                     onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                    placeholder="Link ảnh ngoại mạng..."
+                    placeholder="Link ảnh..."
                     className="w-full pl-10 pr-3 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-100 outline-none text-xs"
                   />
                 </div>
@@ -232,14 +197,6 @@ const PostForm: React.FC<PostFormProps> = ({ initialData, onClose, onSave }) => 
                    />
                 </div>
               </div>
-              {uploading && (
-                <div className="mt-2 w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
-                  <div 
-                    className="bg-primary-600 h-full transition-all duration-300" 
-                    style={{ width: `${uploadProgress}%` }}
-                  ></div>
-                </div>
-              )}
             </div>
 
             <div>
@@ -271,50 +228,17 @@ const PostForm: React.FC<PostFormProps> = ({ initialData, onClose, onSave }) => 
             <div className="w-full bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group">
               <div className="relative aspect-[16/10] bg-gray-100 overflow-hidden">
                 {formData.imageUrl ? (
-                  <img 
-                    src={formData.imageUrl} 
-                    alt="Preview" 
-                    className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                  />
+                  <img src={formData.imageUrl} alt="Preview" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center text-gray-300">
                     <ImageIcon size={48} strokeWidth={1} />
-                    <span className="text-[10px] font-bold mt-2 uppercase tracking-tighter">Chưa có ảnh đại diện</span>
                   </div>
                 )}
-                <div className="absolute top-2 left-2">
-                   <span className={`text-[9px] px-2 py-0.5 rounded-sm font-black text-white uppercase shadow-lg ${formData.category ? 'bg-primary-600' : 'bg-gray-400'}`}>
-                      {formData.category ? SERVICE_CATEGORIES.find(c => c.id === formData.category)?.title : 'Danh mục'}
-                   </span>
-                </div>
               </div>
               <div className="p-4">
-                <h5 className="font-bold text-gray-800 text-sm leading-tight mb-2 line-clamp-2">
-                  {formData.title || 'Tiêu đề bài viết...'}
-                </h5>
-                <p className="text-[11px] text-gray-500 line-clamp-2 mb-3">
-                  {formData.summary || 'Nội dung tóm tắt sẽ hiển thị tại đây khi bạn nhập vào form...'}
-                </p>
-                <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-50">
-                   <div className="flex items-center gap-1.5">
-                      <div className={`w-2 h-2 rounded-full ${formData.status === 'published' ? 'bg-green-500' : 'bg-gray-400'}`}></div>
-                      <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">
-                        {formData.status === 'published' ? 'Công khai' : 'Nháp'}
-                      </span>
-                   </div>
-                   <span className="text-[10px] text-gray-400 font-medium italic">Vừa xong</span>
-                </div>
+                <h5 className="font-bold text-gray-800 text-sm leading-tight mb-2 line-clamp-2">{formData.title || 'Tiêu đề...'}</h5>
+                <p className="text-[11px] text-gray-500 line-clamp-2">{formData.summary || 'Tóm tắt...'}</p>
               </div>
-            </div>
-
-            <div className="mt-8 p-4 bg-amber-50 rounded-xl border border-amber-100 w-full space-y-2">
-                <div className="flex items-center gap-2 text-amber-700">
-                   <AlertCircle size={16} />
-                   <h6 className="text-[10px] font-black uppercase">Lưu ý hệ thống</h6>
-                </div>
-                <p className="text-[10px] text-amber-800 leading-relaxed">
-                  Giới hạn kích thước ảnh tải lên là <b>2MB</b>. Bài viết sau khi đăng sẽ được duyệt bởi Ban Biên Tập trước khi hiển thị chính thức.
-                </p>
             </div>
           </div>
         </div>
@@ -324,10 +248,10 @@ const PostForm: React.FC<PostFormProps> = ({ initialData, onClose, onSave }) => 
             type="submit"
             form="post-form"
             disabled={loading || uploading}
-            className="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-xl shadow-primary-100 disabled:opacity-50"
+            className="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-xl shadow-primary-100"
           >
             {loading ? <Loader2 className="animate-spin" size={20}/> : (initialData ? <Save size={20}/> : <Send size={20} />)}
-            {initialData ? 'CẬP NHẬT THAY ĐỔI' : 'XUẤT BẢN BÀI VIẾT'}
+            {initialData ? 'CẬP NHẬT' : 'XUẤT BẢN'}
           </button>
           <button
             type="button"

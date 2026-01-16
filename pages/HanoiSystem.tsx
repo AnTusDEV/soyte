@@ -156,7 +156,7 @@ const ALL_FACILITIES: Facility[] = [
 ];
 
 const callApi = async () => {
-  const url = "http://localhost:7001/api/syt_han/thongtinbenhvien/get_current";
+  const url = "http://localhost:7001/syt_han/thongtinbenhvien/get_current";
   try {
     const response = await fetch(url, {
       method: "GET",

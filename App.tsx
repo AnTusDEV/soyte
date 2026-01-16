@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import Home from './pages/Home';
@@ -13,31 +13,48 @@ import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import HealthRecordsDetail from './pages/HealthRecordsDetail';
 import WorkSchedule from './pages/WorkSchedule';
-import { supabase } from './supabase';
+import { api } from './api';
 
 const App = () => {
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Lấy session hiện tại
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-    });
-
-    // Lắng nghe thay đổi trạng thái auth
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
+  const checkAuth = useCallback(async () => {
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      try {
+        const userData = await api.get('/auth/me');
+        setSession({ user: userData });
+      } catch (error) {
+        console.warn("Session verification failed, clearing token.");
+        localStorage.removeItem('auth_token');
+        setSession(null);
+      }
+    } else {
+      setSession(null);
+    }
+    setLoading(false);
   }, []);
+
+  useEffect(() => {
+    checkAuth();
+    
+    // Custom event to handle login from within the same window
+    const handleAuthChange = () => checkAuth();
+    window.addEventListener('auth-change', handleAuthChange);
+    window.addEventListener('storage', handleAuthChange);
+    
+    return () => {
+      window.removeEventListener('auth-change', handleAuthChange);
+      window.removeEventListener('storage', handleAuthChange);
+    };
+  }, [checkAuth]);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+        <div className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="text-gray-500 font-bold text-xs uppercase tracking-widest">Đang tải hệ thống...</p>
       </div>
     );
   }
@@ -47,7 +64,7 @@ const App = () => {
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<Login onLoginSuccess={checkAuth} />} />
           <Route path="/health-records/detail" element={<HealthRecordsDetail />} />
           <Route path="/schedule" element={<WorkSchedule />} />
           

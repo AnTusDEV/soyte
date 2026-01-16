@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+
+import React, { useState, useEffect, useCallback } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Menu,
@@ -11,8 +12,7 @@ import {
   LayoutDashboard,
 } from "lucide-react";
 import { MAIN_MENU } from "../constants";
-import { auth } from "../firebase";
-import { signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { api } from "../api";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,27 +22,45 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Lắng nghe trạng thái đăng nhập từ Firebase
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setCurrentUser(user);
-    });
+  const checkAuth = useCallback(async () => {
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      try {
+        const userData = await api.get('/auth/me');
+        setCurrentUser(userData);
+      } catch (error) {
+        console.error("Header auth check failed:", error);
+        setCurrentUser(null);
+      }
+    } else {
+      setCurrentUser(null);
+    }
+  }, []);
 
+  useEffect(() => {
+    checkAuth();
+    
+    // Listen for custom event and storage event for multi-tab sync
+    const handleAuthChange = () => checkAuth();
+    window.addEventListener('auth-change', handleAuthChange);
+    window.addEventListener('storage', handleAuthChange);
+    
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
 
     return () => {
-      unsubscribe();
+      window.removeEventListener('auth-change', handleAuthChange);
+      window.removeEventListener('storage', handleAuthChange);
       clearInterval(timer);
     };
-  }, []);
+  }, [checkAuth]);
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      navigate("/");
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
+  const handleLogout = () => {
+    localStorage.removeItem('auth_token');
+    setCurrentUser(null);
+    // Dispatch events to notify other components (App.tsx and Header.tsx itself)
+    window.dispatchEvent(new Event('auth-change'));
+    window.dispatchEvent(new Event('storage'));
+    navigate("/");
   };
 
   const getFormattedDateTime = (date: Date) => {
@@ -80,7 +98,7 @@ const Header = () => {
             {currentUser ? (
               <div className="flex items-center gap-3">
                 <span className="flex items-center gap-1.5 bg-white/10 px-2 py-0.5 rounded text-secondary-300">
-                  <User size={12} /> {currentUser.email?.split("@")[0]}
+                  <User size={12} /> {currentUser.email?.split("@")[0] || currentUser.username}
                 </span>
                 <Link
                   to="/admin"
@@ -125,7 +143,7 @@ const Header = () => {
               />
               <div className="flex flex-col">
                 <h2 className="text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-widest hidden md:block">
-                  CỔNG THÔNG TIN ĐIỆN TỬ Y TẾ CỘNG ĐỒNG
+                  CỔNG THÔNG TIN ĐIỆN TỬ SỞ Y TẾ HÀ NỘI
                 </h2>
                 <h1 className="text-xl md:text-3xl font-black text-[#d32f2f] uppercase leading-none py-1 group-hover:text-red-700 transition-colors">
                   SỨC KHỎE THỦ ĐÔ
@@ -135,28 +153,7 @@ const Header = () => {
                 </p>
               </div>
             </Link>
-            <div
-              className="ads-zone-group zonegroup-vertical"
-              id="ads-zone-37"
-              data-id="37"
-              data-type="vertical"
-              data-position="mangset"
-              data-timeflip="2000"
-            >
-              <div className="ads-block-item text-center ">
-                <a
-                  href="https://baoquangninh.vn/ads-tracking?aid=284&amp;cmpid=284&amp;alink=284"
-                  target=""
-                >
-                  <img
-                    src="https://media.baoquangninh.vn/upload/image/202511/original/b38ecbf2b29402f0ee5f03bbf4eb102d.gif"
-                    width=""
-                    height=""
-                    alt="Advertisement"
-                  />
-                </a>
-              </div>
-            </div>
+            
             <div className="hidden lg:flex items-center flex-1 max-w-sm justify-end">
               <div className="relative w-full group">
                 <input

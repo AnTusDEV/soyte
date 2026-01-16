@@ -24,7 +24,7 @@ import { MenuItem, NewsItem } from "./types";
 // Define the 12 Service Grid Items
 export const SERVICE_CATEGORIES = [
   {
-    id: "news-events",
+    id: 1,
     title: "Tin tức – Sự kiện y tế",
     path: "/news/events",
     icon: Newspaper,
@@ -33,7 +33,7 @@ export const SERVICE_CATEGORIES = [
     titleClass: "text-blue-900",
   },
   {
-    id: "alerts",
+    id: 2,
     title: "Cảnh báo y tế – Truyền thông nguy cơ",
     path: "/news/alerts",
     icon: AlertTriangle,
@@ -42,7 +42,7 @@ export const SERVICE_CATEGORIES = [
     titleClass: "text-orange-900",
   },
   {
-    id: "policy",
+    id: 3,
     title: "Chính sách y tế – Bảo hiểm y tế",
     path: "/news/policy",
     icon: FileText,
@@ -51,7 +51,7 @@ export const SERVICE_CATEGORIES = [
     titleClass: "text-indigo-900",
   },
   {
-    id: "prevention",
+    id: 4,
     title: "Phòng bệnh – Nâng cao sức khỏe",
     path: "/news/prevention",
     icon: ShieldPlus,
@@ -60,7 +60,7 @@ export const SERVICE_CATEGORIES = [
     titleClass: "text-emerald-900",
   },
   {
-    id: "exam",
+    id: 5,
     title: "Khám bệnh - chữa bệnh",
     path: "/news/examination",
     icon: Stethoscope,
@@ -69,7 +69,7 @@ export const SERVICE_CATEGORIES = [
     titleClass: "text-cyan-900",
   },
   {
-    id: "consulting",
+    id: 6,
     title: "Tư vấn sức khỏe",
     path: "/consulting",
     icon: MessageCircleHeart,
@@ -78,7 +78,7 @@ export const SERVICE_CATEGORIES = [
     titleClass: "text-pink-900",
   },
   {
-    id: "records",
+    id:7,
     title: "Hồ sơ sức khỏe toàn dân",
     path: "/health-records",
     icon: FileHeart,
@@ -87,7 +87,7 @@ export const SERVICE_CATEGORIES = [
     titleClass: "text-sky-900",
   },
   {
-    id: "system",
+    id: 8,
     title: "Hệ thống y tế Thủ đô",
     path: "/hanoi-system",
     icon: Building2,
@@ -96,7 +96,7 @@ export const SERVICE_CATEGORIES = [
     titleClass: "text-slate-900",
   },
   {
-    id: "emergency",
+    id: 9,
     title: "Trung tâm điều hành cấp cứu thông minh",
     path: "/emergency",
     icon: Ambulance,
@@ -105,7 +105,7 @@ export const SERVICE_CATEGORIES = [
     titleClass: "text-red-900",
   },
   {
-    id: "digital",
+    id: 10,
     title: "Chuyển đổi số y tế",
     path: "/digital",
     icon: Laptop2,
@@ -114,7 +114,7 @@ export const SERVICE_CATEGORIES = [
     titleClass: "text-violet-900",
   },
   {
-    id: "social",
+    id: 11,
     title: "Bảo trợ xã hội",
     path: "/news/social",
     icon: HeartHandshake,
@@ -123,7 +123,7 @@ export const SERVICE_CATEGORIES = [
     titleClass: "text-teal-900",
   },
   {
-    id: "good-deeds",
+    id: 12,
     title: "Gương người tốt – việc tốt ngành Y",
     path: "/news/good-deeds",
     icon: Award,
