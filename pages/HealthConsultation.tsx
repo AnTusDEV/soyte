@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Video, 
   MessageCircle, 
@@ -17,7 +17,9 @@ import {
   X,
   ArrowRight,
   Phone,
-  ChevronRight
+  ChevronRight,
+  UserCheck,
+  Building2
 } from 'lucide-react';
 
 // --- Mock Data ---
@@ -131,6 +133,7 @@ const HealthConsultation = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
+  const [selectedDoctorForBooking, setSelectedDoctorForBooking] = useState<Doctor | null>(null);
   const [bookingForm, setBookingForm] = useState({
     name: '',
     phone: '',
@@ -138,6 +141,11 @@ const HealthConsultation = () => {
     date: '',
     reason: ''
   });
+
+  // Automatically show booking modal on mount
+  useEffect(() => {
+    setShowBookingModal(true);
+  }, []);
 
   // Filter Logic
   const filteredDoctors = DOCTORS.filter(doc => {
@@ -179,8 +187,14 @@ const HealthConsultation = () => {
   };
 
   const handleOpenBooking = (doc: Doctor) => {
+    setSelectedDoctorForBooking(doc);
     setBookingForm({ ...bookingForm, specialty: doc.specialty });
     setShowBookingModal(true);
+  };
+
+  const handleCloseBooking = () => {
+    setShowBookingModal(false);
+    setSelectedDoctorForBooking(null);
   };
 
   return (
@@ -223,7 +237,7 @@ const HealthConsultation = () => {
                     <Filter size={20} className="text-teal-600"/> Chọn Chuyên khoa
                 </h3>
             </div>
-            <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+            <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2 pt-1 pl-1">
                 {SPECIALTIES.map(spec => (
                     <button
                         key={spec.id}
@@ -344,20 +358,36 @@ const HealthConsultation = () => {
         </div>
       )}
 
-      {/* 5. Booking Appointment Modal (NEW - Based on requested image) */}
+      {/* 5. Booking Appointment Modal */}
       {showBookingModal && (
         <div className="fixed inset-0 bg-primary-900/90 backdrop-blur-md z-[100] flex items-center justify-center p-4">
             <div className="w-full max-w-4xl animate-in fade-in zoom-in-95 duration-300 relative">
                 {/* Close Button */}
                 <button 
-                  onClick={() => setShowBookingModal(false)}
+                  onClick={handleCloseBooking}
                   className="absolute -top-12 right-0 text-white hover:text-secondary-400 transition flex items-center gap-2 font-bold uppercase tracking-widest text-sm"
                 >
                   <X size={24} /> Đóng
                 </button>
 
                 <div className="p-8 md:p-12 text-white">
-                  <h2 className="text-4xl md:text-5xl font-black mb-10 tracking-tight">Đặt lịch khám</h2>
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+                    <h2 className="text-4xl md:text-5xl font-black tracking-tight">Đặt lịch khám</h2>
+                    
+                    {/* Display Doctor Info in Modal if selected */}
+                    {selectedDoctorForBooking && (
+                      <div className="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl flex items-center gap-4 animate-in slide-in-from-right-4">
+                        <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-secondary-400 flex-shrink-0">
+                          <img src={selectedDoctorForBooking.avatar} className="w-full h-full object-cover" alt="" />
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-black uppercase text-secondary-400 tracking-widest mb-0.5">Bạn đang đặt với</p>
+                          <h4 className="text-sm font-bold">{selectedDoctorForBooking.title} {selectedDoctorForBooking.name}</h4>
+                          <p className="text-[10px] text-gray-300 flex items-center gap-1"><Building2 size={10} /> {selectedDoctorForBooking.hospital}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                     {/* Họ và tên */}
@@ -427,13 +457,11 @@ const HealthConsultation = () => {
 
                   {/* Actions */}
                   <div className="mt-12 flex flex-col md:flex-row items-center justify-between gap-6">
-                    <button className="flex items-center gap-2 font-bold text-lg hover:text-secondary-400 transition-colors">
-                      <ArrowRight size={20} /> Đặt Lịch Hẹn Chi Tiết
-                    </button>
+                    <div></div>
                     <button 
                       onClick={() => {
                         alert("Hệ thống đã ghi nhận lịch hẹn của bạn. Nhân viên y tế sẽ liên hệ lại sớm nhất.");
-                        setShowBookingModal(false);
+                        handleCloseBooking();
                       }}
                       className="w-full md:w-auto px-16 py-4 border-2 border-white rounded-full text-xl font-bold hover:bg-white hover:text-primary-900 transition-all duration-300 shadow-xl"
                     >
@@ -443,8 +471,7 @@ const HealthConsultation = () => {
                 </div>
             </div>
         </div>
-      )}
-
+      )} 
     </div>
   );
 };
