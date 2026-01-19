@@ -13,6 +13,8 @@ import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import HealthRecordsDetail from './pages/HealthRecordsDetail';
 import WorkSchedule from './pages/WorkSchedule';
+// import DigitalTransformation from './pages/DigitalTransformation';
+import DataLookup from './pages/DataLookup';
 import { api } from './api';
 
 const App = () => {
@@ -79,6 +81,8 @@ const App = () => {
           <Route path="/hanoi-system" element={<HanoiSystem />} />
           <Route path="/emergency" element={<EmergencyCenter />} />
           <Route path="/consulting" element={<HealthConsultation />} />
+          {/* <Route path="/digital" element={<DigitalTransformation />} /> */}
+          <Route path="/data-lookup" element={<DataLookup />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Layout>

@@ -17,7 +17,8 @@ import {
   Users, 
   Utensils,
   Syringe,
-  CalendarDays
+  CalendarDays,
+  Search
 } from "lucide-react";
 import { MenuItem, NewsItem } from "./types";
 
@@ -106,9 +107,9 @@ export const SERVICE_CATEGORIES = [
   },
   {
     id: 10,
-    title: "Chuyển đổi số y tế",
-    path: "/digital",
-    icon: Laptop2,
+    title: "Tra cứu dữ liệu",
+    path: "/data-lookup",
+    icon: Search,
     containerClass: "bg-gradient-to-br from-violet-50 via-violet-100 to-violet-50 border-violet-200 hover:shadow-violet-300",
     iconBoxClass: "bg-violet-600 text-white shadow-violet-400/50",
     titleClass: "text-violet-900",
@@ -168,7 +169,7 @@ export const MAIN_MENU: MenuItem[] = [
       { id: "emergency", title: "Trung tâm cấp cứu thông minh", path: "/emergency", icon: Ambulance }, 
     ],
   },
-  { id: "digital", title: "Chuyển đổi số", path: "/digital", icon: Laptop2 },
+  { id: "digital", title: "Chuyển đổi số", path: "/data-lookup", icon: Laptop2 },
   { id: "social-security", title: "An sinh xã hội", path: "/social-security", icon: Info },
   {
     id: "guide",
@@ -237,7 +238,7 @@ export const MOCK_NEWS: NewsItem[] = [
   {
     id: 7,
     title: "Khánh thành Trung tâm lọc máu hiện đại nhất Thủ đô tại Bệnh viện Thanh Nhàn",
-    excerpt: "Hệ thống máy lọc máu thế hệ mới giúp giảm thời gian điều trị và nâng cao chất lượng sống cho bệnh nhân suy thận mãn...",
+    excerpt: "Hệ thống máy lọc máu thế hệ mới giúp giảm thời gian điều trị và nâng cao chất lượng sống cho bệnh nhân chuyên môn cao...",
     date: "11/01/2026",
     image: "https://picsum.photos/seed/hanoi7/800/600",
     category: "exam",
