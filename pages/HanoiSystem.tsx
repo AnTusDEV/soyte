@@ -85,7 +85,7 @@ const ALL_FACILITIES: Facility[] = [
     name: item.name,
     type: "PB" as const,
     category: i < 8 ? "Phòng ban thuộc Sở" : "Chi cục thuộc Sở",
-    address: "Số 04 Sơn Tây,  Điện Biên,  Ba Đình, Hà Nội",
+    address: "Số 04 Sơn Tây,  Ba Đình, Hà Nội",
     phone: "024 3998 5765",
     coords: [21.0312 + i * 0.00005, 105.8315 + i * 0.00005] as [number, number],
     description:
@@ -125,13 +125,13 @@ const ALL_FACILITIES: Facility[] = [
   },
   {
     id: "bv-h1",
-    name: "Bệnh viện đa khoa huyện Ba Vì",
+    name: "Bệnh viện đa khoa Ba Vì",
     type: "BV",
     category: "Bệnh viện",
-    address: "Thị trấn Tây Đằng, Huyện Ba Vì, Hà Nội",
+    address: "Thị trấn Tây Đằng, Ba Vì, Hà Nội",
     phone: "024 3386 3144",
     coords: [21.2352, 105.4125],
-    description: "Phục vụ khám chữa bệnh cho nhân dân huyện Ba Vì.",
+    description: "Phục vụ khám chữa bệnh cho nhân dân Ba Vì.",
   },
   {
     id: "tt-1",

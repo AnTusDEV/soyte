@@ -118,7 +118,7 @@ const DOCTORS: Doctor[] = [
     name: "Vũ Thị Lan",
     title: "BSCKI",
     specialty: "Nhi khoa",
-    hospital: "TTYT Quận Đống Đa",
+    hospital: "TTYT Đống Đa",
     avatar: "https://img.freepik.com/free-photo/female-doctor-hospital-with-stethoscope_23-2148827776.jpg",
     rating: 4.5,
     reviewCount: 30,
@@ -372,7 +372,7 @@ const HealthConsultation = () => {
 
                 <div className="p-8 md:p-12 text-white">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-                    <h2 className="text-4xl md:text-5xl font-black tracking-tight">Đặt lịch khám</h2>
+                    <h2 className="text-4xl md:text-5xl font-black tracking-tight">Đặt lịch khám </h2>
                     
                     {/* Display Doctor Info in Modal if selected */}
                     {selectedDoctorForBooking && (
@@ -420,11 +420,9 @@ const HealthConsultation = () => {
                           onChange={(e) => setBookingForm({...bookingForm, specialty: e.target.value})}
                         >
                           <option value="">Vui lòng chọn chuyên khoa</option>
-                          <option value="Tim mạch">Tim mạch</option>
-                          <option value="Nhi khoa">Nhi khoa</option>
-                          <option value="Nội khoa">Nội khoa</option>
-                          <option value="Da liễu">Da liễu</option>
-                          <option value="Sản phụ khoa">Sản phụ khoa</option>
+                          {SPECIALTIES.filter(spec => spec.id !== 'all').map(spec => (
+                            <option key={spec.id} value={spec.name}>{spec.name}</option>
+                          ))}
                         </select>
                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
                           <ChevronRight size={20} className="rotate-90" />

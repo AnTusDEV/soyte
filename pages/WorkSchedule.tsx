@@ -74,8 +74,8 @@ const WorkSchedule = () => {
           time: "15:30",
           attendee: "PGĐ Nguyễn Đình Hưng",
           content:
-            "Kiểm tra thực địa công tác phòng chống dịch bệnh mùa Đông Xuân tại huyện Sóc Sơn.",
-          location: "TTYT Huyện Sóc Sơn",
+            "Kiểm tra thực địa công tác phòng chống dịch bệnh mùa Đông Xuân tại Sóc Sơn.",
+          location: "TTYT Sóc Sơn",
           vehicle: "Xe 29A-115.02",
         },
       ],
@@ -110,14 +110,14 @@ const WorkSchedule = () => {
           time: "10:00",
           attendee: "PGĐ Đinh Hồng Phong",
           content:
-            "Kiểm tra công tác triển khai thẻ bảo hiểm y tế cho người nghèo và cận nghèo tại các huyện ngoại thành.",
-          location: "UBND Huyện Ba Vì",
+            "Kiểm tra công tác triển khai thẻ bảo hiểm y tế cho người nghèo và cận nghèo tại các ngoại thành.",
+          location: "UBND Ba Vì",
         },
         {
           time: "14:00",
           attendee: "PGĐ Vũ Cao Cương",
           content:
-            "Họp trực tuyến với các Quận, Huyện về công tác tiêm chủng mở rộng đợt 1 năm 2026.",
+            "Họp trực tuyến với các Quận, về công tác tiêm chủng mở rộng đợt 1 năm 2026.",
           location: "Phòng họp 2, Sở Y tế",
         },
         {
@@ -153,7 +153,7 @@ const WorkSchedule = () => {
           attendee: "PGĐ Vũ Cao Cương",
           content:
             "Kiểm tra công tác an toàn vệ sinh thực phẩm tại các bếp ăn tập thể trường học khu vực nội thành.",
-          location: "Quận Hoàn Kiếm",
+          location: "Hoàn Kiếm",
           vehicle: "Xe 29A-115.02",
         },
       ],

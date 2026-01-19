@@ -35,7 +35,7 @@ const HealthRecords = () => {
     },
     {
       id: "soc-son",
-      name: "Bệnh viện Đa khoa Huyện Sóc Sơn",
+      name: "Bệnh viện Đa khoa Sóc Sơn",
       icon: Building,
       color: "text-blue-600",
       bg: "bg-blue-50",
@@ -149,26 +149,13 @@ const HealthRecords = () => {
               className="inline-flex items-center gap-3 bg-white text-primary-800 font-bold text-lg px-6 py-3 rounded-lg shadow-md hover:shadow-xl hover:bg-gray-50 transition-all transform hover:-translate-y-1 border border-gray-200"
             >
               <LayoutDashboard className="text-primary-600" size={24} />
-              <span>Dashbaord điều hành Sở Y Tế</span>
+              <span>Dashboard điều hành Sở Y Tế → </span>
             </Link>
           </div>
         </div>
 
         {/* Dashboard Frame */}
-        <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden min-h-[650px] flex flex-col">
-          <div className="bg-gray-800 p-4 flex justify-between items-center text-white">
-            <div className="flex items-center gap-2">
-              <Activity className="text-secondary-400" size={18} />
-              <span className="text-sm font-bold uppercase tracking-widest">
-                Dữ liệu thời gian thực
-              </span>
-            </div>
-            <div className="flex gap-2">
-              <span className="w-3 h-3 rounded-full bg-red-500"></span>
-              <span className="w-3 h-3 rounded-full bg-yellow-500"></span>
-              <span className="w-3 h-3 rounded-full bg-green-500"></span>
-            </div>
-          </div>
+        <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden min-h-[650px] flex flex-col"> 
           <div className="flex-grow relative bg-slate-100">
             <div
               id="view-design"

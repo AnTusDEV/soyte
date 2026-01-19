@@ -206,7 +206,7 @@ export const MOCK_NEWS: NewsItem[] = [
   {
     id: 3,
     title: "Cảnh báo gia tăng các bệnh đường hô hấp trong đợt rét đậm đầu năm 2026",
-    excerpt: "CDC Hà Nội ghi nhận số ca mắc cúm A và viêm phổi tăng nhẹ tại các quận huyện ngoại thành do thời tiết chuyển lạnh sâu. Người dân cần chủ động giữ ấm và tiêm phòng...",
+    excerpt: "CDC Hà Nội ghi nhận số ca mắc cúm A và viêm phổi tăng nhẹ tại các quận ngoại thành do thời tiết chuyển lạnh sâu. Người dân cần chủ động giữ ấm và tiêm phòng...",
     date: "08/01/2026",
     image: "https://picsum.photos/seed/hanoi3/800/600",
     category: "alerts",
@@ -262,7 +262,7 @@ export const MOCK_NEWS: NewsItem[] = [
   {
     id: 10,
     title: "Gương sáng thầy thuốc: BS Nguyễn Văn A và hành trình 20 năm bám trụ y tế xã",
-    excerpt: "Sự tận tụy của người bác sĩ già tại vùng xa huyện Ba Vì đã cứu sống hàng trăm trường hợp hiểm nghèo trong đêm tối...",
+    excerpt: "Sự tận tụy của người bác sĩ già tại vùng xa Ba Vì đã cứu sống hàng trăm trường hợp hiểm nghèo trong đêm tối...",
     date: "06/01/2026",
     image: "https://picsum.photos/seed/hanoi10/800/600",
     category: "good-deeds",
