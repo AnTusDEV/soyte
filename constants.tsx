@@ -1,4 +1,3 @@
-
 import {
   Newspaper,
   AlertTriangle,
@@ -13,12 +12,12 @@ import {
   HeartHandshake,
   Award,
   Home,
-  Info, 
-  Users, 
+  Info,
+  Users,
   Utensils,
   Syringe,
   CalendarDays,
-  Search
+  Search,
 } from "lucide-react";
 import { MenuItem, NewsItem } from "./types";
 
@@ -29,7 +28,8 @@ export const SERVICE_CATEGORIES = [
     title: "Tin tức – Sự kiện y tế",
     path: "/news/events",
     icon: Newspaper,
-    containerClass: "bg-gradient-to-br from-blue-50 via-blue-100 to-blue-50 border-blue-200 hover:shadow-blue-300",
+    containerClass:
+      "bg-gradient-to-br from-blue-50 via-blue-100 to-blue-50 border-blue-200 hover:shadow-blue-300",
     iconBoxClass: "bg-blue-600 text-white shadow-blue-400/50",
     titleClass: "text-blue-900",
   },
@@ -38,7 +38,8 @@ export const SERVICE_CATEGORIES = [
     title: "Cảnh báo y tế – Truyền thông nguy cơ",
     path: "/news/alerts",
     icon: AlertTriangle,
-    containerClass: "bg-gradient-to-br from-orange-50 via-orange-100 to-orange-50 border-orange-200 hover:shadow-orange-300",
+    containerClass:
+      "bg-gradient-to-br from-orange-50 via-orange-100 to-orange-50 border-orange-200 hover:shadow-orange-300",
     iconBoxClass: "bg-orange-500 text-white shadow-orange-400/50",
     titleClass: "text-orange-900",
   },
@@ -47,7 +48,8 @@ export const SERVICE_CATEGORIES = [
     title: "Chính sách y tế – Bảo hiểm y tế",
     path: "/news/policy",
     icon: FileText,
-    containerClass: "bg-gradient-to-br from-indigo-50 via-indigo-100 to-indigo-50 border-indigo-200 hover:shadow-indigo-300",
+    containerClass:
+      "bg-gradient-to-br from-indigo-50 via-indigo-100 to-indigo-50 border-indigo-200 hover:shadow-indigo-300",
     iconBoxClass: "bg-indigo-600 text-white shadow-indigo-400/50",
     titleClass: "text-indigo-900",
   },
@@ -56,7 +58,8 @@ export const SERVICE_CATEGORIES = [
     title: "Phòng bệnh – Nâng cao sức khỏe",
     path: "/news/prevention",
     icon: ShieldPlus,
-    containerClass: "bg-gradient-to-br from-emerald-50 via-emerald-100 to-emerald-50 border-emerald-200 hover:shadow-emerald-300",
+    containerClass:
+      "bg-gradient-to-br from-emerald-50 via-emerald-100 to-emerald-50 border-emerald-200 hover:shadow-emerald-300",
     iconBoxClass: "bg-emerald-600 text-white shadow-emerald-400/50",
     titleClass: "text-emerald-900",
   },
@@ -65,7 +68,8 @@ export const SERVICE_CATEGORIES = [
     title: "Khám bệnh - chữa bệnh",
     path: "/news/examination",
     icon: Stethoscope,
-    containerClass: "bg-gradient-to-br from-cyan-50 via-cyan-100 to-cyan-50 border-cyan-200 hover:shadow-cyan-300",
+    containerClass:
+      "bg-gradient-to-br from-cyan-50 via-cyan-100 to-cyan-50 border-cyan-200 hover:shadow-cyan-300",
     iconBoxClass: "bg-cyan-600 text-white shadow-cyan-400/50",
     titleClass: "text-cyan-900",
   },
@@ -74,16 +78,18 @@ export const SERVICE_CATEGORIES = [
     title: "Tư vấn sức khỏe",
     path: "/consulting",
     icon: MessageCircleHeart,
-    containerClass: "bg-gradient-to-br from-pink-50 via-pink-100 to-pink-50 border-pink-200 hover:shadow-pink-300",
+    containerClass:
+      "bg-gradient-to-br from-pink-50 via-pink-100 to-pink-50 border-pink-200 hover:shadow-pink-300",
     iconBoxClass: "bg-pink-500 text-white shadow-pink-400/50",
     titleClass: "text-pink-900",
   },
   {
-    id:7,
+    id: 7,
     title: "Hồ sơ sức khỏe toàn dân",
     path: "/health-records",
     icon: FileHeart,
-    containerClass: "bg-gradient-to-br from-sky-50 via-sky-100 to-sky-50 border-sky-200 hover:shadow-sky-300",
+    containerClass:
+      "bg-gradient-to-br from-sky-50 via-sky-100 to-sky-50 border-sky-200 hover:shadow-sky-300",
     iconBoxClass: "bg-sky-600 text-white shadow-sky-400/50",
     titleClass: "text-sky-900",
   },
@@ -92,7 +98,8 @@ export const SERVICE_CATEGORIES = [
     title: "Hệ thống y tế Thủ đô",
     path: "/hanoi-system",
     icon: Building2,
-    containerClass: "bg-gradient-to-br from-slate-50 via-slate-100 to-slate-50 border-slate-200 hover:shadow-slate-300",
+    containerClass:
+      "bg-gradient-to-br from-slate-50 via-slate-100 to-slate-50 border-slate-200 hover:shadow-slate-300",
     iconBoxClass: "bg-slate-600 text-white shadow-slate-400/50",
     titleClass: "text-slate-900",
   },
@@ -101,7 +108,8 @@ export const SERVICE_CATEGORIES = [
     title: "Trung tâm điều hành cấp cứu thông minh",
     path: "/emergency",
     icon: Ambulance,
-    containerClass: "bg-gradient-to-br from-red-50 via-red-100 to-red-50 border-red-200 hover:shadow-red-300",
+    containerClass:
+      "bg-gradient-to-br from-red-50 via-red-100 to-red-50 border-red-200 hover:shadow-red-300",
     iconBoxClass: "bg-red-600 text-white shadow-red-400/50",
     titleClass: "text-red-900",
   },
@@ -110,7 +118,8 @@ export const SERVICE_CATEGORIES = [
     title: "Tra cứu dữ liệu",
     path: "/data-lookup",
     icon: Search,
-    containerClass: "bg-gradient-to-br from-violet-50 via-violet-100 to-violet-50 border-violet-200 hover:shadow-violet-300",
+    containerClass:
+      "bg-gradient-to-br from-violet-50 via-violet-100 to-violet-50 border-violet-200 hover:shadow-violet-300",
     iconBoxClass: "bg-violet-600 text-white shadow-violet-400/50",
     titleClass: "text-violet-900",
   },
@@ -119,7 +128,8 @@ export const SERVICE_CATEGORIES = [
     title: "Bảo trợ xã hội",
     path: "/news/social",
     icon: HeartHandshake,
-    containerClass: "bg-gradient-to-br from-teal-50 via-teal-100 to-teal-50 border-teal-200 hover:shadow-teal-300",
+    containerClass:
+      "bg-gradient-to-br from-teal-50 via-teal-100 to-teal-50 border-teal-200 hover:shadow-teal-300",
     iconBoxClass: "bg-teal-600 text-white shadow-teal-400/50",
     titleClass: "text-teal-900",
   },
@@ -128,7 +138,8 @@ export const SERVICE_CATEGORIES = [
     title: "Gương người tốt – việc tốt ngành Y",
     path: "/news/good-deeds",
     icon: Award,
-    containerClass: "bg-gradient-to-br from-yellow-50 via-yellow-100 to-yellow-50 border-yellow-200 hover:shadow-yellow-300",
+    containerClass:
+      "bg-gradient-to-br from-yellow-50 via-yellow-100 to-yellow-50 border-yellow-200 hover:shadow-yellow-300",
     iconBoxClass: "bg-yellow-500 text-white shadow-yellow-400/50",
     titleClass: "text-yellow-900",
   },
@@ -142,9 +153,24 @@ export const MAIN_MENU: MenuItem[] = [
     path: "/news/events",
     icon: Newspaper,
     children: [
-      { id: "news-events", title: "Tin tức – Sự kiện y tế", path: "/news/events", icon: Newspaper },
-      { id: "alerts", title: "Cảnh báo y tế - Truyền thông nguy cơ", path: "/news/alerts", icon: AlertTriangle },
-      { id: "good-deeds", title: "Gương người tốt – việc tốt", path: "/news/good-deeds", icon: Award },
+      {
+        id: "news-events",
+        title: "Tin tức – Sự kiện y tế",
+        path: "/news/events",
+        icon: Newspaper,
+      },
+      {
+        id: "alerts",
+        title: "Cảnh báo y tế - Truyền thông nguy cơ",
+        path: "/news/alerts",
+        icon: AlertTriangle,
+      },
+      {
+        id: "good-deeds",
+        title: "Gương người tốt – việc tốt",
+        path: "/news/good-deeds",
+        icon: Award,
+      },
     ],
   },
   {
@@ -153,9 +179,24 @@ export const MAIN_MENU: MenuItem[] = [
     path: "/news/examination",
     icon: Stethoscope,
     children: [
-      { id: "exam-general", title: "Thông tin khám chữa bệnh", path: "/news/examination", icon: Stethoscope },
-      { id: "food-safety", title: "Tư vấn sức khỏe", path: "/consulting", icon: Utensils },
-      { id: "population", title: "Hồ sơ sức khỏe toàn dân", path: "/health-records", icon: Users },
+      {
+        id: "exam-general",
+        title: "Thông tin khám chữa bệnh",
+        path: "/news/examination",
+        icon: Stethoscope,
+      },
+      {
+        id: "food-safety",
+        title: "Tư vấn sức khỏe",
+        path: "/consulting",
+        icon: Utensils,
+      },
+      {
+        id: "population",
+        title: "Hồ sơ sức khỏe toàn dân",
+        path: "/health-records",
+        icon: Users,
+      },
     ],
   },
   { id: "policy", title: "Chính sách - BHYT", path: "/policy", icon: Info },
@@ -165,22 +206,62 @@ export const MAIN_MENU: MenuItem[] = [
     path: "/hanoi-system",
     icon: Building2,
     children: [
-      { id: "system-network", title: "Mạng lưới cơ sở y tế", path: "/hanoi-system", icon: Building2 },
-      { id: "emergency", title: "Trung tâm cấp cứu thông minh", path: "/emergency", icon: Ambulance }, 
+      {
+        id: "system-network",
+        title: "Mạng lưới cơ sở y tế",
+        path: "/hanoi-system",
+        icon: Building2,
+      },
+      {
+        id: "emergency",
+        title: "Trung tâm cấp cứu thông minh",
+        path: "/emergency",
+        icon: Ambulance,
+      },
     ],
   },
-  { id: "digital", title: "Chuyển đổi số", path: "/data-lookup", icon: Laptop2 },
-  { id: "social-security", title: "An sinh xã hội", path: "/social-security", icon: Info },
+  {
+    id: "digital",
+    title: "Chuyển đổi số",
+    path: "/data-lookup",
+    icon: Laptop2,
+  },
+  {
+    id: "social-security",
+    title: "An sinh xã hội",
+    path: "/social-security",
+    icon: Info,
+  },
   {
     id: "guide",
     title: "Giới thiệu/Liên hệ",
     path: "/schedule",
     icon: HeartHandshake,
     children: [
-      { id: "work-schedule", title: "Lịch công tác", path: "/schedule", icon: CalendarDays },
-      { id: "guide-exam", title: "Quy trình khám bệnh", path: "/guide/exam", icon: FileText },
-      { id: "guide-insurance", title: "Bảo hiểm y tế", path: "/news/policy", icon: ShieldPlus },
-      { id: "guide-vaccine", title: "Lịch tiêm chủng", path: "/guide/vaccine", icon: Syringe },
+      {
+        id: "work-schedule",
+        title: "Lịch công tác",
+        path: "/schedule",
+        icon: CalendarDays,
+      },
+      {
+        id: "guide-exam",
+        title: "Quy trình khám bệnh",
+        path: "/guide/exam",
+        icon: FileText,
+      },
+      {
+        id: "guide-insurance",
+        title: "Bảo hiểm y tế",
+        path: "/news/policy",
+        icon: ShieldPlus,
+      },
+      {
+        id: "guide-vaccine",
+        title: "Lịch tiêm chủng",
+        path: "/guide/vaccine",
+        icon: Syringe,
+      },
     ],
   },
 ];
@@ -188,138 +269,114 @@ export const MAIN_MENU: MenuItem[] = [
 export const MOCK_NEWS: NewsItem[] = [
   {
     id: 1,
-    title: "Sở Y tế Hà Nội: Triển khai kế hoạch đảm bảo y tế phục vụ Tết Nguyên đán 2026",
-    excerpt: "Giám đốc Sở Y tế yêu cầu các cơ sở khám chữa bệnh trực 24/24, chuẩn bị đầy đủ cơ số thuốc và phương án cấp cứu ngoại viện để phục vụ nhân dân đón Tết Bính Ngọ 2026...",
-    date: "10/01/2026",
-    image: "https://picsum.photos/seed/hanoi1/800/600",
-    category: "news-events",
+    title:
+      "Người dân cùng chung tay bảo vệ môi trường, nâng cao sức khỏe cộng đồng",
+    excerpt:
+      "Trong bối cảnh ô nhiễm môi trường, đặc biệt là ô nhiễm không khí, đang trở thành thách thức lớn đối với các đô thị lớn, việc xây dựng và triển khai các chính sách kiểm soát phát thải được xem là yêu cầu cấp thiết nhằm bảo vệ sức khỏe nhân dân, hướng tới xây dựng môi trường xanh - sạch và phát triển bền vững.",
+    date: "17/01/2026",
+    image:
+      "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=600&auto=format&fit=crop",
+    category: "prevention",
     isFeatured: true,
   },
   {
     id: 2,
-    title: "Tổng kết công tác Y tế năm 2025: Hà Nội hoàn thành 100% chỉ tiêu chuyển đổi số",
-    excerpt: "Tại hội nghị tổng kết năm 2025, ngành Y tế Thủ đô được đánh giá cao nhờ việc đồng bộ hóa dữ liệu sức khỏe toàn dân và triển khai bệnh án điện tử tại tất cả các tuyến...",
-    date: "05/01/2026",
-    image: "https://picsum.photos/seed/hanoi2/800/600",
-    category: "digital",
+    title: "Không chủ quan với đau thần kinh tọa",
+    excerpt:
+      "Đau thần kinh tọa là bệnh hay gặp trên lâm sàng, do nhiều nguyên nhân gây nên. Trong đó khoảng 80% các trường hợp đau thần kinh tọa do thoát vị đĩa đệm cột sống thắt lưng.",
+    date: "16/01/2026",
+    image:
+      "https://sqhx-hanoi.mediacdn.vn/zoom/270x170/91579363132710912/2026/1/16/bvtn14126-1768528454303669785729-39-0-1319-2048-crop-1768528545039428563904.jpg",
+    category: "examination",
   },
   {
     id: 3,
-    title: "Cảnh báo gia tăng các bệnh đường hô hấp trong đợt rét đậm đầu năm 2026",
-    excerpt: "CDC Hà Nội ghi nhận số ca mắc cúm A và viêm phổi tăng nhẹ tại các quận ngoại thành do thời tiết chuyển lạnh sâu. Người dân cần chủ động giữ ấm và tiêm phòng...",
-    date: "08/01/2026",
-    image: "https://picsum.photos/seed/hanoi3/800/600",
-    category: "alerts",
+    title: "Nhổ răng khôn không đau, giải pháp an toàn, hiệu quả",
+    excerpt:
+      "Răng khôn hay còn gọi là răng số 8, thường mọc trong độ tuổi từ 18 đến 26 tuổi, giai đoạn con người đã hoàn thiện hệ răng vĩnh viễn. Khác với các răng khác, răng khôn hầu như không tham gia chức năng ăn nhai. Do mọc muộn, không còn đủ chỗ trên cung hàm nên răng khôn rất dễ mọc lệch, mọc ngầm hoặc chỉ mọc được một phần, gây ra nhiều phiền toái và biến chứng cho người bệnh.",
+    date: "16/01/2026",
+    image:
+      "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?q=80&w=600&auto=format&fit=crop",
+    category: "examination",
   },
   {
     id: 4,
-    title: "Bệnh viện Xanh Pôn phẫu thuật thành công ca ghép tạng thứ 100 trong năm 2025",
-    excerpt: "Đánh dấu cột mốc quan trọng trong phát triển kỹ thuật cao, kíp mổ đã thực hiện thành công ca ghép thận từ người cho sống, bệnh nhân hồi phục tốt sau 1 tuần...",
-    date: "28/12/2025",
-    image: "https://picsum.photos/seed/hanoi4/800/600",
-    category: "exam",
+    title: "Thông tin y tế trên báo chí ngày 16-1-2026",
+    excerpt:
+      "Ngành Y tế Hà Nội công bố danh sách số điện thoại dịch vụ cấp cứu 115 bố trí tại các điểm trong toàn thành phố, nhằm giúp người dân truy cập dễ dàng và gọi ngay đến đơn vị cấp cứu gần nhất khi có tình huống khẩn cấp về y tế.",
+    date: "16/01/2026",
+    image:
+      "https://sqhx-hanoi.mediacdn.vn/zoom/260x194/91579363132710912/2026/1/15/diem-bao-1768455137077492999991-0-0-312-499-crop-1768455140148839888871.jpg",
+    category: "news-events",
   },
   {
     id: 5,
-    title: "Triển khai tiêm chủng mở rộng vắc xin 5 trong 1 đợt 1 năm 2026",
-    excerpt: "Sở Y tế Hà Nội thông báo kế hoạch tiêm chủng mở rộng cho trẻ em dưới 1 tuổi, đảm bảo an toàn và hiệu quả...",
+    title: "Thông tin y tế trên báo chí ngày 15-1-2026",
+    excerpt:
+      "Ngày 14/1, tại Trạm Y tế phường Vĩnh Hưng, Hà Nội gần 400 người dân đến từ sớm để chờ được thăm khám sức khỏe. Khác với những buổi khám định kỳ quen thuộc, lần này họ được trực tiếp các giáo sư, bác sĩ của Bệnh viện Đại học Y Hà Nội khám, tư vấn ngay tại trạm y tế phường.",
     date: "15/01/2026",
-    image: "https://picsum.photos/seed/hanoi5/800/600",
-    category: "prevention",
+    image:
+      "https://images.unsplash.com/photo-1583088580009-2d947c3e90a6?q=80&w=600&auto=format&fit=crop",
+    category: "news-events",
   },
   {
     id: 6,
-    title: "Hà Nội thí điểm Trạm Y tế xã hoạt động theo nguyên lý y học gia đình",
-    excerpt: "Nâng cao năng lực y tế cơ sở, giúp người dân tiếp cận dịch vụ chăm sóc sức khỏe ban đầu chất lượng ngay tại địa phương...",
-    date: "12/01/2026",
-    image: "https://picsum.photos/seed/hanoi6/800/600",
+    title:
+      "Bệnh viện Nam Thăng Long chính thức tiếp nhận cơ sở vật chất từ UBND phường Tây Tựu",
+    excerpt:
+      "Thực hiện Quyết định số 10/QĐ-UBND của UBND Thành phố Hà Nội về việc điều chuyển tài sản công; sáng ngày 15/1, tại số 10 Phúc Lý, phường Tây Tựu (trụ sở quận Bắc Từ Liêm cũ) đã diễn ra lễ bàn giao, điều chuyển nguyên trạng tài sản công từ UBND phường Tây Tựu sang Sở Y tế để giao Bệnh viện Nam Thăng Long quản lý, sử dụng làm cơ sở hoạt động sự nghiệp lĩnh vực y tế.",
+    date: "15/01/2026",
+    image:
+      "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=600&auto=format&fit=crop",
     category: "system",
   },
   {
     id: 7,
-    title: "Khánh thành Trung tâm lọc máu hiện đại nhất Thủ đô tại Bệnh viện Thanh Nhàn",
-    excerpt: "Hệ thống máy lọc máu thế hệ mới giúp giảm thời gian điều trị và nâng cao chất lượng sống cho bệnh nhân chuyên môn cao...",
-    date: "11/01/2026",
-    image: "https://picsum.photos/seed/hanoi7/800/600",
-    category: "exam",
-  },
-  {
-    id: 8,
-    title: "Tăng cường kiểm tra an toàn thực phẩm tại các bếp ăn trường học đầu năm học mới",
-    excerpt: "Đoàn kiểm tra liên ngành thành phố thực hiện giám sát chặt chẽ nguồn gốc thực phẩm và quy trình chế biến tại các trường tiểu học...",
-    date: "09/01/2026",
-    image: "https://picsum.photos/seed/hanoi8/800/600",
-    category: "news-events",
-  },
-  {
-    id: 9,
-    title: "Hơn 5 triệu người dân Hà Nội đã có Hồ sơ sức khỏe điện tử",
-    excerpt: "Dữ liệu được tích hợp từ hơn 60 bệnh viện và hàng trăm trạm y tế, giúp bác sĩ nắm bắt tiền sử bệnh lý của bệnh nhân nhanh chóng...",
-    date: "07/01/2026",
-    image: "https://picsum.photos/seed/hanoi9/800/600",
-    category: "digital",
-  },
-  {
-    id: 10,
-    title: "Gương sáng thầy thuốc: BS Nguyễn Văn A và hành trình 20 năm bám trụ y tế xã",
-    excerpt: "Sự tận tụy của người bác sĩ già tại vùng xa Ba Vì đã cứu sống hàng trăm trường hợp hiểm nghèo trong đêm tối...",
-    date: "06/01/2026",
-    image: "https://picsum.photos/seed/hanoi10/800/600",
+    title:
+      "Tạo hành trang cho con em của gia đình người hiến tạng nhân đạo bước tiếp hành trình tương lai",
+    excerpt:
+      "Sáng ngày 15/1, tại Bệnh viện đa khoa Xanh Pôn đã diễn ra lễ trao học bổng nhằm hỗ trợ, giúp đỡ con em của gia đình người hiến tạng nhân đạo có hoàn cảnh khó khăn. Buổi lễ có sự tham dự của PGS.TS Đồng Văn Hệ, Giám đốc Trung tâm Điều phối ghép tạng quốc gia; lãnh đạo phòng Bảo trợ Xã hội (Sở Y tế Hà Nội); đại diện Bệnh viện đa khoa Xanh Pôn và đại diện Quỹ Khởi sự từ tâm (đơn vị tài trợ).",
+    date: "15/01/2026",
+    image:
+      "https://sqhx-hanoi.mediacdn.vn/zoom/270x170/91579363132710912/2026/1/15/img-9971-1768460231557623513361-32-0-1282-2000-crop-17684602372812090848831.jpg",
     category: "good-deeds",
   },
   {
-    id: 11,
-    title: "Cảnh báo ngộ độc rượu chứa Methanol trong dịp lễ hội đầu năm",
-    excerpt: "Sở Y tế khuyến cáo người dân không sử dụng các loại rượu không rõ nguồn gốc, nhãn mác để tránh hậu quả đáng tiếc...",
-    date: "04/01/2026",
-    image: "https://picsum.photos/seed/hanoi11/800/600",
-    category: "alerts",
+    id: 8,
+    title:
+      "Hà Nội: Nâng cao chất lượng chăm sóc điều dưỡng, hướng tới sự hài lòng của người bệnh",
+    excerpt:
+      "Nhằm nâng cao chất lượng và hiệu quả chăm sóc người bệnh tại các cơ sở khám bệnh, chữa bệnh, đáp ứng nhu cầu ngày càng cao của nhân dân Thủ đô, Sở Y tế Hà Nội đã xây dựng và ban hành Kế hoạch công tác điều dưỡng Ngành Y tế Hà Nội năm 2026 với nhiều mục tiêu, nhiệm vụ và giải pháp đồng bộ, thiết thực.",
+    date: "14/01/2026",
+    image:
+      "https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?q=80&w=600&auto=format&fit=crop",
+    category: "examination",
   },
   {
-    id: 12,
-    title: "Bệnh viện Tim Hà Nội triển khai kỹ thuật mổ tim không để lại sẹo",
-    excerpt: "Kỹ thuật nội soi mổ tim tiên tiến giúp bệnh nhân hồi phục nhanh và đảm bảo tính thẩm mỹ cao, đặc biệt là với bệnh nhi...",
-    date: "03/01/2026",
-    image: "https://picsum.photos/seed/hanoi12/800/600",
-    category: "exam",
-  },
-  {
-    id: 13,
-    title: "Kế hoạch nâng cấp 20 trạm y tế phường, xã trong quý I năm 2026",
-    excerpt: "UBND Thành phố phê duyệt ngân sách đầu tư cơ sở vật chất và trang thiết bị hiện đại cho các trạm y tế tuyến cơ sở...",
-    date: "02/01/2026",
-    image: "https://picsum.photos/seed/hanoi13/800/600",
-    category: "system",
-  },
-  {
-    id: 14,
-    title: "Bảo hiểm y tế học sinh: Quyền lợi thiết thực và trách nhiệm cộng đồng",
-    excerpt: "Hà Nội phấn đấu đạt 100% học sinh, sinh viên tham gia bảo hiểm y tế để đảm bảo an sinh xã hội cho thế hệ tương lai...",
-    date: "01/01/2026",
-    image: "https://picsum.photos/seed/hanoi14/800/600",
-    category: "policy",
-  },
-  {
-    id: 15,
-    title: "CDC Hà Nội: Chủ động giám sát dịch bệnh truyền nhiễm xâm nhập qua sân bay Nội Bài",
-    excerpt: "Các kịch bản ứng phó với biến chủng virus mới được diễn tập và chuẩn bị sẵn sàng tại các cửa khẩu hàng không...",
-    date: "28/12/2025",
-    image: "https://picsum.photos/seed/hanoi15/800/600",
-    category: "alerts",
+    id: 9,
+    title: "Tác ruột do dây chằng - biến chứng nguy hiểm sau phẫu thuật",
+    excerpt:
+      "Các bác sĩ khuyến cáo người dân sau phẫu thuật ổ bụng cần chú ý các dấu hiệu đau bụng, nôn, bí trung đại tiện để kịp thời đến cơ sở y tế thăm khám, tránh các biến chứng nguy hiểm của tắc ruột.",
+    date: "13/01/2026",
+    image:
+      "https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=600&auto=format&fit=crop",
+    category: "examination",
   },
 ];
 
 export const MOCK_VIDEOS = [
   {
     id: "v1",
-    title: "Bản tin Y tế Hà Nội: Toàn cảnh công tác phòng chống dịch tuần 1 tháng 1/2026",
+    title:
+      "Bản tin Y tế Hà Nội: Toàn cảnh công tác phòng chống dịch tuần 1 tháng 1/2026",
     duration: "05:30",
     thumbnail: "https://picsum.photos/seed/video1/800/450",
     date: "07/01/2026",
   },
   {
     id: "v2",
-    title: "Phóng sự: Những chiến sĩ áo trắng thầm lặng đêm Giao thừa Tết Bính Ngọ",
+    title:
+      "Phóng sự: Những chiến sĩ áo trắng thầm lặng đêm Giao thừa Tết Bính Ngọ",
     duration: "08:45",
     thumbnail: "https://picsum.photos/seed/video2/800/450",
     date: "10/01/2026",
@@ -331,81 +388,34 @@ export const MOCK_VIDEOS = [
     thumbnail: "https://picsum.photos/seed/video3/800/450",
     date: "02/01/2026",
   },
-  {
-    id: "v4",
-    title: "Tọa đàm: Nâng cao chất lượng khám chữa bệnh tại y tế cơ sở",
-    duration: "15:20",
-    thumbnail: "https://picsum.photos/seed/video4/800/450",
-    date: "28/12/2025",
-  },
-  {
-    id: "v5",
-    title: "Chuyên mục Sức khỏe: Phòng chống bệnh tiểu đường",
-    duration: "10:00",
-    thumbnail: "https://picsum.photos/seed/video5/800/450",
-    date: "25/12/2025",
-  },
 ];
 
 export const MOCK_CULTURE = [
   {
     id: "c1",
-    title: 'Sôi nổi hội thi "Nét đẹp Văn hóa công sở ngành Y tế" chào xuân 2026',
+    title:
+      'Sôi nổi hội thi "Nét đẹp Văn hóa công sở ngành Y tế" chào xuân 2026',
     date: "12/01/2026",
     image: "https://picsum.photos/seed/culture1/600/400",
-  },
-  {
-    id: "c2",
-    title: 'Triển lãm ảnh "Thầy thuốc Hà Nội làm theo lời Bác" tại Phố đi bộ Hồ Gươm',
-    date: "05/01/2026",
-    image: "https://picsum.photos/seed/culture2/600/400",
-  },
-  {
-    id: "c3",
-    title: "Chương trình nghệ thuật đặc biệt kỷ niệm ngày Thầy thuốc Việt Nam",
-    date: "15/01/2026",
-    image: "https://picsum.photos/seed/culture3/600/400",
   },
 ];
 
 export const MOCK_SPORTS = [
   {
     id: "s1",
-    title: "Giải bóng đá Cup Sức khỏe Thủ đô 2026: Bệnh viện Thanh Nhàn vô địch",
+    title:
+      "Giải bóng đá Cup Sức khỏe Thủ đô 2026: Bệnh viện Thanh Nhàn vô địch",
     date: "14/01/2026",
     image: "https://picsum.photos/seed/sport1/600/400",
-  },
-  {
-    id: "s2",
-    title: "Hội thao ngành Y tế: Hơn 2.000 vận động viên tham gia chạy việt dã",
-    date: "08/01/2026",
-    image: "https://picsum.photos/seed/sport2/600/400",
-  },
-  {
-    id: "s3",
-    title: 'Phong trào rèn luyện sức khỏe "Mỗi người dân đi bộ 10.000 bước mỗi ngày"',
-    date: "01/01/2026",
-    image: "https://picsum.photos/seed/sport3/600/400",
   },
 ];
 
 export const MOCK_INTERNATIONAL = [
   {
     id: "i1",
-    title: "WHO cảnh báo biến chủng cúm mới: Việt Nam chủ động giám sát ngay từ cửa khẩu",
+    title:
+      "WHO cảnh báo biến chủng cúm mới: Việt Nam chủ động giám sát ngay từ cửa khẩu",
     date: "13/01/2026",
     image: "https://picsum.photos/seed/inter1/600/400",
-  },
-  {
-    id: "i2",
-    title: "Hợp tác y tế Việt - Nhật: Chuyển giao công nghệ phẫu thuật nội soi bằng Robot",
-    date: "09/01/2026",
-    image: "https://picsum.photos/seed/inter2/600/400",
-  },
-  {
-    id: "i3",
-    title: 'Các nước ASEAN thống nhất cơ chế "Hộ chiếu vắc xin" điện tử phiên bản 2.0',
-    date: "28/12/2025",
-    image: "https://picsum.photos/seed/inter3/600/400",
   },
 ];

@@ -3,27 +3,19 @@ import { Link } from "react-router-dom";
 import {
   ArrowRight,
   Activity,
-  Phone,
-  Play,
-  Radio,
+  Phone, 
   Clock,
   ChevronRight,
   ChevronLeft,
-  Zap,
-  Loader2,
+  Zap, 
 } from "lucide-react";
 import {
   SERVICE_CATEGORIES,
-  MOCK_NEWS,
-  MOCK_VIDEOS,
-  MOCK_CULTURE,
-  MOCK_SPORTS,
+  MOCK_NEWS, 
 } from "../constants";
 import HospitalSlider from "../components/HospitalSlider";
 import { api } from "../api";
-const Home = () => {
-  const [activeChannel, setActiveChannel] = useState("H1");
-  const [currentVideo, setCurrentVideo] = useState(MOCK_VIDEOS[0]);
+const Home = () => { 
   const [dbPosts, setDbPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
