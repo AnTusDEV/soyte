@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
   <head>
@@ -20,6 +21,17 @@
     <script>
       tailwind.config = {
         theme: {
+          container: {
+            center: true,
+            padding: '1rem',
+            screens: {
+              sm: '640px',
+              md: '768px',
+              lg: '1024px',
+              xl: '1240px',
+              '2xl': '1240px',
+            },
+          },
           extend: {
             colors: {
               primary: {
@@ -32,6 +44,7 @@
                 900: "#0c4a6e",
               },
               secondary: {
+                50: "#ecfdf5",
                 500: "#10b981", // Success Green
                 600: "#059669",
               },
@@ -39,6 +52,7 @@
             animation: {
               "bounce-slow": "bounce 3s infinite",
               shake: "shake 0.5s cubic-bezier(.36,.07,.19,.97) both",
+              "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
             },
             keyframes: {
               shake: {
@@ -57,12 +71,48 @@
       body {
         font-family: "Roboto", sans-serif;
       }
+      
+      /* Tùy chỉnh thanh cuộn ngang mượt mà */
+      .horizontal-scroll-container {
+        display: flex;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none;  /* IE/Edge */
+        cursor: grab;
+      }
+      
+      .horizontal-scroll-container:active {
+        cursor: grabbing;
+      }
+
+      .horizontal-scroll-container::-webkit-scrollbar {
+        display: none; /* Chrome/Safari */
+      }
+
       .no-scrollbar::-webkit-scrollbar {
         display: none;
       }
       .no-scrollbar {
         -ms-overflow-style: none;
         scrollbar-width: none;
+      }
+      
+      /* Hiệu ứng mờ ở hai đầu để báo hiệu còn dữ liệu */
+      .scroll-mask {
+        position: relative;
+      }
+      .scroll-mask::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 40px;
+        background: linear-gradient(to left, rgba(249, 250, 251, 1), transparent);
+        pointer-events: none;
+        z-index: 10;
       }
     </style>
     <script type="importmap">
@@ -85,16 +135,5 @@
   <body class="bg-gray-50 text-slate-800 antialiased">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
-    <script src="https://datahub.hanoi.gov.vn/js/visualcommon/publish-dashboard-drag.js"></script>
-    <script>
-      dashboard.setUnit("");
-      dashboard.setUser("");
-      dashboard.domReady(() => {
-        dashboard.viewDashboard(
-          "https://datahub.hanoi.gov.vn/databox/ttksbt/tinyroute/1EBC83D81249F5F1.cpx?secrd=zZlJb2VFjTYo0sQ8vu0Tmk2K87v92uRv5VtEQsbYeQHWoRD9KmJ3AiWiHLfkBh1m",
-          "view-design"
-        );
-      });
-    </script>
   </body>
 </html>

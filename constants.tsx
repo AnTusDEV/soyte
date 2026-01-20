@@ -21,7 +21,6 @@ import {
 } from "lucide-react";
 import { MenuItem, NewsItem } from "./types";
 
-// Define the 12 Service Grid Items
 export const SERVICE_CATEGORIES = [
   {
     id: 1,
@@ -115,7 +114,7 @@ export const SERVICE_CATEGORIES = [
   },
   {
     id: 10,
-    title: "Tra cứu dữ liệu",
+    title: "Chuyển đổi số",
     path: "/data-lookup",
     icon: Search,
     containerClass:
