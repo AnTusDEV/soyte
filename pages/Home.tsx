@@ -31,17 +31,16 @@ const Home = () => {
         const response = await api.get(
           "/posts"
         );
-
-        // Dữ liệu mới nằm trong response.data
+ 
         if (response && response.data && Array.isArray(response.data)) {
           const mappedPosts = response.data.map((p: any) => ({
             id: p.id,
             title: p.title,
             summary: p.summary,
             content: p.content,
-            imageUrl: p.image_url, // map snake_case
+            imageUrl: p.image_url,
             category: p.category_id || "news-events",
-            createdAt: p.created_at, // map snake_case
+            createdAt: p.created_at,
             isFeatured: p.is_featured,
           }));
           setDbPosts(mappedPosts);

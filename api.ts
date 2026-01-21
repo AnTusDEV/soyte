@@ -1,12 +1,27 @@
 
-// const BASE_URL = 'https://160.30.252.5:7002/api';
-const BASE_URL = 'https://localhost:7002/api';
+const BASE_URL = 'https://160.30.252.5:7002/api';
+// const BASE_URL = 'https://localhost:7002/api';
 
 export const api = {
-  async get(endpoint: string) {
+  async get(endpoint: string, params?: Record<string, any>) {
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    let url = `${BASE_URL}${cleanEndpoint}`;
+
+    if (params) {
+      const queryParams = new URLSearchParams();
+      for (const key in params) {
+        if (params[key] !== undefined && params[key] !== null) {
+          queryParams.append(key, params[key].toString());
+        }
+      }
+      const queryString = queryParams.toString();
+      if (queryString) {
+        url += (url.includes('?') ? '&' : '?') + queryString;
+      }
+    }
+
     try {
-      const response = await fetch(`${BASE_URL}${cleanEndpoint}`, {
+      const response = await fetch(url, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`,
           'Accept': 'application/json',
