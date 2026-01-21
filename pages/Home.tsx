@@ -29,7 +29,7 @@ const Home = () => {
     const fetchLatestPosts = async () => {
       try {
         const response = await api.get(
-          "/posts?status=published&limit=11&order=createdAt.desc"
+          "/posts"
         );
 
         // Dữ liệu mới nằm trong response.data

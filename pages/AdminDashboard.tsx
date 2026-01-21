@@ -34,14 +34,10 @@ const AdminDashboard = () => {
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      let endpoint = '/posts?order=createdAt.desc';
-      if (filterCategory !== 'all') {
+      let endpoint = '/posts';
+      if (filterCategory !== 'all') 
         endpoint += `&category_id=${filterCategory}`;
-      }
-
       const response = await api.get(endpoint);
-      
-      // Xử lý dữ liệu từ wrapper { data: [...] }
       if (response && response.data && Array.isArray(response.data)) {
         const mapped = response.data.map((p: any) => ({
           ...p,

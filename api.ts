@@ -1,5 +1,6 @@
 
-const BASE_URL = 'http://160.30.252.5:7002/api';
+// const BASE_URL = 'https://160.30.252.5:7002/api';
+const BASE_URL = 'https://localhost:7002/api';
 
 export const api = {
   async get(endpoint: string) {
@@ -13,8 +14,7 @@ export const api = {
       });
       if (!response.ok) {
         if (response.status === 401) {
-          localStorage.removeItem('auth_token');
-          // Dispatch event to clear UI state if unauthorized
+          localStorage.removeItem('auth_token'); 
           window.dispatchEvent(new Event('auth-change'));
         }
         throw new Error(`API Error: ${response.status} ${response.statusText}`);
