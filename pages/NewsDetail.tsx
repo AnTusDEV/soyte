@@ -48,7 +48,10 @@ const NewsDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [post, setPost] = useState<any>(null);
   const [relatedPosts, setRelatedPosts] = useState<NewsItem[]>([]);
+  const [relatedPosts, setRelatedPosts] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [fontSize, setFontSize] = useState(16);
   const [error, setError] = useState<string | null>(null);
   const [fontSize, setFontSize] = useState(16);
 
@@ -100,6 +103,7 @@ const NewsDetail = () => {
           }
         } else {
           throw new Error("Không tìm thấy bài viết");
+          throw new Error("Không tìm thấy bài viết");
         }
       } catch (err) {
         console.error("Error fetching post:", err);
@@ -109,16 +113,18 @@ const NewsDetail = () => {
       }
     };
 
+
     fetchPost();
     window.scrollTo(0, 0);
   }, [id]);
-
+  
   const changeFontSize = (delta: number) => {
     setFontSize((prev) => Math.max(14, Math.min(22, prev + delta)));
   };
 
   if (loading) {
     return (
+      <div className="min-h-[60vh] flex items-center justify-center bg-white">
       <div className="min-h-[60vh] flex items-center justify-center bg-white">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
@@ -131,7 +137,9 @@ const NewsDetail = () => {
   }
 
   if (error || !post) {
+  if (error || !post) {
     return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center bg-gray-50 p-4">
       <div className="min-h-[60vh] flex flex-col items-center justify-center bg-gray-50 p-4">
         <div className="text-center space-y-4">
           <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto text-gray-400">
@@ -187,6 +195,7 @@ const NewsDetail = () => {
           {/* Main Content */}
           <div className="lg:col-span-8">
             <article>
+            <article>
               <header className="mb-6">
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4">
                   {category && (
@@ -205,6 +214,7 @@ const NewsDetail = () => {
                   </div>
                 </div>
 
+                <h1 className="text-2xl md:text-3xl font-black text-gray-900 leading-tight mb-4">
                 <h1 className="text-2xl md:text-3xl font-black text-gray-900 leading-tight mb-4">
                   {post.title}
                 </h1>
@@ -236,6 +246,10 @@ const NewsDetail = () => {
                 <div className="mb-8 p-4 bg-gray-50 border-l-4 border-red-600 rounded-r-lg">
                   <p className="text-base md:text-lg font-semibold text-gray-700 leading-relaxed italic">
                     {post.excerpt}
+              {post.excerpt && (
+                <div className="mb-8 p-4 bg-gray-50 border-l-4 border-red-600 rounded-r-lg">
+                  <p className="text-base md:text-lg font-semibold text-gray-700 leading-relaxed italic">
+                    {post.excerpt}
                   </p>
                 </div>
               )}
@@ -249,6 +263,9 @@ const NewsDetail = () => {
                       className="w-full h-auto"
                     />
                   </div>
+                  {/* <figcaption className="text-xs text-gray-500 italic font-medium px-4 mt-2">
+                    Nguồn: Sở Y tế Hà Nội
+                  </figcaption> */}
                   {/* <figcaption className="text-xs text-gray-500 italic font-medium px-4 mt-2">
                     Nguồn: Sở Y tế Hà Nội
                   </figcaption> */}
