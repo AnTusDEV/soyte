@@ -19,7 +19,6 @@ const Home = () => {
   const [activeChannel, setActiveChannel] = useState("H1");
   const [dbPosts, setDbPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-
   const images = [
     "https://suckhoethudo.vn/assets/anh2-r7WidWql.jpg",
     "https://suckhoethudo.vn/assets/anh1-CFkqSFx4.png",
@@ -174,13 +173,13 @@ const Home = () => {
         </div>
       </section>
 
-      <section className="relative w-full h-[200px] overflow-hidden  mt-2  shadow-xl">
+      <section className="relative container p-0  h-[150px] overflow-hidden  mt-2  shadow-xl">
         <img
           src={images[currentImageIndex]}
           alt="Slide"
-          className="w-full h-full object-cover transition-opacity duration-1000 ease-in-out"
+          className="object-cover transition-opacity duration-1000 ease-in-out w-full h-full object-fill"
         />
-        <div className="absolute inset-0 flex items-center justify-between p-4">
+        <div className=" absolute inset-0 flex items-center justify-between p-4">
           <button
             onClick={goToPrevious}
             className="bg-black/50 text-white w-10 h-10 rounded-full hover:bg-black/75 transition ml-2 flex items-center justify-center"
@@ -193,6 +192,39 @@ const Home = () => {
           >
             <ChevronRight />
           </button>
+        </div>
+      </section>
+      <section className="py-12 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-black text-primary-900 uppercase tracking-tight mb-4">
+              Dịch vụ & Tiện ích
+            </h3>
+            <div className="w-24 h-1.5 bg-secondary-500 mx-auto rounded-full"></div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {SERVICE_CATEGORIES.map((category) => {
+              const Icon = category.icon;
+              return (
+                <Link
+                  key={category.id}
+                  to={category.path}
+                  className={`group p-6 rounded-2xl border flex flex-col items-center text-center transition-all duration-300 transform hover:-translate-y-2 ${category.containerClass}`}
+                >
+                  <div
+                    className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 ${category.iconBoxClass}`}
+                  >
+                    <Icon size={28} />
+                  </div>
+                  <h4
+                    className={`font-bold text-sm uppercase leading-tight ${category.titleClass}`}
+                  >
+                    {category.title}
+                  </h4>
+                </Link>
+              );
+            })}
+          </div>
         </div>
       </section>
 
@@ -314,40 +346,6 @@ const Home = () => {
           </div>
         </div>
       </section>
-
-      <section className="py-12 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h3 className="text-3xl font-black text-primary-900 uppercase tracking-tight mb-4">
-              Dịch vụ & Tiện ích
-            </h3>
-            <div className="w-24 h-1.5 bg-secondary-500 mx-auto rounded-full"></div>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {SERVICE_CATEGORIES.map((category) => {
-              const Icon = category.icon;
-              return (
-                <Link
-                  key={category.id}
-                  to={category.path}
-                  className={`group p-6 rounded-2xl border flex flex-col items-center text-center transition-all duration-300 transform hover:-translate-y-2 ${category.containerClass}`}
-                >
-                  <div
-                    className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 ${category.iconBoxClass}`}
-                  >
-                    <Icon size={28} />
-                  </div>
-                  <h4
-                    className={`font-bold text-sm uppercase leading-tight ${category.titleClass}`}
-                  >
-                    {category.title}
-                  </h4>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </section>
       <section className="py-8 bg-white border-t border-gray-100">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
@@ -406,9 +404,7 @@ const Home = () => {
                 </Link>
               </div>
 
-              {/* Dark Media Container */}
               <div className="bg-[#0f172a] rounded-lg overflow-hidden shadow-xl border border-gray-800">
-                {/* Channel Tabs */}
                 <div className="flex bg-[#1e293b] border-b border-gray-700">
                   <div className="px-4 py-3 flex items-center text-white font-bold text-sm bg-gray-800 border-r border-gray-700">
                     <List size={16} className="mr-2" /> KÊNH

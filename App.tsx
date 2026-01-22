@@ -1,6 +1,7 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import NewsCategory from './pages/NewsCategory';
@@ -10,46 +11,18 @@ import HanoiSystem from './pages/HanoiSystem';
 import EmergencyCenter from './pages/EmergencyCenter';
 import HealthConsultation from './pages/HealthConsultation';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import AdminDashboard from './pages/AdminDashboard';
 import HealthRecordsDetail from './pages/HealthRecordsDetail';
 import WorkSchedule from './pages/WorkSchedule';
 import DataLookup from './pages/DataLookup';
-import PolicyHealthInsurance from './pages/PolicyHealthInsurance'; 
-import { api } from './api';
+import PolicyHealthInsurance from './pages/PolicyHealthInsurance';
+import UserManagement from './pages/UserManagement';
+import AdminRoute from './components/AdminRoute';
+import { useAuth } from './AuthContext';
 
 const App = () => {
-  const [session, setSession] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  const checkAuth = useCallback(async () => {
-    const token = localStorage.getItem('auth_token');
-    if (token) {
-      try {
-        const userData = await api.get('/auth/me');
-        setSession({ user: userData });
-      } catch (error) {
-        console.warn("Session verification failed, clearing token.");
-        localStorage.removeItem('auth_token');
-        setSession(null);
-      }
-    } else {
-      setSession(null);
-    }
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    checkAuth();
-    
-    const handleAuthChange = () => checkAuth();
-    window.addEventListener('auth-change', handleAuthChange);
-    window.addEventListener('storage', handleAuthChange);
-    
-    return () => {
-      window.removeEventListener('auth-change', handleAuthChange);
-      window.removeEventListener('storage', handleAuthChange);
-    };
-  }, [checkAuth]);
+  const { loading } = useAuth();
 
   if (loading) {
     return (
@@ -61,32 +34,36 @@ const App = () => {
   }
 
   return (
-    <HashRouter>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login onLoginSuccess={checkAuth} />} />
-          <Route path="/health-records/detail" element={<HealthRecordsDetail />} />
-          <Route path="/schedule" element={<WorkSchedule />} />
-          <Route path="/policy" element={<PolicyHealthInsurance />} />
-          
-          <Route
-            path="/admin"
-            element={session ? <AdminDashboard /> : <Navigate to="/login" replace />}
-          />
+    <Layout>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/health-records/detail" element={<HealthRecordsDetail />} />
+        <Route path="/schedule" element={<WorkSchedule />} />
+        <Route path="/policy" element={<PolicyHealthInsurance />} />
+        <Route path="/news/:categoryId" element={<NewsCategory />} />
+        <Route path="/news/detail/:id" element={<NewsDetail />} />
+        <Route path="/health-records" element={<HealthRecords />} />
+        <Route path="/hanoi-system" element={<HanoiSystem />} />
+        <Route path="/emergency" element={<EmergencyCenter />} />
+        <Route path="/consulting" element={<HealthConsultation />} />
+        <Route path="/data-lookup" element={<DataLookup />} />
+        
+        {/* Admin Routes */}
+        <Route path="/admin" element={<AdminRoute />}>
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="users" element={<UserManagement />} />
+          <Route index element={<Navigate to="dashboard" replace />} />
+        </Route>
 
-          <Route path="/news/:categoryId" element={<NewsCategory />} />
-          <Route path="/news/detail/:id" element={<NewsDetail />} />
-          <Route path="/health-records" element={<HealthRecords />} />
-          <Route path="/hanoi-system" element={<HanoiSystem />} />
-          <Route path="/emergency" element={<EmergencyCenter />} />
-          <Route path="/consulting" element={<HealthConsultation />} />
-          <Route path="/data-lookup" element={<DataLookup />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes> 
-      </Layout>
-    </HashRouter>
+        {/* Not Found */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Layout>
   );
 };
 
 export default App;
+

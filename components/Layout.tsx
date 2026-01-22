@@ -15,6 +15,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const isSpecialPage = 
     location.pathname.startsWith('/admin') || 
     location.pathname.startsWith('/login') ||
+    location.pathname.startsWith('/register') ||
     location.pathname === '/hanoi-system' ||
     location.pathname === '/emergency';
 

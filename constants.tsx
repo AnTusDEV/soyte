@@ -304,14 +304,13 @@ export const MAIN_MENU: MenuItem[] = [
   },
 ];
 
-// Fix: Added missing MOCK_NEWS export used in Home.tsx and NewsCategory.tsx
 export const MOCK_NEWS: NewsItem[] = [
   {
     id: 1,
     title: "Hà Nội triển khai thí điểm hồ sơ sức khỏe điện tử toàn dân",
     excerpt: "Sở Y tế Hà Nội vừa ban hành kế hoạch triển khai thí điểm lập hồ sơ sức khỏe điện tử cho người dân trên địa bàn 30 quận, huyện, thị xã nhằm nâng cao chất lượng quản lý sức khỏe cộng đồng.",
     date: "12/05/2024",
-    image: "https://images.unsplash.com/photo-1576091160550-2173dad99901?q=80&w=800&auto=format&fit=crop",
+    image: "https://chuyendoiso.quangngai.gov.vn/items/cms/4347.jpg",
     category: "news-events",
     isFeatured: true
   },

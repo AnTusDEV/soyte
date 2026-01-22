@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect, useCallback } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation, NavLink } from "react-router-dom";
 import {
   Menu,
   X,
@@ -10,68 +10,29 @@ import {
   LogOut,
   User,
   LayoutDashboard,
+  Users,
 } from "lucide-react";
 import { MAIN_MENU } from "../constants";
-import { api } from "../api";
+import { useAuth } from "../AuthContext"; // Import useAuth hook
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [currentUser, setCurrentUser] = useState<any>(null);
-
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [currentTime] = useState(new Date());
+  const { user, logout } = useAuth(); // Use the context 
+  
   const location = useLocation();
-  const navigate = useNavigate();
-
-  const checkAuth = useCallback(async () => {
-    const token = localStorage.getItem('auth_token');
-    if (token) {
-      try {
-        const userData = await api.get('/auth/me');
-        setCurrentUser(userData);
-      } catch (error) {
-        console.error("Header auth check failed:", error);
-        setCurrentUser(null);
-      }
-    } else {
-      setCurrentUser(null);
-    }
-  }, []);
 
   useEffect(() => {
-    checkAuth();
-    
-    // Listen for custom event and storage event for multi-tab sync
-    const handleAuthChange = () => checkAuth();
-    window.addEventListener('auth-change', handleAuthChange);
-    window.addEventListener('storage', handleAuthChange);
-    
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-
-    return () => {
-      window.removeEventListener('auth-change', handleAuthChange);
-      window.removeEventListener('storage', handleAuthChange);
-      clearInterval(timer);
-    };
-  }, [checkAuth]);
-
-  const handleLogout = () => {
-    localStorage.removeItem('auth_token');
-    setCurrentUser(null);
-    // Dispatch events to notify other components (App.tsx and Header.tsx itself)
-    window.dispatchEvent(new Event('auth-change'));
-    window.dispatchEvent(new Event('storage'));
-    navigate("/");
-  };
+    // const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    // return () => {
+    //   clearInterval(timer);
+    // };
+  }, []);
 
   const getFormattedDateTime = (date: Date) => {
     const days = [
-      "Chủ nhật",
-      "Thứ Hai",
-      "Thứ Ba",
-      "Thứ Tư",
-      "Thứ Năm",
-      "Thứ Sáu",
-      "Thứ Bảy",
+      "Chủ nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy",
     ];
     return `${days[date.getDay()]}, ${date.getDate()}/${
       date.getMonth() + 1
@@ -92,22 +53,23 @@ const Header = () => {
               <Phone size={14} className="mr-1.5 animate-pulse" />
               ĐƯỜNG DÂY NÓNG SỞ Y TẾ: 02439985765/ 0967981616
             </span>
-          </div>
-
-          <div className="flex items-center space-x-3 md:space-x-4 font-medium">
-            {currentUser ? (
-              <div className="flex items-center gap-3">
+          </div> 
+            <div className="flex items-center space-x-3 md:space-x-4 font-medium">
+            {user ? ( 
+              <div className="relative flex items-center gap-3"> 
                 <span className="flex items-center gap-1.5 bg-white/10 px-2 py-0.5 rounded text-secondary-300">
-                  <User size={12} /> {currentUser.email?.split("@")[0] || currentUser.username}
-                </span>
-                <Link
-                  to="/admin"
-                  className="flex items-center gap-1 bg-secondary-500 hover:bg-secondary-600 px-2.5 py-1 rounded font-bold text-white transition-all shadow-lg text-[10px] md:text-xs"
-                >
-                  <LayoutDashboard size={14} /> QUẢN TRỊ
-                </Link>
+                  <User size={12} /> {user.full_name || 'Quản trị viên'}
+                </span> 
+                {user?.role === 'admin' && (
+                  <Link
+                    to="/admin/dashboard"
+                    className="flex items-center gap-1 bg-secondary-500 hover:bg-secondary-600 px-2.5 py-1 rounded font-bold text-white transition-all shadow-lg text-[10px] md:text-xs"
+                  >
+                    <LayoutDashboard size={14} /> QUẢN TRỊ
+                  </Link>
+                )} 
                 <button
-                  onClick={handleLogout}
+                  onClick={logout}
                   className="flex items-center gap-1 hover:text-red-300 transition text-[10px] md:text-xs"
                 >
                   <LogOut size={14} /> Thoát
@@ -130,8 +92,8 @@ const Header = () => {
           </div>
         </div>
       </div>
-
-      {/* Main Branding */}
+      
+      {/* ... rest of the component is unchanged ... */}
       <div className="bg-white py-6 md:py-8 shadow-sm relative z-20">
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -176,8 +138,6 @@ const Header = () => {
           </div>
         </div>
       </div>
-
-      {/* Navigation */}
       <nav
         className={`${
           isMenuOpen ? "block" : "hidden"
