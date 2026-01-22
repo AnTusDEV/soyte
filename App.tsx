@@ -13,8 +13,8 @@ import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import HealthRecordsDetail from './pages/HealthRecordsDetail';
 import WorkSchedule from './pages/WorkSchedule';
-// import DigitalTransformation from './pages/DigitalTransformation';
 import DataLookup from './pages/DataLookup';
+import PolicyHealthInsurance from './pages/PolicyHealthInsurance'; 
 import { api } from './api';
 
 const App = () => {
@@ -41,7 +41,6 @@ const App = () => {
   useEffect(() => {
     checkAuth();
     
-    // Custom event to handle login from within the same window
     const handleAuthChange = () => checkAuth();
     window.addEventListener('auth-change', handleAuthChange);
     window.addEventListener('storage', handleAuthChange);
@@ -69,6 +68,7 @@ const App = () => {
           <Route path="/login" element={<Login onLoginSuccess={checkAuth} />} />
           <Route path="/health-records/detail" element={<HealthRecordsDetail />} />
           <Route path="/schedule" element={<WorkSchedule />} />
+          <Route path="/policy" element={<PolicyHealthInsurance />} />
           
           <Route
             path="/admin"
@@ -81,10 +81,9 @@ const App = () => {
           <Route path="/hanoi-system" element={<HanoiSystem />} />
           <Route path="/emergency" element={<EmergencyCenter />} />
           <Route path="/consulting" element={<HealthConsultation />} />
-          {/* <Route path="/digital" element={<DigitalTransformation />} /> */}
           <Route path="/data-lookup" element={<DataLookup />} />
           <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        </Routes> 
       </Layout>
     </HashRouter>
   );

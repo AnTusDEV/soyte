@@ -1,3 +1,4 @@
+
 import {
   Newspaper,
   AlertTriangle,
@@ -45,7 +46,7 @@ export const SERVICE_CATEGORIES = [
   {
     id: 3,
     title: "Chính sách y tế – Bảo hiểm y tế",
-    path: "/news/policy",
+    path: "/policy",
     icon: FileText,
     containerClass:
       "bg-gradient-to-br from-indigo-50 via-indigo-100 to-indigo-50 border-indigo-200 hover:shadow-indigo-300",
@@ -252,7 +253,7 @@ export const MAIN_MENU: MenuItem[] = [
       {
         id: "guide-insurance",
         title: "Bảo hiểm y tế",
-        path: "/news/policy",
+        path: "/policy",
         icon: ShieldPlus,
       },
       {
@@ -265,156 +266,71 @@ export const MAIN_MENU: MenuItem[] = [
   },
 ];
 
+// Fix: Added missing MOCK_NEWS export used in Home.tsx and NewsCategory.tsx
 export const MOCK_NEWS: NewsItem[] = [
   {
     id: 1,
-    title:
-      "Người dân cùng chung tay bảo vệ môi trường, nâng cao sức khỏe cộng đồng",
-    excerpt:
-      "Trong bối cảnh ô nhiễm môi trường, đặc biệt là ô nhiễm không khí, đang trở thành thách thức lớn đối với các đô thị lớn, việc xây dựng và triển khai các chính sách kiểm soát phát thải được xem là yêu cầu cấp thiết nhằm bảo vệ sức khỏe nhân dân, hướng tới xây dựng môi trường xanh - sạch và phát triển bền vững.",
-    date: "17/01/2026",
-    image:
-      "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=600&auto=format&fit=crop",
-    category: "prevention",
-    isFeatured: true,
+    title: "Hà Nội triển khai thí điểm hồ sơ sức khỏe điện tử toàn dân",
+    excerpt: "Sở Y tế Hà Nội vừa ban hành kế hoạch triển khai thí điểm lập hồ sơ sức khỏe điện tử cho người dân trên địa bàn 30 quận, huyện, thị xã nhằm nâng cao chất lượng quản lý sức khỏe cộng đồng.",
+    date: "12/05/2024",
+    image: "https://images.unsplash.com/photo-1576091160550-2173dad99901?q=80&w=800&auto=format&fit=crop",
+    category: "news-events",
+    isFeatured: true
   },
   {
     id: 2,
-    title: "Không chủ quan với đau thần kinh tọa",
-    excerpt:
-      "Đau thần kinh tọa là bệnh hay gặp trên lâm sàng, do nhiều nguyên nhân gây nên. Trong đó khoảng 80% các trường hợp đau thần kinh tọa do thoát vị đĩa đệm cột sống thắt lưng.",
-    date: "16/01/2026",
-    image:
-      "https://sqhx-hanoi.mediacdn.vn/zoom/270x170/91579363132710912/2026/1/16/bvtn14126-1768528454303669785729-39-0-1319-2048-crop-1768528545039428563904.jpg",
-    category: "examination",
+    title: "Cảnh báo dịch sốt xuất huyết có xu hướng gia tăng tại một số quận huyện",
+    excerpt: "Theo Trung tâm Kiểm soát bệnh tật (CDC) Hà Nội, số ca mắc sốt xuất huyết trên địa bàn thành phố đang có dấu hiệu tăng nhanh tại các khu vực dân cư đông đúc.",
+    date: "11/05/2024",
+    image: "https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?q=80&w=800&auto=format&fit=crop",
+    category: "alerts"
   },
   {
     id: 3,
-    title: "Nhổ răng khôn không đau, giải pháp an toàn, hiệu quả",
-    excerpt:
-      "Răng khôn hay còn gọi là răng số 8, thường mọc trong độ tuổi từ 18 đến 26 tuổi, giai đoạn con người đã hoàn thiện hệ răng vĩnh viễn. Khác với các răng khác, răng khôn hầu như không tham gia chức năng ăn nhai. Do mọc muộn, không còn đủ chỗ trên cung hàm nên răng khôn rất dễ mọc lệch, mọc ngầm hoặc chỉ mọc được một phần, gây ra nhiều phiền toái và biến chứng cho người bệnh.",
-    date: "16/01/2026",
-    image:
-      "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?q=80&w=600&auto=format&fit=crop",
-    category: "examination",
+    title: "Bác sĩ Bệnh viện Xanh Pôn cứu sống bệnh nhân bị vỡ tạng do tai nạn",
+    excerpt: "Các bác sĩ Khoa Ngoại tiêu hóa, Bệnh viện Đa khoa Xanh Pôn vừa thực hiện thành công ca phẫu thuật cấp cứu cho một bệnh nhân bị chấn thương bụng kín nghiêm trọng.",
+    date: "10/05/2024",
+    image: "https://images.unsplash.com/photo-1551076805-e1869033e561?q=80&w=800&auto=format&fit=crop",
+    category: "good-deeds"
   },
   {
     id: 4,
-    title: "Thông tin y tế trên báo chí ngày 16-1-2026",
-    excerpt:
-      "Ngành Y tế Hà Nội công bố danh sách số điện thoại dịch vụ cấp cứu 115 bố trí tại các điểm trong toàn thành phố, nhằm giúp người dân truy cập dễ dàng và gọi ngay đến đơn vị cấp cứu gần nhất khi có tình huống khẩn cấp về y tế.",
-    date: "16/01/2026",
-    image:
-      "https://sqhx-hanoi.mediacdn.vn/zoom/260x194/91579363132710912/2026/1/15/diem-bao-1768455137077492999991-0-0-312-499-crop-1768455140148839888871.jpg",
-    category: "news-events",
+    title: "Hà Nội tăng cường kiểm tra an toàn thực phẩm tại các bếp ăn trường học",
+    excerpt: "Sở Y tế phối hợp với Sở Giáo dục và Đào tạo Hà Nội thành lập các đoàn kiểm tra liên ngành nhằm đảm bảo an toàn vệ sinh thực phẩm cho học sinh.",
+    date: "09/05/2024",
+    image: "https://images.unsplash.com/photo-1547573854-74d2a71d0826?q=80&w=800&auto=format&fit=crop",
+    category: "news-events"
   },
   {
     id: 5,
-    title: "Thông tin y tế trên báo chí ngày 15-1-2026",
-    excerpt:
-      "Ngày 14/1, tại Trạm Y tế phường Vĩnh Hưng, Hà Nội gần 400 người dân đến từ sớm để chờ được thăm khám sức khỏe. Khác với những buổi khám định kỳ quen thuộc, lần này họ được trực tiếp các giáo sư, bác sĩ của Bệnh viện Đại học Y Hà Nội khám, tư vấn ngay tại trạm y tế phường.",
-    date: "15/01/2026",
-    image:
-      "https://images.unsplash.com/photo-1583088580009-2d947c3e90a6?q=80&w=600&auto=format&fit=crop",
-    category: "news-events",
+    title: "Khám bệnh, phát thuốc miễn phí cho người cao tuổi tại huyện Sóc Sơn",
+    excerpt: "Hơn 500 người cao tuổi tại xã Minh Phú, huyện Sóc Sơn đã được các y bác sĩ tình nguyện khám bệnh, tư vấn sức khỏe và cấp phát thuốc miễn phí.",
+    date: "08/05/2024",
+    image: "https://images.unsplash.com/photo-1581056771107-24ca5f033842?q=80&w=800&auto=format&fit=crop",
+    category: "social"
   },
   {
     id: 6,
-    title:
-      "Bệnh viện Nam Thăng Long chính thức tiếp nhận cơ sở vật chất từ UBND phường Tây Tựu",
-    excerpt:
-      "Thực hiện Quyết định số 10/QĐ-UBND của UBND Thành phố Hà Nội về việc điều chuyển tài sản công; sáng ngày 15/1, tại số 10 Phúc Lý, phường Tây Tựu (trụ sở quận Bắc Từ Liêm cũ) đã diễn ra lễ bàn giao, điều chuyển nguyên trạng tài sản công từ UBND phường Tây Tựu sang Sở Y tế để giao Bệnh viện Nam Thăng Long quản lý, sử dụng làm cơ sở hoạt động sự nghiệp lĩnh vực y tế.",
-    date: "15/01/2026",
-    image:
-      "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=600&auto=format&fit=crop",
-    category: "system",
+    title: "Thủ tục đăng ký bảo hiểm y tế hộ gia đình trực tuyến",
+    excerpt: "Hướng dẫn chi tiết các bước đăng ký tham gia bảo hiểm y tế hộ gia đình qua cổng dịch vụ công quốc gia và ứng dụng VssID.",
+    date: "07/05/2024",
+    image: "https://images.unsplash.com/photo-1454165205744-3b78555e5572?q=80&w=800&auto=format&fit=crop",
+    category: "policy"
   },
   {
     id: 7,
-    title:
-      "Tạo hành trang cho con em của gia đình người hiến tạng nhân đạo bước tiếp hành trình tương lai",
-    excerpt:
-      "Sáng ngày 15/1, tại Bệnh viện đa khoa Xanh Pôn đã diễn ra lễ trao học bổng nhằm hỗ trợ, giúp đỡ con em của gia đình người hiến tạng nhân đạo có hoàn cảnh khó khăn. Buổi lễ có sự tham dự của PGS.TS Đồng Văn Hệ, Giám đốc Trung tâm Điều phối ghép tạng quốc gia; lãnh đạo phòng Bảo trợ Xã hội (Sở Y tế Hà Nội); đại diện Bệnh viện đa khoa Xanh Pôn và đại diện Quỹ Khởi sự từ tâm (đơn vị tài trợ).",
-    date: "15/01/2026",
-    image:
-      "https://sqhx-hanoi.mediacdn.vn/zoom/270x170/91579363132710912/2026/1/15/img-9971-1768460231557623513361-32-0-1282-2000-crop-17684602372812090848831.jpg",
-    category: "good-deeds",
+    title: "Lợi ích của việc tiêm chủng mở rộng đối với trẻ em",
+    excerpt: "Tiêm chủng là biện pháp hiệu quả nhất để phòng ngừa các bệnh truyền nhiễm nguy hiểm ở trẻ nhỏ, giúp xây dựng hệ miễn dịch cộng đồng vững mạnh.",
+    date: "06/05/2024",
+    image: "https://images.unsplash.com/photo-1584362946444-1e7c4f9b7113?q=80&w=800&auto=format&fit=crop",
+    category: "prevention"
   },
   {
     id: 8,
-    title:
-      "Hà Nội: Nâng cao chất lượng chăm sóc điều dưỡng, hướng tới sự hài lòng của người bệnh",
-    excerpt:
-      "Nhằm nâng cao chất lượng và hiệu quả chăm sóc người bệnh tại các cơ sở khám bệnh, chữa bệnh, đáp ứng nhu cầu ngày càng cao của nhân dân Thủ đô, Sở Y tế Hà Nội đã xây dựng và ban hành Kế hoạch công tác điều dưỡng Ngành Y tế Hà Nội năm 2026 với nhiều mục tiêu, nhiệm vụ và giải pháp đồng bộ, thiết thực.",
-    date: "14/01/2026",
-    image:
-      "https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?q=80&w=600&auto=format&fit=crop",
-    category: "examination",
-  },
-  {
-    id: 9,
-    title: "Tác ruột do dây chằng - biến chứng nguy hiểm sau phẫu thuật",
-    excerpt:
-      "Các bác sĩ khuyến cáo người dân sau phẫu thuật ổ bụng cần chú ý các dấu hiệu đau bụng, nôn, bí trung đại tiện để kịp thời đến cơ sở y tế thăm khám, tránh các biến chứng nguy hiểm của tắc ruột.",
-    date: "13/01/2026",
-    image:
-      "https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=600&auto=format&fit=crop",
-    category: "examination",
-  },
-];
-
-export const MOCK_VIDEOS = [
-  {
-    id: "v1",
-    title:
-      "Bản tin Y tế Hà Nội: Toàn cảnh công tác phòng chống dịch tuần 1 tháng 1/2026",
-    duration: "05:30",
-    thumbnail: "https://picsum.photos/seed/video1/800/450",
-    date: "07/01/2026",
-  },
-  {
-    id: "v2",
-    title:
-      "Phóng sự: Những chiến sĩ áo trắng thầm lặng đêm Giao thừa Tết Bính Ngọ",
-    duration: "08:45",
-    thumbnail: "https://picsum.photos/seed/video2/800/450",
-    date: "10/01/2026",
-  },
-  {
-    id: "v3",
-    title: "Hướng dẫn người dân sử dụng ứng dụng Hồ sơ sức khỏe điện tử",
-    duration: "03:15",
-    thumbnail: "https://picsum.photos/seed/video3/800/450",
-    date: "02/01/2026",
-  },
-];
-
-export const MOCK_CULTURE = [
-  {
-    id: "c1",
-    title:
-      'Sôi nổi hội thi "Nét đẹp Văn hóa công sở ngành Y tế" chào xuân 2026',
-    date: "12/01/2026",
-    image: "https://picsum.photos/seed/culture1/600/400",
-  },
-];
-
-export const MOCK_SPORTS = [
-  {
-    id: "s1",
-    title:
-      "Giải bóng đá Cup Sức khỏe Thủ đô 2026: Bệnh viện Thanh Nhàn vô địch",
-    date: "14/01/2026",
-    image: "https://picsum.photos/seed/sport1/600/400",
-  },
-];
-
-export const MOCK_INTERNATIONAL = [
-  {
-    id: "i1",
-    title:
-      "WHO cảnh báo biến chủng cúm mới: Việt Nam chủ động giám sát ngay từ cửa khẩu",
-    date: "13/01/2026",
-    image: "https://picsum.photos/seed/inter1/600/400",
-  },
+    title: "Chuyển đổi số ngành y tế: Bước tiến mới trong quản lý bệnh viện",
+    excerpt: "Việc áp dụng bệnh án điện tử và hệ thống quản lý thông tin bệnh viện (HIS) giúp tối ưu hóa quy trình khám chữa bệnh và giảm thời gian chờ đợi của bệnh nhân.",
+    date: "05/05/2024",
+    image: "https://images.unsplash.com/photo-1516549655169-df83a0774514?q=80&w=800&auto=format&fit=crop",
+    category: "digital"
+  }
 ];
