@@ -8,6 +8,7 @@ const Register: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -20,6 +21,7 @@ const Register: React.FC = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccessMessage('');
 
     if (formData.password !== formData.confirmPassword) {
       setError('Mật khẩu xác nhận không khớp.');
@@ -29,13 +31,18 @@ const Register: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await api.post('/register', {
-        fullName: formData.fullName,
+      await api.post('/auth/register', {
+        full_name: formData.fullName,
         email: formData.email,
         password: formData.password,
-        unit: formData.unit
+        unit: formData.unit,
+        role: 'user'
       });
-      navigate('/login');
+      setSuccessMessage('Đăng ký tài khoản thành công! Vui lòng chờ quản trị viên phê duyệt.');
+      // Optionally navigate after a short delay or user acknowledgment
+      setTimeout(() => {
+        navigate('/login');
+      }, 3000); // Navigate after 3 seconds
     } catch (err: any) {
       setError('Đăng ký thất bại: ' + (err.response?.data?.message || err.message || 'Lỗi hệ thống, vui lòng thử lại sau.'));
     } finally {
@@ -73,6 +80,15 @@ const Register: React.FC = () => {
               <div className="bg-red-50 border-l-4 border-red-500 p-4 text-red-700 text-sm flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
                 <AlertCircle size={18} className="shrink-0 mt-0.5" />
                 <span>{error}</span>
+              </div>
+            )}
+
+            {successMessage && (
+              <div className="bg-green-50 border-l-4 border-green-500 p-4 text-green-700 text-sm flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span>{successMessage}</span>
               </div>
             )}
 
