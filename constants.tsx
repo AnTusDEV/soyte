@@ -144,6 +144,44 @@ export const SERVICE_CATEGORIES = [
     titleClass: "text-yellow-900",
   },
 ];
+export const MOCK_VIDEOS = [
+  {
+    id: "v1",
+    title: "Bản tin Y tế Hà Nội: Toàn cảnh công tác phòng chống dịch tuần 1 tháng 1/2026",
+    duration: "05:30",
+    thumbnail: "https://picsum.photos/seed/video1/800/450",
+    date: "07/01/2026",
+  },
+  {
+    id: "v2",
+    title: "Phóng sự: Những chiến sĩ áo trắng thầm lặng đêm Giao thừa Tết Bính Ngọ",
+    duration: "08:45",
+    thumbnail: "https://picsum.photos/seed/video2/800/450",
+    date: "10/01/2026",
+  },
+  {
+    id: "v3",
+    title: "Hướng dẫn người dân sử dụng ứng dụng Hồ sơ sức khỏe điện tử",
+    duration: "03:15",
+    thumbnail: "https://picsum.photos/seed/video3/800/450",
+    date: "02/01/2026",
+  },
+  {
+    id: "v4",
+    title: "Tọa đàm: Nâng cao chất lượng khám chữa bệnh tại y tế cơ sở",
+    duration: "15:20",
+    thumbnail: "https://picsum.photos/seed/video4/800/450",
+    date: "28/12/2025",
+  },
+  {
+    id: "v5",
+    title: "Chuyên mục Sức khỏe: Phòng chống bệnh tiểu đường",
+    duration: "10:00",
+    thumbnail: "https://picsum.photos/seed/video5/800/450",
+    date: "25/12/2025",
+  },
+];
+
 
 export const MAIN_MENU: MenuItem[] = [
   { id: "home", title: "Trang chủ", path: "/", icon: Home },

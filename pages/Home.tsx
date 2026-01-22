@@ -3,19 +3,20 @@ import { Link } from "react-router-dom";
 import {
   ArrowRight,
   Activity,
-  Phone, 
+  Phone,
   Clock,
   ChevronRight,
   ChevronLeft,
-  Zap, 
+  Zap,
+  Radio,
+  List,
+  Play,
 } from "lucide-react";
-import {
-  SERVICE_CATEGORIES,
-  MOCK_NEWS, 
-} from "../constants";
+import { SERVICE_CATEGORIES, MOCK_NEWS, MOCK_VIDEOS } from "../constants";
 import HospitalSlider from "../components/HospitalSlider";
 import { api } from "../api";
-const Home = () => { 
+const Home = () => {
+  const [activeChannel, setActiveChannel] = useState("H1");
   const [dbPosts, setDbPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -24,14 +25,12 @@ const Home = () => {
     "https://suckhoethudo.vn/assets/anh1-CFkqSFx4.png",
   ];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
+  const [currentVideo, setCurrentVideo] = useState(MOCK_VIDEOS[0]);
   useEffect(() => {
     const fetchLatestPosts = async () => {
       try {
-        const response = await api.get(
-          "/posts"
-        );
- 
+        const response = await api.get("/posts");
+
         if (response && response.data && Array.isArray(response.data)) {
           const mappedPosts = response.data.map((p: any) => ({
             id: p.id,
@@ -63,7 +62,7 @@ const Home = () => {
           imageUrl: n.image,
           category: n.category,
           createdAt: new Date().toISOString(),
-        }))
+        })),
       );
     };
 
@@ -74,7 +73,7 @@ const Home = () => {
     if (images.length === 0) return;
     const interval = setInterval(() => {
       setCurrentImageIndex((prevIndex) =>
-        prevIndex === images.length - 1 ? 0 : prevIndex + 1
+        prevIndex === images.length - 1 ? 0 : prevIndex + 1,
       );
     }, 5000);
     return () => clearInterval(interval);
@@ -82,13 +81,13 @@ const Home = () => {
 
   const goToPrevious = () => {
     setCurrentImageIndex((prevIndex) =>
-      prevIndex === 0 ? images.length - 1 : prevIndex - 1
+      prevIndex === 0 ? images.length - 1 : prevIndex - 1,
     );
   };
 
   const goToNext = () => {
     setCurrentImageIndex((prevIndex) =>
-      prevIndex === images.length - 1 ? 0 : prevIndex + 1
+      prevIndex === images.length - 1 ? 0 : prevIndex + 1,
     );
   };
 
@@ -231,7 +230,7 @@ const Home = () => {
                       <div className="absolute bottom-6 left-6 right-6">
                         <span className="bg-red-600 text-white text-[10px] font-black px-3 py-1 rounded-sm uppercase tracking-widest mb-3 inline-block">
                           {SERVICE_CATEGORIES.find(
-                            (c) => c.id === spotlightPost.category
+                            (c) => c.id === spotlightPost.category,
                           )?.title || "TIN TỨC"}
                         </span>
                         <h2 className="text-2xl md:text-3xl font-black text-white leading-tight line-clamp-2 group-hover:text-red-400 transition-colors">
@@ -246,7 +245,7 @@ const Home = () => {
                       <span className="flex items-center gap-1">
                         <Clock size={14} />{" "}
                         {new Date(spotlightPost.createdAt).toLocaleDateString(
-                          "vi-VN"
+                          "vi-VN",
                         )}
                       </span>
                       <span className="text-red-600 hover:underline flex items-center gap-1">
@@ -303,7 +302,7 @@ const Home = () => {
                             <span className="text-[10px] font-bold text-gray-400 flex items-center gap-1">
                               <Clock size={12} />{" "}
                               {new Date(post.createdAt).toLocaleDateString(
-                                "vi-VN"
+                                "vi-VN",
                               )}
                             </span>
                           </div>
@@ -349,7 +348,171 @@ const Home = () => {
           </div>
         </div>
       </section>
+      <section className="py-8 bg-white border-t border-gray-100">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+            {/* LEFT COLUMN: TIÊU ĐIỂM (List Style) - 4 Columns (1/3 Width) */}
+            <div className="xl:col-span-4">
+              <div className="mb-4 border-b-2 border-red-600 pb-1">
+                <h3 className="text-xl font-bold text-red-600 uppercase flex items-center">
+                  <span className="mr-2">★</span> Tiêu điểm
+                </h3>
+              </div>
 
+              <div className="flex flex-col gap-5">
+                {/* Items */}
+                {MOCK_NEWS.slice(0, 5).map((news, idx) => (
+                  <Link
+                    key={news.id}
+                    to={`/news/detail/${news.id}`}
+                    className="flex gap-4 group items-start border-b border-gray-100 last:border-0 pb-4 last:pb-0"
+                  >
+                    <div className="w-24 h-16 flex-shrink-0 overflow-hidden rounded bg-gray-200 shadow-sm relative">
+                      <img
+                        src={news.image}
+                        alt={news.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                      />
+                      {idx === 0 && (
+                        <span className="absolute bottom-0 left-0 bg-red-600 text-white text-[10px] px-1 font-bold">
+                          HOT
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex flex-col">
+                      <h4 className="text-sm font-bold text-gray-800 group-hover:text-red-600 leading-snug line-clamp-3 mb-1">
+                        {news.title}
+                      </h4>
+                      <span className="text-[11px] text-gray-400">
+                        {news.date}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* RIGHT COLUMN: TRUYỀN HÌNH - PHÁT THANH - 8 Columns (2/3 Width) */}
+            <div className="xl:col-span-8">
+              <div className="mb-4 border-b-2 border-red-600 pb-1 flex justify-between items-end">
+                <h3 className="text-xl font-bold text-red-600 uppercase flex items-center">
+                  <Radio className="mr-2" size={20} /> Truyền hình - Phát thanh
+                </h3>
+                <Link
+                  to="/media"
+                  className="text-xs text-gray-500 hover:text-red-600"
+                >
+                  Xem tất cả {">>"}
+                </Link>
+              </div>
+
+              {/* Dark Media Container */}
+              <div className="bg-[#0f172a] rounded-lg overflow-hidden shadow-xl border border-gray-800">
+                {/* Channel Tabs */}
+                <div className="flex bg-[#1e293b] border-b border-gray-700">
+                  <div className="px-4 py-3 flex items-center text-white font-bold text-sm bg-gray-800 border-r border-gray-700">
+                    <List size={16} className="mr-2" /> KÊNH
+                  </div>
+                  {["H1", "H2", "FM90", "JOYFM"].map((channel) => (
+                    <button
+                      key={channel}
+                      onClick={() => setActiveChannel(channel)}
+                      className={`px-6 py-3 text-sm font-bold uppercase transition-colors relative
+                              ${
+                                activeChannel === channel
+                                  ? "text-red-500 bg-[#0f172a]"
+                                  : "text-gray-400 hover:text-white hover:bg-gray-800"
+                              }`}
+                    >
+                      {channel}
+                      {activeChannel === channel && (
+                        <span className="absolute top-0 left-0 right-0 h-0.5 bg-red-600"></span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex flex-col md:flex-row h-[450px]">
+                  {/* Main Video Player (Wider) */}
+                  <div className="md:w-3/4 bg-black relative group cursor-pointer border-r border-gray-800">
+                    <img
+                      src={currentVideo.thumbnail}
+                      alt="Video cover"
+                      className="w-full h-full object-cover opacity-80 group-hover:opacity-90 transition"
+                    />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <div className="w-20 h-20 rounded-full bg-red-600/90 text-white flex items-center justify-center group-hover:scale-110 transition shadow-[0_0_20px_rgba(220,38,38,0.5)]">
+                        <Play size={40} fill="currentColor" className="ml-1" />
+                      </div>
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black via-black/80 to-transparent">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded uppercase">
+                          Trực tiếp
+                        </span>
+                        <span className="text-gray-300 text-sm">
+                          {currentVideo.date}
+                        </span>
+                      </div>
+                      <h3 className="text-white font-bold text-2xl leading-tight line-clamp-2">
+                        {currentVideo.title}
+                      </h3>
+                    </div>
+                  </div>
+
+                  {/* Playlist Sidebar (Narrower) */}
+                  <div className="md:w-1/4 bg-[#1e293b] overflow-y-auto no-scrollbar">
+                    <div className="p-3">
+                      {MOCK_VIDEOS.map((video, idx) => (
+                        <div
+                          key={video.id}
+                          onClick={() => setCurrentVideo(video)}
+                          className={`flex flex-col gap-2 p-2 rounded cursor-pointer mb-2 transition border border-transparent
+                                       ${
+                                         currentVideo.id === video.id
+                                           ? "bg-gray-700 border-gray-600"
+                                           : "hover:bg-gray-800"
+                                       }
+                                    `}
+                        >
+                          <div className="w-full aspect-video bg-gray-900 rounded overflow-hidden flex-shrink-0 relative">
+                            <img
+                              src={video.thumbnail}
+                              className="w-full h-full object-cover opacity-80"
+                              alt=""
+                            />
+                            <span className="absolute bottom-1 right-1 bg-black/80 text-white text-[9px] px-1 rounded">
+                              {video.duration}
+                            </span>
+                          </div>
+                          <div className="flex-1">
+                            <h5
+                              className={`text-xs font-bold leading-snug line-clamp-3 ${
+                                currentVideo.id === video.id
+                                  ? "text-red-400"
+                                  : "text-gray-300"
+                              }`}
+                            >
+                              {video.title}
+                            </h5>
+                          </div>
+                        </div>
+                      ))}
+
+                      <Link
+                        to="/media"
+                        className="block text-center text-xs text-gray-400 hover:text-white py-2 border-t border-gray-700 mt-2"
+                      >
+                        Xem tất cả
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
       <HospitalSlider />
     </div>
   );
