@@ -1,4 +1,3 @@
-
 import {
   Newspaper,
   AlertTriangle,
@@ -144,17 +143,53 @@ export const SERVICE_CATEGORIES = [
     titleClass: "text-yellow-900",
   },
 ];
+export const SERVICE_CATEGORIES_FILTER = [
+  {
+    id: 1,
+    title: "Tin tức – Sự kiện y tế",
+  },
+  {
+    id: 2,
+    title: "Cảnh báo y tế – Truyền thông nguy cơ",
+  },
+  {
+    id: 3,
+    title: "Khám bệnh - chữa bệnh",
+  },
+  {
+    id: 4,
+    title: "Phòng bệnh – Nâng cao sức khỏe",
+  },
+  {
+    id: 5,
+    title: "Bảo trợ xã hội",
+  },
+  {
+    id: 6,
+    title: "Chuyển đổi số",
+  },
+  {
+    id: 7,
+    title: "Chính sách y tế - bảo hiểm y tế",
+  },
+  {
+    id: 8,
+    title: "Gương người tốt – việc tốt ngành Y",
+  },
+];
 export const MOCK_VIDEOS = [
   {
     id: "v1",
-    title: "Bản tin Y tế Hà Nội: Toàn cảnh công tác phòng chống dịch tuần 1 tháng 1/2026",
+    title:
+      "Bản tin Y tế Hà Nội: Toàn cảnh công tác phòng chống dịch tuần 1 tháng 1/2026",
     duration: "05:30",
     thumbnail: "https://picsum.photos/seed/video1/800/450",
     date: "07/01/2026",
   },
   {
     id: "v2",
-    title: "Phóng sự: Những chiến sĩ áo trắng thầm lặng đêm Giao thừa Tết Bính Ngọ",
+    title:
+      "Phóng sự: Những chiến sĩ áo trắng thầm lặng đêm Giao thừa Tết Bính Ngọ",
     duration: "08:45",
     thumbnail: "https://picsum.photos/seed/video2/800/450",
     date: "10/01/2026",
@@ -181,7 +216,6 @@ export const MOCK_VIDEOS = [
     date: "25/12/2025",
   },
 ];
-
 
 export const MAIN_MENU: MenuItem[] = [
   { id: "home", title: "Trang chủ", path: "/", icon: Home },
@@ -308,66 +342,213 @@ export const MOCK_NEWS: NewsItem[] = [
   {
     id: 1,
     title: "Hà Nội triển khai thí điểm hồ sơ sức khỏe điện tử toàn dân",
-    excerpt: "Sở Y tế Hà Nội vừa ban hành kế hoạch triển khai thí điểm lập hồ sơ sức khỏe điện tử cho người dân trên địa bàn 30 quận, huyện, thị xã nhằm nâng cao chất lượng quản lý sức khỏe cộng đồng.",
+    excerpt:
+      "Sở Y tế Hà Nội vừa ban hành kế hoạch triển khai thí điểm lập hồ sơ sức khỏe điện tử cho người dân trên địa bàn 30 quận, huyện, thị xã nhằm nâng cao chất lượng quản lý sức khỏe cộng đồng.",
     date: "12/05/2024",
     image: "https://chuyendoiso.quangngai.gov.vn/items/cms/4347.jpg",
     category: "news-events",
-    isFeatured: true
+    isFeatured: true,
   },
   {
     id: 2,
-    title: "Cảnh báo dịch sốt xuất huyết có xu hướng gia tăng tại một số quận huyện",
-    excerpt: "Theo Trung tâm Kiểm soát bệnh tật (CDC) Hà Nội, số ca mắc sốt xuất huyết trên địa bàn thành phố đang có dấu hiệu tăng nhanh tại các khu vực dân cư đông đúc.",
+    title:
+      "Cảnh báo dịch sốt xuất huyết có xu hướng gia tăng tại một số quận huyện",
+    excerpt:
+      "Theo Trung tâm Kiểm soát bệnh tật (CDC) Hà Nội, số ca mắc sốt xuất huyết trên địa bàn thành phố đang có dấu hiệu tăng nhanh tại các khu vực dân cư đông đúc.",
     date: "11/05/2024",
-    image: "https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?q=80&w=800&auto=format&fit=crop",
-    category: "alerts"
+    image:
+      "https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?q=80&w=800&auto=format&fit=crop",
+    category: "alerts",
   },
   {
     id: 3,
     title: "Bác sĩ Bệnh viện Xanh Pôn cứu sống bệnh nhân bị vỡ tạng do tai nạn",
-    excerpt: "Các bác sĩ Khoa Ngoại tiêu hóa, Bệnh viện Đa khoa Xanh Pôn vừa thực hiện thành công ca phẫu thuật cấp cứu cho một bệnh nhân bị chấn thương bụng kín nghiêm trọng.",
+    excerpt:
+      "Các bác sĩ Khoa Ngoại tiêu hóa, Bệnh viện Đa khoa Xanh Pôn vừa thực hiện thành công ca phẫu thuật cấp cứu cho một bệnh nhân bị chấn thương bụng kín nghiêm trọng.",
     date: "10/05/2024",
-    image: "https://images.unsplash.com/photo-1551076805-e1869033e561?q=80&w=800&auto=format&fit=crop",
-    category: "good-deeds"
+    image:
+      "https://images.unsplash.com/photo-1551076805-e1869033e561?q=80&w=800&auto=format&fit=crop",
+    category: "good-deeds",
   },
   {
     id: 4,
-    title: "Hà Nội tăng cường kiểm tra an toàn thực phẩm tại các bếp ăn trường học",
-    excerpt: "Sở Y tế phối hợp với Sở Giáo dục và Đào tạo Hà Nội thành lập các đoàn kiểm tra liên ngành nhằm đảm bảo an toàn vệ sinh thực phẩm cho học sinh.",
+    title:
+      "Hà Nội tăng cường kiểm tra an toàn thực phẩm tại các bếp ăn trường học",
+    excerpt:
+      "Sở Y tế phối hợp với Sở Giáo dục và Đào tạo Hà Nội thành lập các đoàn kiểm tra liên ngành nhằm đảm bảo an toàn vệ sinh thực phẩm cho học sinh.",
     date: "09/05/2024",
-    image: "https://images.unsplash.com/photo-1547573854-74d2a71d0826?q=80&w=800&auto=format&fit=crop",
-    category: "news-events"
+    image:
+      "https://images.unsplash.com/photo-1547573854-74d2a71d0826?q=80&w=800&auto=format&fit=crop",
+    category: "news-events",
   },
   {
     id: 5,
-    title: "Khám bệnh, phát thuốc miễn phí cho người cao tuổi tại huyện Sóc Sơn",
-    excerpt: "Hơn 500 người cao tuổi tại xã Minh Phú, huyện Sóc Sơn đã được các y bác sĩ tình nguyện khám bệnh, tư vấn sức khỏe và cấp phát thuốc miễn phí.",
+    title:
+      "Khám bệnh, phát thuốc miễn phí cho người cao tuổi tại huyện Sóc Sơn",
+    excerpt:
+      "Hơn 500 người cao tuổi tại xã Minh Phú, huyện Sóc Sơn đã được các y bác sĩ tình nguyện khám bệnh, tư vấn sức khỏe và cấp phát thuốc miễn phí.",
     date: "08/05/2024",
-    image: "https://images.unsplash.com/photo-1581056771107-24ca5f033842?q=80&w=800&auto=format&fit=crop",
-    category: "social"
+    image:
+      "https://images.unsplash.com/photo-1581056771107-24ca5f033842?q=80&w=800&auto=format&fit=crop",
+    category: "social",
   },
   {
     id: 6,
     title: "Thủ tục đăng ký bảo hiểm y tế hộ gia đình trực tuyến",
-    excerpt: "Hướng dẫn chi tiết các bước đăng ký tham gia bảo hiểm y tế hộ gia đình qua cổng dịch vụ công quốc gia và ứng dụng VssID.",
+    excerpt:
+      "Hướng dẫn chi tiết các bước đăng ký tham gia bảo hiểm y tế hộ gia đình qua cổng dịch vụ công quốc gia và ứng dụng VssID.",
     date: "07/05/2024",
-    image: "https://images.unsplash.com/photo-1454165205744-3b78555e5572?q=80&w=800&auto=format&fit=crop",
-    category: "policy"
+    image:
+      "https://images.unsplash.com/photo-1454165205744-3b78555e5572?q=80&w=800&auto=format&fit=crop",
+    category: "policy",
   },
   {
     id: 7,
     title: "Lợi ích của việc tiêm chủng mở rộng đối với trẻ em",
-    excerpt: "Tiêm chủng là biện pháp hiệu quả nhất để phòng ngừa các bệnh truyền nhiễm nguy hiểm ở trẻ nhỏ, giúp xây dựng hệ miễn dịch cộng đồng vững mạnh.",
+    excerpt:
+      "Tiêm chủng là biện pháp hiệu quả nhất để phòng ngừa các bệnh truyền nhiễm nguy hiểm ở trẻ nhỏ, giúp xây dựng hệ miễn dịch cộng đồng vững mạnh.",
     date: "06/05/2024",
-    image: "https://images.unsplash.com/photo-1584362946444-1e7c4f9b7113?q=80&w=800&auto=format&fit=crop",
-    category: "prevention"
+    image:
+      "https://images.unsplash.com/photo-1584362946444-1e7c4f9b7113?q=80&w=800&auto=format&fit=crop",
+    category: "prevention",
   },
   {
     id: 8,
     title: "Chuyển đổi số ngành y tế: Bước tiến mới trong quản lý bệnh viện",
-    excerpt: "Việc áp dụng bệnh án điện tử và hệ thống quản lý thông tin bệnh viện (HIS) giúp tối ưu hóa quy trình khám chữa bệnh và giảm thời gian chờ đợi của bệnh nhân.",
+    excerpt:
+      "Việc áp dụng bệnh án điện tử và hệ thống quản lý thông tin bệnh viện (HIS) giúp tối ưu hóa quy trình khám chữa bệnh và giảm thời gian chờ đợi của bệnh nhân.",
     date: "05/05/2024",
-    image: "https://images.unsplash.com/photo-1516549655169-df83a0774514?q=80&w=800&auto=format&fit=crop",
-    category: "digital"
-  }
+    image:
+      "https://images.unsplash.com/photo-1516549655169-df83a0774514?q=80&w=800&auto=format&fit=crop",
+    category: "digital",
+  },
+];
+
+export const MOCK_INTERNATIONAL = [
+  {
+    id: "i1",
+    title:
+      "WHO cảnh báo biến chủng cúm mới: Việt Nam chủ động giám sát ngay từ cửa khẩu",
+    date: "13/01/2026",
+    image: "https://picsum.photos/seed/inter1/600/400",
+  },
+  {
+    id: "i2",
+    title:
+      "Hợp tác y tế Việt - Nhật: Chuyển giao công nghệ phẫu thuật nội soi bằng Robot",
+    date: "09/01/2026",
+    image: "https://picsum.photos/seed/inter2/600/400",
+  },
+  {
+    id: "i3",
+    title:
+      'Các nước ASEAN thống nhất cơ chế "Hộ chiếu vắc xin" điện tử phiên bản 2.0',
+    date: "28/12/2025",
+    image: "https://picsum.photos/seed/inter3/600/400",
+  },
+];
+export const MOCK_CULTURE = [
+  {
+    id: "s1",
+    title:
+      "Giải bóng đá Cup Sức khỏe Thủ đô 2026: Bệnh viện Thanh Nhàn vô địch",
+    date: "14/01/2026",
+    image: "https://picsum.photos/seed/sport1/600/400",
+  },
+  {
+    id: "s2",
+    title: "Hội thao ngành Y tế: Hơn 2.000 vận động viên tham gia chạy việt dã",
+    date: "08/01/2026",
+    image: "https://picsum.photos/seed/sport2/600/400",
+  },
+  {
+    id: "s3",
+    title:
+      'Phong trào rèn luyện sức khỏe "Mỗi người dân đi bộ 10.000 bước mỗi ngày"',
+    date: "01/01/2026",
+    image: "https://picsum.photos/seed/sport3/600/400",
+  },
+];
+export const MOCK_SPORTS = [
+  {
+    id: "s1",
+    title:
+      "Giải bóng đá Cup Sức khỏe Thủ đô 2026: Bệnh viện Thanh Nhàn vô địch",
+    date: "14/01/2026",
+    image: "https://picsum.photos/seed/sport1/600/400",
+  },
+  {
+    id: "s2",
+    title: "Hội thao ngành Y tế: Hơn 2.000 vận động viên tham gia chạy việt dã",
+    date: "08/01/2026",
+    image: "https://picsum.photos/seed/sport2/600/400",
+  },
+  {
+    id: "s3",
+    title:
+      'Phong trào rèn luyện sức khỏe "Mỗi người dân đi bộ 10.000 bước mỗi ngày"',
+    date: "01/01/2026",
+    image: "https://picsum.photos/seed/sport3/600/400",
+  },
+];
+
+export const CATEGORIES = [
+  {
+    id: 3,
+    title: "Khám bệnh - chữa bệnh",
+    icon: Stethoscope,
+    iconColor: "text-pink-600",
+    hoverColor: "text-pink-600",
+    image: "https://suckhoethudo.vn/assets/kham benh-__1wzyZ_.png",
+    data: [],
+  },
+  {
+    id: 4,
+    title: "Phòng bệnh - Nâng cao sức khỏe",
+    icon: ShieldPlus,
+    iconColor: "text-orange-500",
+    hoverColor: "text-orange-600",
+    image: "https://suckhoethudo.vn/assets/phong benh-CTWuljBT.png",
+    data: [],
+    paddingClass: "md:pl-8",
+  },
+  {
+    id: 5,
+    title: "Bảo trợ xã hội",
+    icon: HeartHandshake,
+    iconColor: "text-blue-500",
+    hoverColor: "text-blue-600",
+    image: "https://suckhoethudo.vn/assets/bao tro XH-By5fco0o.png",
+    data: [],
+    paddingClass: "md:pl-8",
+  },
+  {
+    id: 6,
+    title: "Chuyển đổi số y tế",
+    icon: Laptop2,
+    iconColor: "text-pink-600",
+    hoverColor: "text-pink-600",
+    image: "https://suckhoethudo.vn/assets/chuyen doi so-DSivldkT.png",
+    data: [],
+  },
+  {
+    id: 7,
+    title: "Chính sách y tế - Bảo hiểm y tế",
+    icon: FileText,
+    iconColor: "text-orange-500",
+    hoverColor: "text-orange-600",
+    image: "https://suckhoethudo.vn/assets/chinh sach y te-C_dDpJVZ.png",
+    data: [],
+    paddingClass: "md:pl-8",
+  },
+  {
+    id: 8,
+    title: "Gương người tốt - việc tốt",
+    icon: Award,
+    iconColor: "text-blue-500",
+    hoverColor: "text-blue-600",
+    image: "https://suckhoethudo.vn/assets/guong nguoi tot-C7NJJGDV.png",
+    data: [],
+    paddingClass: "md:pl-8",
+  },
 ];

@@ -14,7 +14,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { api } from "../api";
-import { SERVICE_CATEGORIES } from "../constants";
+import { SERVICE_CATEGORIES_FILTER } from "../constants";
 import PostForm from "../components/PostForm";
 import AdminLayout from "../components/AdminLayout"; // Import the new layout
 
@@ -29,7 +29,7 @@ const AdminDashboard = () => {
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      let endpoint = "/posts"; // Assuming this doesn't need /auth prefix
+      let endpoint = "/posts";
       if (filterCategory !== "all") {
         endpoint += `?category_id=${filterCategory}`;
       }
@@ -71,7 +71,7 @@ const AdminDashboard = () => {
   const filteredPosts = posts.filter(
     (post) =>
       post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.summary?.toLowerCase().includes(searchTerm.toLowerCase())
+      post.summary?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
@@ -152,7 +152,7 @@ const AdminDashboard = () => {
               className="flex-grow md:w-64 bg-white border border-gray-200 p-2.5 rounded-xl outline-none text-sm font-bold text-gray-600"
             >
               <option value="all">Tất cả danh mục</option>
-              {SERVICE_CATEGORIES.map((cat) => (
+              {SERVICE_CATEGORIES_FILTER.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.title}
                 </option>
@@ -187,8 +187,8 @@ const AdminDashboard = () => {
                 </tr>
               ) : (
                 filteredPosts.map((post) => {
-                  const category = SERVICE_CATEGORIES.find(
-                    (c) => c.id === post.category
+                  const category = SERVICE_CATEGORIES_FILTER.find(
+                    (c) => c.id === post.category,
                   );
                   return (
                     <tr
@@ -250,14 +250,14 @@ const AdminDashboard = () => {
                           <span className="flex items-center gap-1">
                             <Calendar size={12} />{" "}
                             {new Date(post.createdAt).toLocaleDateString(
-                              "vi-VN"
+                              "vi-VN",
                             )}
                           </span>
                           <span className="flex items-center gap-1 mt-0.5">
                             <Clock size={12} />{" "}
                             {new Date(post.createdAt).toLocaleTimeString(
                               "vi-VN",
-                              { hour: "2-digit", minute: "2-digit" }
+                              { hour: "2-digit", minute: "2-digit" },
                             )}
                           </span>
                         </div>
@@ -267,7 +267,7 @@ const AdminDashboard = () => {
                           <button
                             onClick={() => {
                               setEditingPost(post);
-setIsFormOpen(true);
+                              setIsFormOpen(true);
                             }}
                             className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition shadow-sm bg-white border border-gray-100"
                           >

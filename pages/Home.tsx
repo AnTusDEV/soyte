@@ -12,7 +12,12 @@ import {
   List,
   Play,
 } from "lucide-react";
-import { SERVICE_CATEGORIES, MOCK_NEWS, MOCK_VIDEOS } from "../constants";
+import {
+  SERVICE_CATEGORIES,
+  MOCK_NEWS,
+  MOCK_VIDEOS,
+  CATEGORIES,
+} from "../constants";
 import HospitalSlider from "../components/HospitalSlider";
 import { api } from "../api";
 const Home = () => {
@@ -25,6 +30,56 @@ const Home = () => {
   ];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currentVideo, setCurrentVideo] = useState(MOCK_VIDEOS[0]);
+  const CategoryColumn = ({
+    title,
+    Icon,
+    iconColor,
+    hoverColor,
+    image,
+    data,
+    paddingClass = "",
+  }) => {
+    if (!data || data.length === 0) return null;
+    const [first, ...rest] = data;
+    return (
+      <div className={`pt-6 md:pt-0 ${paddingClass}`}>
+        <div className="mb-4 flex items-center gap-2">
+          <Icon className={iconColor} size={20} />
+          <h3 className="text-md font-bold text-primary-900 uppercase">
+            {title}
+          </h3>
+        </div>
+
+        <div className="group mb-4 cursor-pointer">
+          <div className="mb-2">
+            <img
+              src={image}
+              className="object-cover group-hover:scale-105 transition h-[200px] w-full"
+              alt={first.title}
+            />
+          </div>
+          <h4
+            className={`font-bold text-gray-800 leading-snug group-hover:${hoverColor}`}
+          >
+            {first.title}
+          </h4>
+        </div>
+        <ul className="space-y-3">
+          {rest.map((item) => (
+            <li
+              key={item.id}
+              className={`text-sm text-gray-600 border-t border-gray-100 pt-2 cursor-pointer line-clamp-2 hover:${hoverColor}`}
+            >
+              <Link key={item.id} to={`/news/detail/${item.id}`}>
+                • {item.title}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+
   useEffect(() => {
     const fetchLatestPosts = async () => {
       try {
@@ -51,6 +106,57 @@ const Home = () => {
         setLoading(false);
       }
     };
+    const fetchCategory = async () => {
+      try {
+        const postData = [
+          {
+            category_id: 3,
+            limit: 3,
+          },
+          {
+            category_id: 4,
+            limit: 3,
+          },
+          {
+            category_id: 5,
+            limit: 3,
+          },
+          {
+            category_id: 6,
+            limit: 3,
+          },
+          {
+            category_id: 7,
+            limit: 3,
+          },
+          {
+            category_id: 8,
+            limit: 3,
+          },
+        ];
+        const response = await api.post("/posts/by-categories", postData);
+        if (response && response.data && Array.isArray(response.data)) {
+          // Tạo lookup object từ response.data
+          const postsByCategory = response.data.reduce(
+            (acc, item) => {
+              acc[item.category_id] = item.posts;
+              return acc;
+            },
+            {} as Record<number, any[]>,
+          );
+
+          // Gán data cho categories
+          CATEGORIES.forEach((category) => {
+            if (postsByCategory[category.id]) 
+              category.data = postsByCategory[category.id]; 
+          });
+        }else{
+          console.error("Không lấy được dữ liệu!");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
     const useFallbacks = () => {
       setDbPosts(
@@ -66,6 +172,7 @@ const Home = () => {
     };
 
     fetchLatestPosts();
+    fetchCategory();
   }, []);
 
   useEffect(() => {
@@ -302,7 +409,7 @@ const Home = () => {
                 </Link>
               </div>
 
-              <div className="space-y-4 max-h-[600px] overflow-y-auto no-scrollbar pr-2">
+              <div className="space-y-4 max-h-[400px] overflow-y-auto no-scrollbar pr-2">
                 {loading
                   ? [...Array(5)].map((_, i) => (
                       <div key={i} className="flex gap-4 animate-pulse">
@@ -313,7 +420,7 @@ const Home = () => {
                         </div>
                       </div>
                     ))
-                  : latestTenPosts.map((post, idx) => (
+                  : latestTenPosts.map((post) => (
                       <Link
                         key={post.id}
                         to={`/news/detail/${post.id}`}
@@ -506,6 +613,23 @@ const Home = () => {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+      <section className="py-12 bg-white border-t border-gray-200">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 divide-y md:divide-y-0 md:divide-x divide-gray-100">
+            {CATEGORIES.map((item) => (
+              <CategoryColumn
+                title={item.title}
+                Icon={item.icon}
+                iconColor={item.iconColor}
+                hoverColor={item.hoverColor}
+                image={item.image}
+                data={item.data}
+                paddingClass={item.paddingClass}
+              />
+            ))}
           </div>
         </div>
       </section>
