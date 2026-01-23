@@ -157,7 +157,7 @@ export const SERVICE_CATEGORIES_FILTER = [
   {
     id: 3,
     title: "Khám bệnh - chữa bệnh",
-    path: "/policy",
+    path: "/examination",
   },
   {
     id: 4,
@@ -182,7 +182,7 @@ export const SERVICE_CATEGORIES_FILTER = [
   {
     id: 8,
     title: "Gương người tốt – việc tốt ngành Y",
-    path: "/hanoi-system",
+    path: "/good-deeds",
   },
 ];
 export const MOCK_VIDEOS = [

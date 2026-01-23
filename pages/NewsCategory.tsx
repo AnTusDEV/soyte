@@ -100,6 +100,8 @@ const NewsCategory = () => {
           page: page,
           order: "createdAt.desc",
         };
+        console.log(category);
+        
         if (category) params.category_id = category.id;
 
         const response = await api.get("/posts", params);
@@ -245,7 +247,7 @@ const NewsCategory = () => {
                     >
                       <div className="aspect-[16/10] overflow-hidden rounded-sm shadow-sm bg-gray-100 mb-2">
                         <img
-                          src={item.image}
+                          src={item.image_url}
                           alt={item.title}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />

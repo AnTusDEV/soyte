@@ -12,6 +12,8 @@ import {
   Image as ImageIcon,
   Loader2,
   Calendar,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { api } from "../api";
 import { SERVICE_CATEGORIES_FILTER } from "../constants";
@@ -24,37 +26,71 @@ const AdminDashboard = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
+  const [param, setParam] = useState({
+    page: 1,
+    limit: 10, // Increased from 2 for better UX
+  });
+  const [totalPosts, setTotalPosts] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
 
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      let endpoint = "/posts";
+      let endpoint = `/posts?page=${param.page}&limit=${param.limit}`;
       if (filterCategory !== "all") {
-        endpoint += `?category_id=${filterCategory}`;
+        endpoint += `&category_id=${filterCategory}`;
+      }
+      if (debouncedSearchTerm) {
+        endpoint += `&q=${debouncedSearchTerm}`;
       }
       const response = await api.get(endpoint);
+      console.log(response.data);
       if (response && response.data && Array.isArray(response.data)) {
-        const mapped = response.data.map((p: any) => ({
+        
+        const { data, meta } = response;
+        const mapped = data.map((p: any) => ({
           ...p,
           imageUrl: p.image_url,
           createdAt: p.created_at,
           category: p.category_id,
         }));
         setPosts(mapped);
+        setTotalPosts(meta.total);
+        setTotalPages(Math.ceil(meta.total / param.limit));
       } else {
         setPosts([]);
+        setTotalPosts(0);
+        setTotalPages(1);
       }
     } catch (error) {
       console.error("Error fetching posts:", error);
+      setPosts([]);
+      setTotalPosts(0);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300); // Debounce search term
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm]);
+
+  useEffect(() => {
+    setParam((p) => ({ ...p, page: 1 }));
+  }, [filterCategory, debouncedSearchTerm]);
+
+  useEffect(() => {
     fetchPosts();
-  }, [filterCategory]);
+  }, [param, filterCategory, debouncedSearchTerm]);
 
   const handleDelete = async (id: string) => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa bài viết này?")) return;
@@ -68,11 +104,14 @@ const AdminDashboard = () => {
     }
   };
 
-  const filteredPosts = posts.filter(
-    (post) =>
-      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.summary?.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  const handlePageChange = (newPage: number) => {
+    if (newPage > 0 && newPage <= totalPages) {
+      setParam((p) => ({ ...p, page: newPage }));
+    }
+  };
+
+  // Client-side filtering is no longer needed as search is server-side.
+  const filteredPosts = posts;
 
   return (
     <AdminLayout title="Bài viết">
@@ -86,7 +125,7 @@ const AdminDashboard = () => {
               Tổng bài viết
             </p>
             <h3 className="text-2xl font-black text-gray-800">
-              {posts.length}
+              {totalPosts}
             </h3>
           </div>
         </div>
@@ -99,7 +138,7 @@ const AdminDashboard = () => {
               Đã xuất bản
             </p>
             <h3 className="text-2xl font-black text-gray-800">
-              {posts.filter((p) => p.status === "published").length}
+              {totalPosts}
             </h3>
           </div>
         </div>
@@ -295,6 +334,38 @@ const AdminDashboard = () => {
               <p className="text-gray-400 font-bold">
                 Không tìm thấy bài viết nào phù hợp.
               </p>
+            </div>
+          )}
+        </div>
+
+        {/* Pagination Controls */}
+        <div className="px-6 py-4 border-t border-gray-100 flex justify-between items-center">
+          <div className="text-sm text-gray-600">
+            Hiển thị{" "}
+            <span className="font-bold">{posts.length}</span> trên{" "}
+            <span className="font-bold">{totalPosts}</span> kết quả
+          </div>
+          {totalPages > 1 && (
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => handlePageChange(param.page - 1)}
+                disabled={param.page === 1}
+                className="p-2 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600 hover:bg-gray-100 rounded-lg transition flex items-center gap-1"
+              >
+                <ChevronLeft size={16} />
+                <span className="text-sm font-bold">Trước</span>
+              </button>
+              <div className="px-3 py-1 text-sm font-bold">
+                {param.page} / {totalPages}
+              </div>
+              <button
+                onClick={() => handlePageChange(param.page + 1)}
+                disabled={param.page === totalPages || totalPages === 0}
+                className="p-2 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600 hover:bg-gray-100 rounded-lg transition flex items-center gap-1"
+              >
+                <span className="text-sm font-bold">Sau</span>
+                <ChevronRight size={16} />
+              </button>
             </div>
           )}
         </div>
