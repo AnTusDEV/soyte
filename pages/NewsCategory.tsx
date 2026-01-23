@@ -1,71 +1,145 @@
-import React, { useState, useEffect } from "react";
-// Standard named imports from react-router-dom
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
-import {
-  MOCK_NEWS,
-  MAIN_MENU, 
-} from "../constants";
+import { MOCK_NEWS, MAIN_MENU, SERVICE_CATEGORIES_FILTER } from "../constants";
 import { api } from "../api";
 import {
   ChevronRight,
   TrendingUp,
-  Clock, 
-  Home as HomeIcon, 
+  Clock,
+  Home as HomeIcon,
   Zap,
-  ListOrdered, 
+  ListOrdered,
+  Loader2,
 } from "lucide-react";
 
 const NewsCategory = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
-  const [dbLatest, setDbLatest] = useState<any[]>([]);
-  const [dbSpotlight, setDbSpotlight] = useState<any>(null);
-  const [loadingSidebar, setLoadingSidebar] = useState(true); 
-  const featuredHighlights = MOCK_NEWS.slice(4,7)
 
-  // Fetch Sidebar Data from Local API
+  // States for main stream (Infinite Scroll)
+  const [newsPosts, setNewsPosts] = useState<any[]>([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+
+  // States for Sidebar
+  const [latestNews, setLatestNews] = useState<any[]>([]);
+  const [latestNews3, setLatestNews3] = useState<any[]>([]);
+  const [trendingNews, setTrendingNews] = useState<any[]>([]);
+  const [dbSpotlight, setDbSpotlight] = useState<any>(null);
+  const [loadingSidebar, setLoadingSidebar] = useState(true);
+
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastPostElementRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (loading) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPage((prevPage) => prevPage + 1);
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore],
+  );
+
+  // Initial fetch for sidebar and spotlight
   useEffect(() => {
     const fetchSidebarData = async () => {
+      setLoadingSidebar(true);
       try {
-        const data = await api.get(
-          "/posts?status=published&limit=11&order=createdAt.desc"
-        );
+        // 1. Fetch Latest News (10 posts)
+        const latestData = await api.get("/posts", {
+          status: "published",
+          limit: 10,
+          order: "createdAt.desc",
+        });
+        const latestItems = Array.isArray(latestData.data)
+          ? latestData.data
+          : latestData.data?.data || [];
+        setLatestNews(latestItems);
+        setLatestNews3( [...latestItems].sort(() => 0.5 - Math.random()).slice(0, 3));
 
-        if (data && data.length > 0) {
-          setDbSpotlight(data[0]);
-          setDbLatest(data.slice(1, 11));
-        } else {
-          throw new Error("No posts found");
+        // 2. Fetch Spotlight (1 post)
+        if (latestItems.length > 0) {
+          setDbSpotlight(latestItems[0]);
         }
+
+        // 3. Fetch Trending News (Random 5) 
+        const trendingData = await api.get("/posts", {
+          status: "published",
+          limit: 30,
+        });
+        const allPosts = Array.isArray(trendingData.data)
+          ? trendingData.data
+          : trendingData.data?.data || [];
+        const shuffled = [...allPosts].sort(() => 0.5 - Math.random());
+        setTrendingNews(shuffled.slice(0, 5));
       } catch (err) {
-        console.error("Error fetching sidebar news:", err);
-        const fallbackMapped = MOCK_NEWS.map((n) => ({
-          id: n.id,
-          title: n.title,
-          summary: n.excerpt,
-          imageUrl: n.image,
-          category: n.category,
-          createdAt: n.date.split("/").reverse().join("-"),
-        }));
-        setDbSpotlight(fallbackMapped[0]);
-        setDbLatest(fallbackMapped.slice(1, 11));
+        console.error("Error fetching sidebar data:", err);
       } finally {
         setLoadingSidebar(false);
       }
     };
+
     fetchSidebarData();
   }, []);
 
+  // Fetch main news stream (Infinite Scroll)
+  useEffect(() => {
+    const fetchStreamPosts = async () => {
+      setLoading(true);
+      try {
+        // Map category path to ID if needed
+        const category = SERVICE_CATEGORIES_FILTER.find((c) =>
+          c.path.includes(categoryId || ""),
+        );
+        const params: any = {
+          status: "published",
+          limit: 6,
+          page: page,
+          order: "createdAt.desc",
+        };
+        if (category) params.category_id = category.id;
+
+        const response = await api.get("/posts", params);
+        const newPosts = Array.isArray(response.data)
+          ? response.data
+          : response.data?.data || [];
+
+        if (newPosts.length === 0) {
+          setHasMore(false);
+        } else {
+          setNewsPosts((prev) => [...prev, ...newPosts]);
+        }
+      } catch (err) {
+        console.error("Error fetching stream posts:", err);
+        setHasMore(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStreamPosts();
+  }, [page, categoryId]);
+
+  // Reset stream when category changes
+  useEffect(() => {
+    setNewsPosts([]);
+    setPage(1);
+    setHasMore(true);
+  }, [categoryId]);
+
   const categoryTitle =
     MAIN_MENU.find((m) => m.path.includes(categoryId || ""))?.title ||
-    MAIN_MENU.flatMap((m) => m.children).find((c) =>
-      c?.path.includes(categoryId || "")
+    MAIN_MENU.flatMap((m) => m.children || []).find((c) =>
+      c?.path.includes(categoryId || ""),
     )?.title ||
     "Tin tức y tế";
 
-  const spotlightItem = MOCK_NEWS[0];
-  const hotNewsItems = MOCK_NEWS.slice(1, 5);
-  const streamItems = [...MOCK_NEWS, ...MOCK_NEWS].slice(2, 10);
-  const mostReadItems = [...MOCK_NEWS].reverse().slice(0, 5);
+  // Using first post from MOCK_NEWS as fallback spotlight for layout if API fails
+  const spotlightItem = dbSpotlight || MOCK_NEWS[0];
+  const featuredHighlights = MOCK_NEWS.slice(4, 7);
 
   return (
     <div className="bg-white min-h-screen font-sans text-gray-800 pb-12">
@@ -88,20 +162,21 @@ const NewsCategory = () => {
       <div className="container mx-auto px-4 pt-8">
         {categoryId === "events" && (
           <div className="space-y-10 mb-12">
-            {/* Lớp 1: Grid tin chính & sidebar mini */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               {/* Tin ảnh lớn bên trái */}
               <div className="lg:col-span-5 group cursor-pointer">
-                <div className="overflow-hidden rounded-sm mb-4 relative bg-gray-100 shadow-sm">
-                  <img
-                    src={spotlightItem.image}
-                    alt={spotlightItem.title}
-                    className="w-full aspect-[16/9] object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                </div>
-                <h2 className="text-xl md:text-2xl font-black text-gray-900 leading-tight hover:text-red-700 mb-3 transition-colors">
-                  {spotlightItem.title}
-                </h2>
+                <Link to={`/news/detail/${spotlightItem.id}`}>
+                  <div className="overflow-hidden rounded-sm mb-4 relative bg-gray-100 shadow-sm">
+                    <img
+                      src={spotlightItem.image_url || spotlightItem.image}
+                      alt={spotlightItem.title}
+                      className="w-full aspect-[16/9] object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  </div>
+                  <h2 className="text-xl md:text-2xl font-black text-gray-900 leading-tight hover:text-red-700 mb-3 transition-colors">
+                    {spotlightItem.title}
+                  </h2>
+                </Link>
               </div>
 
               {/* Tin mới nhận ở giữa */}
@@ -109,19 +184,12 @@ const NewsCategory = () => {
                 <div className="bg-gray-900 text-white px-4 py-2 text-[10px] font-black uppercase tracking-widest mb-4">
                   Tin Mới Nhận
                 </div>
-                {hotNewsItems.map((item, idx) => (
+                {latestNews.slice(0, 4).map((item, idx) => (
                   <Link
                     key={idx}
                     to={`/news/detail/${item.id}`}
                     className="group py-4 flex flex-col gap-2 first:pt-0"
                   >
-                    {/* <div className="w-full aspect-video flex-shrink-0 overflow-hidden rounded-sm bg-gray-100">
-                      <img
-                        src={item.image}
-                        alt=""
-                        className="w-full h-full object-cover transition-transform group-hover:scale-110"
-                      />
-                    </div> */}
                     <h3 className="text-[13px] font-bold text-gray-800 line-clamp-3 group-hover:text-red-700 transition-colors">
                       • {item.title}
                     </h3>
@@ -129,7 +197,7 @@ const NewsCategory = () => {
                 ))}
               </div>
 
-              {/* Tin đọc nhiều bên phải */}
+              {/* Tin đọc nhiều bên phải (Random) */}
               <div className="lg:col-span-4 bg-gray-50 border border-gray-200 rounded-sm overflow-hidden h-fit">
                 <div className="bg-red-700 px-4 py-2.5">
                   <h3 className="text-white text-xs font-black uppercase flex items-center gap-2">
@@ -137,29 +205,45 @@ const NewsCategory = () => {
                   </h3>
                 </div>
                 <div className="p-4 flex flex-col gap-4">
-                  {mostReadItems.map((item, idx) => (
-                    <Link
-                      key={idx}
-                      to={`/news/detail/${item.id}`}
-                      className="group flex gap-3 items-start border-b border-gray-100 last:border-0 pb-3 last:pb-0"
-                    >
-                      <span
-                        className={`flex-shrink-0 w-6 h-6 flex items-center justify-center rounded text-[11px] font-black italic ${idx < 3 ? "text-red-600 bg-red-50" : "text-gray-400 bg-white"}`}
+                  {loadingSidebar ? (
+                    <div className="animate-pulse space-y-4">
+                      {[...Array(5)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="h-4 bg-gray-200 rounded w-full"
+                        ></div>
+                      ))}
+                    </div>
+                  ) : (
+                    trendingNews.map((item, idx) => (
+                      <Link
+                        key={idx}
+                        to={`/news/detail/${item.id}`}
+                        className="group flex gap-3 items-start border-b border-gray-100 last:border-0 pb-3 last:pb-0"
                       >
-                        {idx + 1}
-                      </span>
-                      <h4 className="text-[13px] font-bold text-gray-800 group-hover:text-red-600 leading-snug">
-                        {item.title}
-                      </h4>
-                    </Link>
-                  ))}
+                        <span
+                          className={`flex-shrink-0 w-6 h-6 flex items-center justify-center rounded text-[11px] font-black italic ${idx < 3 ? "text-red-600 bg-red-50" : "text-gray-400 bg-white"}`}
+                        >
+                          {idx + 1}
+                        </span>
+                        <h4 className="text-[13px] font-bold text-gray-800 group-hover:text-red-600 leading-snug">
+                          {item.title}
+                        </h4>
+                      </Link>
+                    ))
+                  )}
                 </div>
               </div>
+
               <div className="lg:col-span-8">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  {featuredHighlights.map((item) => (
-                    <div key={item.id} className="group cursor-pointer">
-                      <div className="aspect-[16/10] overflow-hidden rounded-sm shadow-sm bg-gray-100">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                  {latestNews3.map((item) => (
+                    <Link
+                      key={item.id}
+                      to={`/news/detail/${item.id}`}
+                      className="group cursor-pointer"
+                    >
+                      <div className="aspect-[16/10] overflow-hidden rounded-sm shadow-sm bg-gray-100 mb-2">
                         <img
                           src={item.image}
                           alt={item.title}
@@ -169,7 +253,7 @@ const NewsCategory = () => {
                       <h3 className="text-[15px] font-bold text-gray-900 leading-snug group-hover:text-red-700 transition-colors">
                         {item.title}
                       </h3>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               </div>
@@ -177,7 +261,7 @@ const NewsCategory = () => {
           </div>
         )}
 
-        {/* 3. DANH SÁCH TIN TỨC CHÍNH BÊN DƯỚI */}
+        {/* 3. DANH SÁCH TIN TỨC CHÍNH BÊN DƯỚI (Infinite Scroll) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           {/* Cột trái: Stream tin chính */}
           <div className="lg:col-span-8">
@@ -187,47 +271,53 @@ const NewsCategory = () => {
               </h2>
             </div>
             <div className="space-y-8">
-              {streamItems.map((item, idx) => (
+              {newsPosts.map((item, idx) => (
                 <div
-                  key={idx}
+                  key={`${item.id}-${idx}`}
+                  ref={idx === newsPosts.length - 1 ? lastPostElementRef : null}
                   className="flex flex-col md:flex-row gap-6 pb-8 border-b border-gray-100 last:border-0 group cursor-pointer"
                 >
-                  <div className="w-full md:w-[280px] aspect-[16/10] flex-shrink-0 overflow-hidden rounded-sm shadow-sm">
+                  <Link
+                    to={`/news/detail/${item.id}`}
+                    className="w-full md:w-[280px] aspect-[16/10] flex-shrink-0 overflow-hidden rounded-sm shadow-sm"
+                  >
                     <img
-                      src={item.image}
+                      src={
+                        item.image_url ||
+                        "https://picsum.photos/seed/" + item.id + "/400/250"
+                      }
                       alt=""
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
-                  </div>
+                  </Link>
                   <div className="flex-grow">
                     <h3 className="text-xl font-bold text-gray-900 leading-tight group-hover:text-red-700 transition-colors mb-3">
                       <Link to={`/news/detail/${item.id}`}>{item.title}</Link>
                     </h3>
                     <p className="text-gray-600 text-sm leading-relaxed line-clamp-2">
-                      {item.excerpt}
+                      {item.summary || item.excerpt}
                     </p>
                     <div className="flex items-center gap-2 mt-4 text-[11px] font-bold text-gray-400 uppercase">
-                      <Clock size={12} /> {spotlightItem.date}
+                      <Clock size={12} />{" "}
+                      {new Date(
+                        item.created_at || item.createdAt,
+                      ).toLocaleDateString("vi-VN")}
                     </div>
                   </div>
                 </div>
               ))}
-            </div>
 
-            {/* Phân trang (Demo) */}
-            <div className="mt-12 flex justify-center gap-2">
-              <button className="px-4 py-2 bg-red-700 text-white font-bold rounded-sm text-sm">
-                1
-              </button>
-              <button className="px-4 py-2 bg-gray-100 text-gray-600 font-bold rounded-sm text-sm hover:bg-gray-200">
-                2
-              </button>
-              <button className="px-4 py-2 bg-gray-100 text-gray-600 font-bold rounded-sm text-sm hover:bg-gray-200">
-                3
-              </button>
-              <button className="px-4 py-2 bg-gray-100 text-gray-600 font-bold rounded-sm text-sm hover:bg-gray-200">
-                Tiếp
-              </button>
+              {loading && (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="animate-spin text-red-700" size={32} />
+                </div>
+              )}
+
+              {!hasMore && newsPosts.length > 0 && (
+                <div className="text-center py-8 text-gray-400 text-sm font-bold uppercase tracking-widest">
+                  --- Hết danh sách bài viết ---
+                </div>
+              )}
             </div>
           </div>
 
@@ -235,7 +325,7 @@ const NewsCategory = () => {
           <div className="lg:col-span-4 space-y-10">
             <div>
               <div className="border-b-2 border-red-600 pb-1 mb-4">
-                <h3 className="text-sm font-black text-red-600 uppercase flex items-center gap-2">
+                <h3 className="text-xl font-black text-red-600 uppercase flex items-center gap-2">
                   <Zap size={18} className="fill-current" /> Tiêu điểm y tế
                 </h3>
               </div>
@@ -252,7 +342,7 @@ const NewsCategory = () => {
                   >
                     <div className="relative aspect-video rounded-sm overflow-hidden mb-3 shadow-md">
                       <img
-                        src={dbSpotlight.imageUrl}
+                        src={dbSpotlight.image_url || dbSpotlight.image}
                         className="w-full h-full object-cover transition-transform group-hover:scale-105"
                         alt=""
                       />
@@ -272,20 +362,31 @@ const NewsCategory = () => {
                 </h3>
               </div>
               <div className="space-y-4">
-                {dbLatest.map((post, idx) => (
-                  <Link
-                    key={post.id}
-                    to={`/news/detail/${post.id}`}
-                    className="flex gap-3 group border-b border-gray-50 pb-3 last:border-0 last:pb-0 items-start"
-                  >
-                    <span className="text-[10px] font-black italic mt-1 w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-sm bg-gray-50 text-gray-400">
-                      {idx + 1}
-                    </span>
-                    <h4 className="text-[13px] font-bold text-gray-700 group-hover:text-primary-700 leading-snug">
-                      {post.title}
-                    </h4>
-                  </Link>
-                ))}
+                {loadingSidebar ? (
+                  <div className="animate-pulse space-y-4">
+                    {[...Array(5)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="h-4 bg-gray-200 rounded w-full"
+                      ></div>
+                    ))}
+                  </div>
+                ) : (
+                  latestNews.map((post, idx) => (
+                    <Link
+                      key={post.id}
+                      to={`/news/detail/${post.id}`}
+                      className="flex gap-3 group border-b border-gray-50 pb-3 last:border-0 last:pb-0 items-start"
+                    >
+                      <span className="text-[10px] font-black italic mt-1 w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-sm bg-gray-50 text-gray-400">
+                        {idx + 1}
+                      </span>
+                      <h4 className="text-[13px] font-bold text-gray-700 group-hover:text-primary-700 leading-snug">
+                        {post.title}
+                      </h4>
+                    </Link>
+                  ))
+                )}
               </div>
             </div>
           </div>

@@ -147,34 +147,42 @@ export const SERVICE_CATEGORIES_FILTER = [
   {
     id: 1,
     title: "Tin tức – Sự kiện y tế",
+    path: "/news/events",
   },
   {
     id: 2,
     title: "Cảnh báo y tế – Truyền thông nguy cơ",
+    path: "/news/alerts",
   },
   {
     id: 3,
     title: "Khám bệnh - chữa bệnh",
+    path: "/policy",
   },
   {
     id: 4,
     title: "Phòng bệnh – Nâng cao sức khỏe",
+    path: "/news/prevention",
   },
   {
     id: 5,
     title: "Bảo trợ xã hội",
+    path: "/news/examination",
   },
   {
     id: 6,
     title: "Chuyển đổi số",
+    path: "/consulting",
   },
   {
     id: 7,
     title: "Chính sách y tế - bảo hiểm y tế",
+    path: "/health-records",
   },
   {
     id: 8,
     title: "Gương người tốt – việc tốt ngành Y",
+    path: "/hanoi-system",
   },
 ];
 export const MOCK_VIDEOS = [
