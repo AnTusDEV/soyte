@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Home, LogOut, LayoutDashboard, User } from "lucide-react"; // Add User icon
+import { Home, LogOut, LayoutDashboard, User, CalendarDays } from "lucide-react"; // Add User and CalendarDays icon
 import { useAuth } from "../AuthContext";
 
 interface AdminLayoutProps {
@@ -58,6 +58,15 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
               >
                 <User size={18} />
                 <span>Quản lý người dùng</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/admin/schedules"
+                className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-white/10 transition-colors"
+              >
+                <CalendarDays size={18} />
+                <span>Quản lý lịch công tác</span>
               </Link>
             </li>
           </ul>

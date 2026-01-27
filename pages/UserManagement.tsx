@@ -39,7 +39,7 @@ const UserManagement: React.FC = () => {
         if (window.confirm('Are you sure you want to deactivate this user?')) {
             try {
                 await api.put(`/auth/users/${userId}`, { status: 'inactive' });
-                setUsers(users.map(u => u.id === userId ? { ...u, status: 'inactive' } : u));
+                setUsers(users?.map(u => u.id === userId ? { ...u, status: 'inactive' } : u));
             } catch (err) {
                 alert('Failed to deactivate user.');
                 console.error(err);

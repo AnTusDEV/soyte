@@ -1,6 +1,7 @@
 
-const BASE_URL = 'https://160.30.252.5:7002/api';
-// const BASE_URL = 'https://localhost:7002/api';
+// const BASE_URL = 'https://160.30.252.5:7002/api';
+const BASE_URL = 'https://localhost:7002/api';
+// const BASE_URL = 'https://suckhoethudo.vn:7005/api';
 
 export const api = {
   async get(endpoint: string, params?: Record<string, any>) {
@@ -116,5 +117,9 @@ export const api = {
       console.warn(`Upload failed:`, error);
       throw error;
     }
+  },
+  
+  async getUsers() {
+    return this.get('/users');
   }
 };

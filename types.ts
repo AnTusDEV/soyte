@@ -39,3 +39,33 @@ export enum FilterTimeRange {
   WEEK = "Tuần này",
   MONTH = "Tháng này"
 }
+
+export interface ScheduleAttachment {
+  id?: string;
+  name: string;
+  url: string;
+  type?: string;
+}
+
+export interface WorkSchedule {
+  id: number;
+  title: string;
+  content: string;
+  start_time: string; // ISO datetime string
+  end_time: string; // ISO datetime string
+  location: string;
+  presider_id: number;
+  coordinating_unit: string;
+  priority: 'IMPORTANT' | 'NORMAL' | 'LOW';
+  attendee_ids: number[];
+  status: 'pending' | 'completed' | 'cancelled';
+  attachments?: ScheduleAttachment[];
+  createdAt?: string;
+  updatedAt?: string; 
+}
+
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+}

@@ -18,6 +18,7 @@ import WorkSchedule from './pages/WorkSchedule';
 import DataLookup from './pages/DataLookup';
 import PolicyHealthInsurance from './pages/PolicyHealthInsurance';
 import UserManagement from './pages/UserManagement';
+import AdminWorkSchedule from './pages/AdminWorkSchedule';
 import AdminRoute from './components/AdminRoute';
 import { useAuth } from './AuthContext';
 
@@ -55,6 +56,7 @@ const App = () => {
         <Route path="/admin" element={<AdminRoute />}>
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="users" element={<UserManagement />} />
+          <Route path="schedules" element={<AdminWorkSchedule />} /> {/* New Admin Schedule Route */}
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
 

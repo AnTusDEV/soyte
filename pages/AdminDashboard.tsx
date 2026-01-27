@@ -45,8 +45,7 @@ const AdminDashboard = () => {
       if (debouncedSearchTerm) {
         endpoint += `&q=${debouncedSearchTerm}`;
       }
-      const response = await api.get(endpoint);
-      console.log(response.data);
+      const response = await api.get(endpoint); 
       if (response && response.data && Array.isArray(response.data)) {
         
         const { data, meta } = response;
