@@ -145,7 +145,7 @@ const HealthRecords = () => {
         <div className="mb-10">
           <div className="flex items-center justify-between mb-6">
             <Link
-              to="https://data.hanoi.gov.vn/datagov/ttksbt/publish/page/index.cpx#/app/5adada4a-76e8-4b48-f346-b8907f5281e1/layout?navId=69631c27c293d1c0d6bc47c1"
+              to="https://data.hanoi.gov.vn/datagov/ttksbt/publish/page/home.cpx#/app/5adada4a-76e8-4b48-f346-b8907f5281e1/layout?navId=6968459ec293d1c0d6bc8e96"
               className="inline-flex items-center gap-3 bg-white text-primary-800 font-bold text-lg px-6 py-3 rounded-lg shadow-md hover:shadow-xl hover:bg-gray-50 transition-all transform hover:-translate-y-1 border border-gray-200"
             >
               <LayoutDashboard className="text-primary-600" size={24} />

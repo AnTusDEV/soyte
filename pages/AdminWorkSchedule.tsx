@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import ScheduleForm from "../components/ScheduleForm";
 import { api } from "../api";
+import { Dropdown } from "@/components/prime";
 
 const AdminWorkSchedule: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -67,7 +68,7 @@ const AdminWorkSchedule: React.FC = () => {
   const userMap = useMemo(() => {
     return users.reduce(
       (acc, user) => {
-        acc[user.id] = user.name;
+        acc[user.id] = user.full_name;
         return acc;
       },
       {} as Record<number, string>,
@@ -122,6 +123,12 @@ const AdminWorkSchedule: React.FC = () => {
       }
     }
   };
+  const statusOptions = [
+    { label: "Tất cả trạng thái", value: "all" },
+    { label: "Đang chờ", value: "pending" },
+    { label: "Hoàn thành", value: "completed" },
+    { label: "Hủy bỏ", value: "cancelled" },
+  ];
 
   const stats = useMemo(
     () => ({
@@ -184,32 +191,15 @@ const AdminWorkSchedule: React.FC = () => {
               className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary-100 font-medium text-sm"
             />
           </div>
-          <div className="relative">
-            <select
-              className="w-full md:w-auto pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl appearance-none focus:outline-none focus:ring-2 focus:ring-primary-100 bg-white font-medium text-sm"
-              value={filterStatus}
-              onChange={(e) =>
-                setFilterStatus(
-                  e.target.value as
-                    | "all"
-                    | "pending"
-                    | "completed"
-                    | "cancelled",
-                )
-              }
-            >
-              <option value="all">Tất cả trạng thái</option>
-              <option value="pending">Đang chờ</option>
-              <option value="completed">Hoàn thành</option>
-              <option value="cancelled">Hủy bỏ</option>
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-400">
-              <Filter size={18} />
-            </div>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <ChevronDown size={16} />
-            </div>
-          </div>
+          <Dropdown
+            value={filterStatus}
+            options={statusOptions}
+            onChange={(e) => setFilterStatus(e.value)}
+            placeholder="Tất cả trạng thái"
+            className="w-full md:w-auto"
+            panelClassName="text-sm"
+            showClear={false}
+          />
         </div>
 
         <div className="overflow-x-auto">
@@ -218,9 +208,8 @@ const AdminWorkSchedule: React.FC = () => {
               <tr className="bg-gray-50 text-left text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
                 <th className="px-6 py-4">Lịch trình</th>
                 <th className="px-6 py-4">Thời gian & Địa điểm</th>
-                <th className="px-6 py-4">Người chủ trì</th>
-                <th className="px-6 py-4">Người tham dự</th>
-                <th className="px-6 py-4 text-center">Trạng thái</th>
+                <th className="px-6 py-4">Cán bộ</th> 
+                <th className="px-6 py-4 text-center">Mức độ</th>
                 <th className="px-6 py-4 text-center">Thao tác</th>
               </tr>
             </thead>
@@ -238,7 +227,8 @@ const AdminWorkSchedule: React.FC = () => {
                   </td>
                 </tr>
               ) : (
-                schedules.length> 0  && schedules.map((schedule) => (
+                schedules.length > 0 &&
+                schedules.map((schedule) => (
                   <tr
                     key={schedule.id}
                     className="hover:bg-gray-50 transition-colors"
@@ -275,29 +265,22 @@ const AdminWorkSchedule: React.FC = () => {
                         {userMap[schedule.presider_id] || "N/A"}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      <div className="flex items-center gap-2">
-                        <Users size={14} className="text-gray-400" />
-                        {schedule.attendee_ids?.length > 0
-                          ? `${schedule.attendee_ids.length} người`
-                          : "Không có"}
-                      </div>
-                    </td>
+                  
                     <td className="px-6 py-4 text-center">
                       <span
                         className={`py-1 px-3 rounded-full text-xs font-bold ${
-                          schedule.status === "completed"
+                          schedule.priority === "NORMAL"
                             ? "bg-green-200 text-green-700"
-                            : schedule.status === "pending"
+                            : schedule.priority === "IMPORTANT"
                               ? "bg-yellow-200 text-yellow-700"
                               : "bg-red-200 text-red-700"
                         }`}
                       >
-                        {schedule.status === "completed"
-                          ? "Hoàn thành"
-                          : schedule.status === "pending"
-                            ? "Đang chờ"
-                            : "Hủy bỏ"}
+                        {schedule.priority === "NORMAL"
+                          ? "Bình thường"
+                          : schedule.priority === "IMPORTANT"
+                            ? "Quan trọng"
+                            : "Thấp"}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-center">
@@ -346,7 +329,6 @@ const AdminWorkSchedule: React.FC = () => {
     </AdminLayout>
   );
 };
-
 interface StatCardProps {
   icon: React.ElementType;
   title: string;
@@ -366,7 +348,7 @@ const StatCard: React.FC<StatCardProps> = ({
     amber: "bg-amber-50 text-amber-600",
   };
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 transition-all transform hover:-translate-y-1">
       <div
         className={`w-12 h-12 ${colors[color]} rounded-xl flex items-center justify-center`}
       >

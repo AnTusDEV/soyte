@@ -105,7 +105,7 @@ const Header = () => {
               />
               <div className="flex flex-col">
                 <h2 className="text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-widest hidden md:block">
-                  CỔNG THÔNG TIN ĐIỆN TỬ SỞ Y TẾ HÀ NỘI
+                  CỔNG THÔNG TIN ĐIỆN TỬ Y TẾ CỘNG ĐỒNG
                 </h2>
                 <h1 className="text-xl md:text-3xl font-black text-[#d32f2f] uppercase leading-none py-1 group-hover:text-red-700 transition-colors">
                   SỨC KHỎE THỦ ĐÔ

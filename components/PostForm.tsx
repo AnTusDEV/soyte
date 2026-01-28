@@ -11,13 +11,18 @@ import {
 } from "lucide-react";
 import { SERVICE_CATEGORIES_FILTER } from "../constants";
 import { api } from "../api";
-
+import { Dropdown } from "@/components/prime";
 interface PostFormProps {
   initialData?: any;
   onClose: () => void;
   onSave: () => void;
 }
+type Status = "draft" | "published";
 
+const statusOptions: { label: string; value: Status }[] = [
+  { label: "Bản nháp (Draft)", value: "draft" },
+  { label: "Công khai (Published)", value: "published" },
+];
 const PostForm: React.FC<PostFormProps> = ({
   initialData,
   onClose,
@@ -114,6 +119,11 @@ const PostForm: React.FC<PostFormProps> = ({
     }
   };
 
+  const categoryOptions = SERVICE_CATEGORIES_FILTER.map((cat) => ({
+    label: cat.title,
+    value: cat.id,
+  }));
+
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
       <div className="bg-white w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[95vh]">
@@ -168,20 +178,17 @@ const PostForm: React.FC<PostFormProps> = ({
                 <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
                   Danh mục <span className="text-red-500">*</span>
                 </label>
-                <select
+                <Dropdown
                   value={formData.category}
+                  options={categoryOptions}
                   onChange={(e) =>
-                    setFormData({ ...formData, category: e.target.value })
+                    setFormData({ ...formData, category: e.value })
                   }
-                  className={`w-full p-3 bg-gray-50 border ${errors.category ? "border-red-500" : "border-gray-200"} rounded-lg outline-none text-sm font-medium`}
-                >
-                  <option value="">-- Chọn danh mục --</option>
-                  {SERVICE_CATEGORIES_FILTER.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.title}
-                    </option>
-                  ))}
-                </select>
+                  placeholder="-Chọn danh mục-"
+                  className={`w-full ${errors.category ? "p-invalid" : ""}`}
+                  panelClassName="text-sm"
+                  showClear
+                />
                 {errors.category && (
                   <p className="text-red-500 text-[10px] mt-1 font-bold">
                     {errors.category}
@@ -192,19 +199,18 @@ const PostForm: React.FC<PostFormProps> = ({
                 <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
                   Trạng thái xuất bản
                 </label>
-                <select
+                <Dropdown
                   value={formData.status}
+                  options={statusOptions}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      status: e.target.value as "draft" | "published",
+                      status: e.value as Status,
                     })
                   }
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg outline-none text-sm font-medium"
-                >
-                  <option value="draft">Bản nháp (Draft)</option>
-                  <option value="published">Công khai (Published)</option>
-                </select>
+                  className="w-full" 
+                  placeholder="Chọn trạng thái"
+                />
               </div>
             </div>
 

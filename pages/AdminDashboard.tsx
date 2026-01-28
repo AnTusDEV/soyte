@@ -18,8 +18,8 @@ import {
 import { api } from "../api";
 import { SERVICE_CATEGORIES_FILTER } from "../constants";
 import PostForm from "../components/PostForm";
-import AdminLayout from "../components/AdminLayout"; // Import the new layout
-
+import AdminLayout from "../components/AdminLayout"; // Import the new layout 
+import { Dropdown } from '@/components/prime'
 const AdminDashboard = () => {
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,9 +45,8 @@ const AdminDashboard = () => {
       if (debouncedSearchTerm) {
         endpoint += `&q=${debouncedSearchTerm}`;
       }
-      const response = await api.get(endpoint); 
+      const response = await api.get(endpoint);
       if (response && response.data && Array.isArray(response.data)) {
-        
         const { data, meta } = response;
         const mapped = data.map((p: any) => ({
           ...p,
@@ -107,7 +106,7 @@ const AdminDashboard = () => {
     if (newPage > 0 && newPage <= totalPages) {
       setParam((p) => ({ ...p, page: newPage }));
     }
-  };
+  }; 
 
   // Client-side filtering is no longer needed as search is server-side.
   const filteredPosts = posts;
@@ -123,9 +122,7 @@ const AdminDashboard = () => {
             <p className="text-gray-400 text-[10px] font-black uppercase">
               Tổng bài viết
             </p>
-            <h3 className="text-2xl font-black text-gray-800">
-              {totalPosts}
-            </h3>
+            <h3 className="text-2xl font-black text-gray-800">{totalPosts}</h3>
           </div>
         </div>
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
@@ -136,9 +133,7 @@ const AdminDashboard = () => {
             <p className="text-gray-400 text-[10px] font-black uppercase">
               Đã xuất bản
             </p>
-            <h3 className="text-2xl font-black text-gray-800">
-              {totalPosts}
-            </h3>
+            <h3 className="text-2xl font-black text-gray-800">{totalPosts}</h3>
           </div>
         </div>
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
@@ -183,19 +178,16 @@ const AdminDashboard = () => {
             />
           </div>
           <div className="flex items-center gap-3 w-full md:w-auto">
-            <Filter className="text-gray-400" size={18} />
-            <select
+            <Filter className="text-gray-400" size={18} /> 
+            <Dropdown
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
-              className="flex-grow md:w-64 bg-white border border-gray-200 p-2.5 rounded-xl outline-none text-sm font-bold text-gray-600"
-            >
-              <option value="all">Tất cả danh mục</option>
-              {SERVICE_CATEGORIES_FILTER.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.title}
-                </option>
-              ))}
-            </select>
+              options={SERVICE_CATEGORIES_FILTER}
+              optionLabel="title"
+              optionValue="id"
+              placeholder="Lọc danh mục"
+              className="w-full md:w-14rem"
+            />
           </div>
         </div>
 
@@ -340,8 +332,7 @@ const AdminDashboard = () => {
         {/* Pagination Controls */}
         <div className="px-6 py-4 border-t border-gray-100 flex justify-between items-center">
           <div className="text-sm text-gray-600">
-            Hiển thị{" "}
-            <span className="font-bold">{posts.length}</span> trên{" "}
+            Hiển thị <span className="font-bold">{posts.length}</span> trên{" "}
             <span className="font-bold">{totalPosts}</span> kết quả
           </div>
           {totalPages > 1 && (

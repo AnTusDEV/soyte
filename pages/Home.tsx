@@ -147,10 +147,10 @@ const Home = () => {
 
           // Gán data cho categories
           CATEGORIES.forEach((category) => {
-            if (postsByCategory[category.id]) 
-              category.data = postsByCategory[category.id]; 
+            if (postsByCategory[category.id])
+              category.data = postsByCategory[category.id];
           });
-        }else{
+        } else {
           console.error("Không lấy được dữ liệu!");
         }
       } catch (err) {
@@ -256,9 +256,11 @@ const Home = () => {
           </div>
           <div className="hidden lg:col-span-5 lg:block">
             <div className="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-lg shadow-2xl">
-              <h3 className="text-xl font-bold mb-4 flex items-center">
-                <Activity className="mr-2 text-secondary-500" /> Số liệu hôm nay
-              </h3>
+              <div className="font-bold mb-4 flex gap-2 items-center">
+                <Activity className="text-secondary-500" />
+                <span className="text-xl"> Số liệu hôm nay</span>
+                <span className="text-sm"> (Số liệu giả lập)</span>
+              </div>
               <div className="space-y-4">
                 <div className="flex justify-between items-center border-b border-white/10 pb-2">
                   <span>Lượt khám bệnh</span>

@@ -3,17 +3,14 @@ import {
   X,
   Save,
   Upload,
-  Calendar,
   Info,
-  Loader2,
-  Users,
+  Loader2, 
   MapPin,
-  ChevronsUp,
   Building,
 } from "lucide-react";
 import { api } from "../api";
 import { WorkSchedule, User } from "../types";
-
+import { Dropdown, Calendar } from "@/components/prime";
 interface ScheduleFormProps {
   initialData?: WorkSchedule;
   onClose: () => void;
@@ -21,6 +18,14 @@ interface ScheduleFormProps {
     schedule: Omit<WorkSchedule, "id" | "status" | "createdAt" | "updatedAt">,
   ) => Promise<void>;
 }
+
+type Priority = "NORMAL" | "IMPORTANT" | "LOW";
+
+const priorityOptions: { label: string; value: Priority }[] = [
+  { label: "Bình thường", value: "NORMAL" },
+  { label: "Quan trọng", value: "IMPORTANT" },
+  { label: "Thấp", value: "LOW" },
+];
 
 const ScheduleForm: React.FC<ScheduleFormProps> = ({
   initialData,
@@ -46,7 +51,16 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
   const [uploading, setUploading] = useState(false);
   const [errors, setErrors] = useState<any>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+  const presiderOptions =
+    users?.map((user) => ({
+      label: user.full_name,
+      value: user.id,
+    })) || [];
+  const attendeeOptions =
+    users?.map((user) => ({
+      label: user.full_name,
+      value: user.id,
+    })) || [];
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -93,30 +107,17 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
     }
   }, [initialData]);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
-  ) => {
+  const handleInputChange = (e: any) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({
       ...prev,
       [name]:
-        name === "presider_id"
-          ? parseInt(value, 10)
-          : name === "priority"
-            ? value
-            : value,
+        typeof value === "string" && !isNaN(Number(value)) && value !== ""
+          ? Number(value)
+          : value,
     }));
   };
-
-  const handleAttendeeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedIds = Array.from(e.target.selectedOptions, (option: any) =>
-      parseInt(option.value, 10),
-    );
-    setFormData((prev) => ({ ...prev, attendee_ids: selectedIds }));
-  };
-
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -163,14 +164,13 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
     if (!formData.location.trim())
       newErrors.location = "Địa điểm không được để trống";
     if (formData.presider_id === 0)
-      newErrors.presider_id = "Vui lòng chọn người chủ trì";
+      newErrors.presider_id = "Vui lòng chọn người tham gia";
 
     if (formData.start_time && formData.end_time) {
       const startDateTime = new Date(formData.start_time);
       const endDateTime = new Date(formData.end_time);
-      if (startDateTime >= endDateTime) {
+      if (startDateTime >= endDateTime)
         newErrors.end_time = "Thời gian kết thúc phải sau thời gian bắt đầu";
-      }
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -206,7 +206,6 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
       <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[95vh]">
         <div className="bg-primary-700 p-4 flex justify-between items-center text-white shrink-0">
           <h3 className="font-bold flex items-center gap-2">
-            {initialData ? <Save size={20} /> : <Calendar size={20} />}
             {initialData ? "CHỈNH SỬA LỊCH TRÌNH" : "TẠO LỊCH TRÌNH MỚI"}
           </h3>
           <button
@@ -268,14 +267,28 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
               <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
                 Thời gian bắt đầu <span className="text-red-500">*</span>
               </label>
-              <input
-                type="datetime-local"
+              <Calendar
                 name="start_time"
-                value={formData.start_time}
-                onChange={handleInputChange}
-                className={`w-full p-3 bg-gray-50 border ${
-                  errors.start_time ? "border-red-500" : "border-gray-200"
-                } rounded-lg focus:ring-2 focus:ring-primary-100 outline-none font-bold text-gray-800`}
+                value={
+                  formData.start_time ? new Date(formData.start_time) : null
+                }
+                onChange={(e) =>
+                  handleInputChange({
+                    target: {
+                      name: "start_time",
+                      value: e.value ? (e.value as Date).toISOString() : "",
+                    },
+                  } as any)
+                }
+                hideOnDateTimeSelect
+                showTime
+                hourFormat="12"
+                showIcon
+                className="w-full"
+                inputClassName={`p-3 bg-gray-50 text-gray-800 text-sm ${
+                  errors.start_time ? "p-invalid" : ""
+                }`}
+                dateFormat="yy-mm-dd"
               />
               {errors.start_time && (
                 <p className="text-red-500 text-[10px] mt-1 font-bold">
@@ -287,14 +300,26 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
               <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
                 Thời gian kết thúc <span className="text-red-500">*</span>
               </label>
-              <input
-                type="datetime-local"
+              <Calendar
                 name="end_time"
-                value={formData.end_time}
-                onChange={handleInputChange}
-                className={`w-full p-3 bg-gray-50 border ${
-                  errors.end_time ? "border-red-500" : "border-gray-200"
-                } rounded-lg focus:ring-2 focus:ring-primary-100 outline-none font-bold text-gray-800`}
+                value={formData.end_time ? new Date(formData.end_time) : null}
+                onChange={(e) =>
+                  handleInputChange({
+                    target: {
+                      name: "end_time",
+                      value: e.value ? (e.value as Date).toISOString() : "",
+                    },
+                  } as any)
+                }
+                showTime
+                hideOnDateTimeSelect
+                hourFormat="12"
+                showIcon
+                className="w-full"
+                inputClassName={`p-3 bg-gray-50 text-gray-800 text-sm ${
+                  errors.start_time ? "p-invalid" : ""
+                }`}
+                dateFormat="yy-mm-dd"
               />
               {errors.end_time && (
                 <p className="text-red-500 text-[10px] mt-1 font-bold">
@@ -354,23 +379,23 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
-                Người chủ trì <span className="text-red-500">*</span>
+                Cán bộ <span className="text-red-500">*</span>
               </label>
-              <select
+              <Dropdown
                 name="presider_id"
                 value={formData.presider_id}
-                onChange={handleInputChange}
-                className={`w-full p-3 bg-gray-50 border ${
-                  errors.presider_id ? "border-red-500" : "border-gray-200"
-                } rounded-lg outline-none text-sm font-medium`}
-              >
-                <option value={0}>-- Chọn người chủ trì --</option>
-                {users?.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.full_name}
-                  </option>
-                ))}
-              </select>
+                options={presiderOptions}
+                onChange={(e) =>
+                  handleInputChange({
+                    target: {
+                      name: "presider_id",
+                      value: e.value,
+                    },
+                  } as any)
+                }
+                placeholder="Chọn người công tác"
+                className={`w-full ${errors.presider_id ? "p-invalid" : ""}`}
+              />
               {errors.presider_id && (
                 <p className="text-red-500 text-[10px] mt-1 font-bold">
                   {errors.presider_id}
@@ -382,49 +407,24 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
                 Mức độ ưu tiên
               </label>
               <div className="relative">
-                <select
+                <Dropdown
                   name="priority"
                   value={formData.priority}
-                  onChange={handleInputChange}
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg outline-none text-sm font-medium appearance-none"
-                >
-                  <option value="NORMAL">Bình thường</option>
-                  <option value="IMPORTANT">Quan trọng</option>
-                  <option value="LOW">Thấp</option>
-                </select>
+                  options={priorityOptions}
+                  onChange={(e) =>
+                    handleInputChange({
+                      target: {
+                        name: "priority",
+                        value: e.value,
+                      },
+                    } as any)
+                  }
+                  className="w-full"
+                  placeholder="Chọn mức độ"
+                />
               </div>
             </div>
           </div>
-
-          <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
-              Người tham dự
-            </label>
-            <div className="relative">
-              <Users
-                size={16}
-                className="absolute left-3 top-4 text-gray-400"
-              />
-              <select
-                multiple
-                name="attendee_ids"
-                value={formData.attendee_ids.map(String)}
-                onChange={handleAttendeeChange}
-                className="w-full p-3 pl-10 bg-gray-50 border border-gray-200 rounded-lg outline-none text-sm font-medium"
-                size={5}
-              >
-                {users?.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.full_name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <p className="text-xs text-gray-400 mt-1">
-              Giữ phím Ctrl (hoặc Cmd trên Mac) để chọn nhiều người.
-            </p>
-          </div>
-
           <div>
             <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
               Tệp đính kèm
