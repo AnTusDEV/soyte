@@ -1,6 +1,12 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Home, LogOut, LayoutDashboard, User, CalendarDays } from "lucide-react"; // Add User and CalendarDays icon
+import {
+  Home,
+  LogOut,
+  LayoutDashboard,
+  User,
+  CalendarDays,
+} from "lucide-react"; // Add User and CalendarDays icon
 import { useAuth } from "../AuthContext";
 import { Toast } from "primereact/toast";
 import { ConfirmDialog } from "primereact/confirmdialog";
@@ -100,7 +106,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
               onClick={handleLogout}
               icon={<LogOut size={18} />}
               label="Thoát"
-              className="!bg-red-600 hover:!bg-red-700 !text-white"
+              className="text-red-500 gap-2 text-sm hover:!bg-red-700 hover:text-white px-3 py-2"
             />
           </div>
         </div>

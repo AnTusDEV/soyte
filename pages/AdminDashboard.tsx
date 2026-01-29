@@ -174,15 +174,21 @@ const AdminDashboard = () => {
           </div>
         </div>
         <div className="flex flex-col justify-center">
+          {/* <Button
+            className="w-full !bg-secondary-600 hover:!bg-secondary-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-secondary-100 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-1"
+            label="SOẠN BÀI MỚI"
+            icon={<Plus size={24} />}
+          /> */}
+
           <Button
             onClick={() => {
               setEditingPost(null);
               setIsFormOpen(true);
             }}
             className="w-full !bg-secondary-600 hover:!bg-secondary-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-secondary-100 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-1"
-            label="SOẠN BÀI MỚI"
-            icon={<Plus size={24} />}
-          />
+          >
+            <Plus size={24} /> SOẠN BÀI MỚI
+          </Button>
         </div>
       </div>
 

@@ -204,7 +204,7 @@ const AdminWorkSchedule: React.FC = () => {
             onClick={() => handleOpenForm()}
             className="w-full !bg-secondary-600 hover:!bg-secondary-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-secondary-100 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-1"
           >
-            <Plus size={24} /> Thêm lịch trình
+            <Plus size={24} /> THÊM LỊCH TRÌNH
           </Button>
         </div>
       </div>

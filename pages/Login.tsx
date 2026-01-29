@@ -1,12 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  Eye,
-  EyeOff,
-  ArrowLeft,
-  AlertCircle,
-  Loader2,
-} from "lucide-react";
+import { Eye, EyeOff, ArrowLeft, AlertCircle, Loader2 } from "lucide-react";
 import { api } from "../api";
 import { useAuth } from "../AuthContext"; // Import useAuth
 import { Button } from "@/components/prime";
@@ -32,9 +26,9 @@ const Login: React.FC = () => {
         password: password,
       });
       console.log(data);
-      
+
       if (data && data.token) {
-        await login(data.token); 
+        await login(data.token);
         navigate("/admin/dashboard", { replace: true });
       } else {
         throw new Error("Phản hồi từ máy chủ không hợp lệ.");
@@ -146,7 +140,7 @@ const Login: React.FC = () => {
                 disabled={isLoading}
                 loading={isLoading}
                 label={isLoading ? "Đang kiểm tra..." : "Đăng nhập"}
-                className="w-full py-4 !bg-[#0088cc] !text-white font-bold rounded-xl shadow-lg hover:!bg-[#0077bb] transition-all"
+                className="w-full px-2 py-4 !bg-[#0088cc] !text-white font-bold rounded-xl shadow-lg hover:!bg-[#0077bb] transition-all"
               />
             </div>
           </form>
@@ -163,4 +157,3 @@ const Login: React.FC = () => {
 };
 
 export default Login;
-
