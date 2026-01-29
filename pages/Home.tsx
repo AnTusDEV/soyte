@@ -18,18 +18,21 @@ import {
   MOCK_VIDEOS,
   CATEGORIES,
 } from "../constants";
+import { Button } from "@/components/prime";
 import HospitalSlider from "../components/HospitalSlider";
 import { api } from "../api";
 const Home = () => {
   const [activeChannel, setActiveChannel] = useState("H1");
   const [dbPosts, setDbPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const spotlightPost = dbPosts[0];
+  const latestTenPosts = dbPosts.slice(1, 11);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [currentVideo, setCurrentVideo] = useState(MOCK_VIDEOS[0]);
   const images = [
     "https://suckhoethudo.vn/assets/anh2-r7WidWql.jpg",
     "https://suckhoethudo.vn/assets/anh1-CFkqSFx4.png",
   ];
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [currentVideo, setCurrentVideo] = useState(MOCK_VIDEOS[0]);
   const CategoryColumn = ({
     title,
     Icon,
@@ -70,21 +73,27 @@ const Home = () => {
               key={item.id}
               className={`text-sm text-gray-600 border-t border-gray-100 pt-2 cursor-pointer line-clamp-2 hover:${hoverColor}`}
             >
-              <Link key={item.id} to={`/news/detail/${item.id}`}>
-                • {item.title}
-              </Link>
+              <Link to={`/news/detail/${item.id}`}>• {item.title}</Link>
             </li>
           ))}
         </ul>
       </div>
     );
   };
-
+  const goToPrevious = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === 0 ? images.length - 1 : prevIndex - 1,
+    );
+  };
+  const goToNext = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === images.length - 1 ? 0 : prevIndex + 1,
+    );
+  };
   useEffect(() => {
     const fetchLatestPosts = async () => {
       try {
         const response = await api.get("/posts");
-
         if (response && response.data && Array.isArray(response.data)) {
           const mappedPosts = response.data.map((p: any) => ({
             id: p.id,
@@ -136,7 +145,6 @@ const Home = () => {
         ];
         const response = await api.post("/posts/by-categories", postData);
         if (response && response.data && Array.isArray(response.data)) {
-          // Tạo lookup object từ response.data
           const postsByCategory = response.data.reduce(
             (acc, item) => {
               acc[item.category_id] = item.posts;
@@ -144,8 +152,6 @@ const Home = () => {
             },
             {} as Record<number, any[]>,
           );
-
-          // Gán data cho categories
           CATEGORIES.forEach((category) => {
             if (postsByCategory[category.id])
               category.data = postsByCategory[category.id];
@@ -157,7 +163,6 @@ const Home = () => {
         console.error(err);
       }
     };
-
     const useFallbacks = () => {
       setDbPosts(
         MOCK_NEWS.map((n) => ({
@@ -170,11 +175,9 @@ const Home = () => {
         })),
       );
     };
-
     fetchLatestPosts();
     fetchCategory();
   }, []);
-
   useEffect(() => {
     if (images.length === 0) return;
     const interval = setInterval(() => {
@@ -184,22 +187,6 @@ const Home = () => {
     }, 5000);
     return () => clearInterval(interval);
   }, [images.length]);
-
-  const goToPrevious = () => {
-    setCurrentImageIndex((prevIndex) =>
-      prevIndex === 0 ? images.length - 1 : prevIndex - 1,
-    );
-  };
-
-  const goToNext = () => {
-    setCurrentImageIndex((prevIndex) =>
-      prevIndex === images.length - 1 ? 0 : prevIndex + 1,
-    );
-  };
-
-  const spotlightPost = dbPosts[0];
-  const latestTenPosts = dbPosts.slice(1, 11);
-
   return (
     <div className="min-h-screen bg-gray-50 relative font-sans">
       <div className="fixed bottom-8 right-6 z-50 flex flex-col items-end gap-2 group">
@@ -215,7 +202,7 @@ const Home = () => {
           <span className="absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75 animate-ping"></span>
           <div className="relative z-10 flex flex-col items-center justify-center text-white">
             <Phone size={28} className="animate-tada" strokeWidth={2.5} />
-            <span className="text-[10px] md:text-xs font-black mt-1">115</span>
+            <span className="text-[10px] md:text-xs font-black mt-1"></span>
           </div>
         </Link>
       </div>
@@ -230,7 +217,7 @@ const Home = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-primary-900 via-primary-900/80 to-transparent"></div>
         </div>
 
-        <div className="container mx-auto px-4 z-10 relative grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div className="container mx-auto px-4 z-10 relative grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
           <div className="lg:col-span-7 space-y-6">
             <span className="bg-secondary-600 text-white px-3 py-1 text-xs font-bold uppercase tracking-wider rounded">
               Thông điệp tuần
@@ -289,18 +276,20 @@ const Home = () => {
           className="object-cover transition-opacity duration-1000 ease-in-out w-full h-full object-fill"
         />
         <div className=" absolute inset-0 flex items-center justify-between p-4">
-          <button
+          <Button
+            icon={<ChevronLeft />}
             onClick={goToPrevious}
-            className="bg-black/50 text-white w-10 h-10 rounded-full hover:bg-black/75 transition ml-2 flex items-center justify-center"
-          >
-            <ChevronLeft />
-          </button>
-          <button
+            text
+            rounded
+            className="!bg-black/50 !text-white w-10 h-10 rounded-full hover:!bg-black/75 transition ml-2 flex items-center justify-center"
+          />
+          <Button
+            icon={<ChevronRight />}
             onClick={goToNext}
-            className="bg-black/50 text-white w-10 h-10 rounded-full hover:bg-black/75 transition mr-2 flex items-center justify-center"
-          >
-            <ChevronRight />
-          </button>
+            text
+            rounded
+            className="!bg-black/50 !text-white w-10 h-10 rounded-full hover:!bg-black/75 transition mr-2 flex items-center justify-center"
+          />
         </div>
       </section>
       <section className="py-12 bg-gray-50">
@@ -339,7 +328,7 @@ const Home = () => {
 
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
             <div className="lg:col-span-7">
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-10 h-1 bg-red-600 rounded-full"></div>
@@ -457,7 +446,7 @@ const Home = () => {
       </section>
       <section className="py-8 bg-white border-t border-gray-100">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
             {/* LEFT COLUMN: TIÊU ĐIỂM (List Style) - 4 Columns (1/3 Width) */}
             <div className="xl:col-span-4">
               <div className="mb-4 border-b-2 border-red-600 pb-1">
@@ -519,21 +508,21 @@ const Home = () => {
                     <List size={16} className="mr-2" /> KÊNH
                   </div>
                   {["H1", "H2", "FM90", "JOYFM"].map((channel) => (
-                    <button
+                    <Button
                       key={channel}
+                      label={channel}
                       onClick={() => setActiveChannel(channel)}
                       className={`px-6 py-3 text-sm font-bold uppercase transition-colors relative
                               ${
                                 activeChannel === channel
-                                  ? "text-red-500 bg-[#0f172a]"
-                                  : "text-gray-400 hover:text-white hover:bg-gray-800"
+                                  ? "!text-red-500 !bg-[#0f172a]"
+                                  : "!text-gray-400 hover:!text-white hover:!bg-gray-800"
                               }`}
                     >
-                      {channel}
                       {activeChannel === channel && (
                         <span className="absolute top-0 left-0 right-0 h-0.5 bg-red-600"></span>
                       )}
-                    </button>
+                    </Button>
                   ))}
                 </div>
 
@@ -546,9 +535,18 @@ const Home = () => {
                       className="w-full h-full object-cover opacity-80 group-hover:opacity-90 transition"
                     />
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <div className="w-20 h-20 rounded-full bg-red-600/90 text-white flex items-center justify-center group-hover:scale-110 transition shadow-[0_0_20px_rgba(220,38,38,0.5)]">
-                        <Play size={40} fill="currentColor" className="ml-1" />
-                      </div>
+                      <Button
+                        icon={
+                          <Play
+                            size={40}
+                            fill="currentColor"
+                            className="ml-1"
+                          />
+                        }
+                        rounded
+                        text
+                        className="w-20 h-20 rounded-full !bg-red-600/90 !text-white flex items-center justify-center group-hover:scale-110 transition shadow-[0_0_20px_rgba(220,38,38,0.5)]"
+                      />
                     </div>
                     <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black via-black/80 to-transparent">
                       <div className="flex items-center gap-2 mb-2">
@@ -620,9 +618,10 @@ const Home = () => {
       </section>
       <section className="py-12 bg-white border-t border-gray-200">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 divide-y md:divide-y-0 md:divide-x divide-gray-100">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 divide-y md:divide-y-0 md:divide-x divide-gray-100">
             {CATEGORIES.map((item) => (
               <CategoryColumn
+                key={item.id}
                 title={item.title}
                 Icon={item.icon}
                 iconColor={item.iconColor}

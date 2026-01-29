@@ -267,7 +267,7 @@ const NewsCategory = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           {/* Cột trái: Stream tin chính */}
           <div className="lg:col-span-8">
-            <div className="mb-8 border-b-2 border-red-700 pb-1 flex justify-between items-end">
+            <div className="mb-4 border-b-2 border-red-700 pb-1 flex justify-between items-end">
               <h2 className="text-xl font-black uppercase text-gray-900 tracking-tighter">
                 {categoryTitle}
               </h2>

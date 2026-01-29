@@ -183,11 +183,11 @@ const NewsDetail = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8 md:py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-12">
           {/* Main Content */}
           <div className="lg:col-span-8">
             <article>
-              <header className="mb-8">
+              <header className="mb-4">
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-5">
                   {category && (
                     <span className="bg-red-700 text-white text-[10px] font-black px-2 py-1 rounded-sm uppercase tracking-tight">
@@ -209,48 +209,48 @@ const NewsDetail = () => {
                   {post.title}
                 </h1>
 
-                <div className="flex flex-wrap items-center justify-between gap-4 py-4 border-y border-gray-100 mb-8">
+                <div className="flex flex-wrap items-center justify-between gap-4 py-4 border-y border-gray-100 mb-4">
                   <div className="flex items-center gap-4">
-                    <button
+                    <Button
                       onClick={() => window.print()}
-                      className="flex items-center gap-1.5 text-xs font-bold text-gray-600 hover:text-red-700 transition-colors"
-                    >
-                      <Printer size={16} /> In trang
-                    </button>
-                    <button
+                      icon={<Printer size={16} />}
+                      label="In trang"
+                      text
+                      className="!text-xs !font-bold !text-gray-600 hover:!text-red-700"
+                    />
+                    <Button
                       onClick={() =>
                         window.open(
                           `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`,
                           "_blank",
                         )
                       }
-                      className="flex items-center gap-1.5 text-xs font-bold text-gray-600 hover:text-blue-600 transition-colors"
-                    >
-                      <Facebook size={16} /> Chia sẻ
-                    </button>
+                      icon={<Facebook size={16} />}
+                      label="Chia sẻ"
+                      text
+                      className="!text-xs !font-bold !text-gray-600 hover:!text-blue-600"
+                    />
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mr-2">
                       Cỡ chữ:
                     </span>
-                    <button
+                    <Button
                       onClick={() => setFontSize(Math.min(22, fontSize + 2))}
+                      label="A+"
                       className="w-8 h-8 rounded border border-gray-200 flex items-center justify-center hover:bg-gray-50 font-bold text-gray-700"
-                    >
-                      A+
-                    </button>
-                    <button
+                    />
+                    <Button
                       onClick={() => setFontSize(Math.max(12, fontSize - 2))}
+                      label="A-"
                       className="w-8 h-8 rounded border border-gray-200 flex items-center justify-center hover:bg-gray-50 font-bold text-gray-700"
-                    >
-                      A-
-                    </button>
+                    />
                   </div>
                 </div>
               </header>
 
               {post.summary && (
-                <div className="mb-8 p-6 bg-gray-50 border-l-4 border-red-700 rounded-r-xl shadow-sm">
+                <div className="mb-4 p-6 bg-gray-50 border-l-4 border-red-700 rounded-r-xl shadow-sm">
                   <p className="text-base md:text-lg font-bold text-gray-800 leading-relaxed italic">
                     {post.summary}
                   </p>
@@ -262,7 +262,7 @@ const NewsDetail = () => {
                 style={{ fontSize: `${fontSize}px` }}
               >
                 {post.image_url && (
-                  <figure className="mb-8 text-center">
+                  <figure className="mb-4 text-center">
                     <div className="rounded-xl overflow-hidden border border-gray-100 shadow-md">
                       <img
                         src={post.image_url}
@@ -297,14 +297,14 @@ const NewsDetail = () => {
 
               {/* Related Posts Grid within main content area */}
               <div className="mt-16 pt-12 border-t-2 border-gray-50">
-                <div className="flex items-center gap-3 mb-8">
+                <div className="flex items-center gap-3 mb-4">
                   <div className="w-1 h-8 bg-red-700 rounded-full"></div>
                   <h3 className="text-xl font-black text-gray-900 uppercase tracking-tighter">
                     Bài viết cùng chuyên mục
                   </h3>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {relatedPosts.slice(0, 3).map((p) => (
                     <BottomRelatedCard key={p.id} post={p} />
                   ))}

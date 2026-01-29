@@ -9,7 +9,8 @@ import {
   Download,  
   ChevronRight,
   FileDown
-} from 'lucide-react';  
+} from 'lucide-react';
+import { Button } from '@/components/prime';
 
 const mockResults = [
   {
@@ -180,9 +181,7 @@ const DataLookup = () => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
-                <button className="bg-[#004a99] hover:bg-[#003d80] text-white px-8 py-2.5 rounded-lg font-bold text-sm transition-colors shadow-sm uppercase tracking-wider">
-                  Tìm kiếm
-                </button>
+                <Button label="Tìm kiếm" className="!bg-[#004a99] hover:!bg-[#003d80] !text-white px-8 py-2.5 rounded-lg font-bold text-sm" />
               </div>
             </div>
 
@@ -233,12 +232,12 @@ const DataLookup = () => {
 
                   {/* Action Column - Download Button */}
                   <div className="p-4 md:p-6 flex items-center justify-center border-t md:border-t-0 md:border-l border-gray-50 bg-gray-50/30 shrink-0">
-                     <button 
+                     <Button 
                        onClick={() => handleDownload(item.fileName)}
-                       className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg font-black text-[11px] uppercase transition-all shadow-sm active:scale-95 whitespace-nowrap"
-                     >
-                       <FileDown size={18} /> Tải tài liệu
-                     </button>
+                       label="Tải tài liệu"
+                       icon={<FileDown size={18} />}
+                       className="!bg-emerald-600 hover:!bg-emerald-700"
+                     />
                   </div>
                 </div>
               ))}

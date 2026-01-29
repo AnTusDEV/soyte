@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -24,6 +23,7 @@ import {
 } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
+import { Button } from '@/components/prime';
 
 // --- Types ---
 interface AmbulanceUnit {
@@ -174,9 +174,7 @@ const EmergencyCenter = () => {
                  <span className="text-gray-700">{ambulances.filter(a => a.status === 'BUSY').length} Nhiệm vụ</span>
               </div>
            </div>
-           <button className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold shadow-lg flex items-center gap-2 transition-all text-sm">
-              <Phone size={18} /> GỌI 115
-           </button>
+           <Button label="GỌI 115" icon={<Phone size={18} />} className="!bg-red-600 hover:!bg-red-700 !text-white" />
         </div>
       </div>
 
@@ -210,13 +208,13 @@ const EmergencyCenter = () => {
               <div className="absolute top-4 right-4 w-72 bg-white rounded-xl shadow-2xl overflow-hidden z-[1001] border border-gray-100 animate-in slide-in-from-right-4">
                  <div className="bg-blue-600 p-3 text-white flex justify-between items-center">
                     <span className="font-bold">{selectedUnit.plateNumber}</span>
-                    <button onClick={() => setSelectedUnit(null)}><X size={18}/></button>
+                    <Button icon={<X size={18}/>} text rounded onClick={() => setSelectedUnit(null)} className="!text-white hover:!bg-white/20"/>
                  </div>
                  <div className="p-4 space-y-3 text-sm">
                     <p><strong>Tài xế:</strong> {selectedUnit.driver}</p>
                     <p><strong>Bệnh viện:</strong> {selectedUnit.hospital}</p>
                     <p><strong>Tốc độ:</strong> {selectedUnit.speed} km/h</p>
-                    <button className="w-full bg-blue-600 text-white py-2 rounded-lg font-bold">LIÊN LẠC</button>
+                    <Button label="LIÊN LẠC" className="w-full !bg-blue-600" />
                  </div>
               </div>
            )}

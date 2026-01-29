@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   FileText,
   Plus,
@@ -18,8 +18,11 @@ import {
 import { api } from "../api";
 import { SERVICE_CATEGORIES_FILTER } from "../constants";
 import PostForm from "../components/PostForm";
-import AdminLayout from "../components/AdminLayout"; // Import the new layout 
-import { Dropdown } from '@/components/prime'
+import AdminLayout from "../components/AdminLayout"; // Import the new layout
+import { Dropdown, Button } from "@/components/prime";
+import { Toast } from "primereact/toast";
+import { confirmDialog } from "primereact/confirmdialog";
+
 const AdminDashboard = () => {
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,6 +37,7 @@ const AdminDashboard = () => {
   });
   const [totalPosts, setTotalPosts] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+  const toast = useRef<Toast>(null);
 
   const fetchPosts = async () => {
     setLoading(true);
@@ -64,6 +68,11 @@ const AdminDashboard = () => {
       }
     } catch (error) {
       console.error("Error fetching posts:", error);
+      toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Error fetching posts",
+      });
       setPosts([]);
       setTotalPosts(0);
       setTotalPages(1);
@@ -91,28 +100,43 @@ const AdminDashboard = () => {
   }, [param, filterCategory, debouncedSearchTerm]);
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Bạn có chắc chắn muốn xóa bài viết này?")) return;
-
-    try {
-      await api.delete(`/posts/${id}`);
-      setPosts(posts.filter((p) => p.id !== id));
-    } catch (error) {
-      alert("Lỗi khi xóa bài viết");
-      console.error(error);
-    }
+    confirmDialog({
+      message: "Bạn có chắc chắn muốn xóa bài viết này?",
+      header: "Xác nhận",
+      icon: "pi pi-exclamation-triangle",
+      accept: async () => {
+        try {
+          await api.delete(`/posts/${id}`);
+          setPosts(posts.filter((p) => p.id !== id));
+          toast.current?.show({
+            severity: "success",
+            summary: "Thành công",
+            detail: "Bài viết đã được xóa",
+          });
+        } catch (error) {
+          toast.current?.show({
+            severity: "error",
+            summary: "Lỗi",
+            detail: "Lỗi khi xóa bài viết",
+          });
+          console.error(error);
+        }
+      },
+    });
   };
 
   const handlePageChange = (newPage: number) => {
     if (newPage > 0 && newPage <= totalPages) {
       setParam((p) => ({ ...p, page: newPage }));
     }
-  }; 
+  };
 
   // Client-side filtering is no longer needed as search is server-side.
   const filteredPosts = posts;
 
   return (
     <AdminLayout title="Bài viết">
+      <Toast ref={toast} />
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-8">
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
           <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
@@ -150,15 +174,15 @@ const AdminDashboard = () => {
           </div>
         </div>
         <div className="flex flex-col justify-center">
-          <button
+          <Button
             onClick={() => {
               setEditingPost(null);
               setIsFormOpen(true);
             }}
-            className="w-full bg-secondary-600 hover:bg-secondary-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-secondary-100 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-1"
-          >
-            <Plus size={24} /> SOẠN BÀI MỚI
-          </button>
+            className="w-full !bg-secondary-600 hover:!bg-secondary-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-secondary-100 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-1"
+            label="SOẠN BÀI MỚI"
+            icon={<Plus size={24} />}
+          />
         </div>
       </div>
 
@@ -178,7 +202,7 @@ const AdminDashboard = () => {
             />
           </div>
           <div className="flex items-center gap-3 w-full md:w-auto">
-            <Filter className="text-gray-400" size={18} /> 
+            <Filter className="text-gray-400" size={18} />
             <Dropdown
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
@@ -294,21 +318,22 @@ const AdminDashboard = () => {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-center gap-2">
-                          <button
+                          <Button
+                            icon={<Edit3 size={18} />}
+                            text
+                            rounded
                             onClick={() => {
                               setEditingPost(post);
                               setIsFormOpen(true);
                             }}
-                            className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition shadow-sm bg-white border border-gray-100"
-                          >
-                            <Edit3 size={18} />
-                          </button>
-                          <button
+                          />
+                          <Button
+                            icon={<Trash2 size={18} />}
+                            text
+                            rounded
+                            severity="danger"
                             onClick={() => handleDelete(post.id)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition shadow-sm bg-white border border-gray-100"
-                          >
-                            <Trash2 size={18} />
-                          </button>
+                          />
                         </div>
                       </td>
                     </tr>
@@ -337,25 +362,24 @@ const AdminDashboard = () => {
           </div>
           {totalPages > 1 && (
             <div className="flex items-center gap-1">
-              <button
+              <Button
                 onClick={() => handlePageChange(param.page - 1)}
                 disabled={param.page === 1}
-                className="p-2 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600 hover:bg-gray-100 rounded-lg transition flex items-center gap-1"
-              >
-                <ChevronLeft size={16} />
-                <span className="text-sm font-bold">Trước</span>
-              </button>
+                icon={<ChevronLeft size={16} />}
+                label="Trước"
+                text
+              />
               <div className="px-3 py-1 text-sm font-bold">
                 {param.page} / {totalPages}
               </div>
-              <button
+              <Button
                 onClick={() => handlePageChange(param.page + 1)}
                 disabled={param.page === totalPages || totalPages === 0}
-                className="p-2 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600 hover:bg-gray-100 rounded-lg transition flex items-center gap-1"
-              >
-                <span className="text-sm font-bold">Sau</span>
-                <ChevronRight size={16} />
-              </button>
+                icon={<ChevronRight size={16} />}
+                label="Sau"
+                iconPos="right"
+                text
+              />
             </div>
           )}
         </div>

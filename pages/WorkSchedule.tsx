@@ -1,6 +1,5 @@
-import React from "react";
-import { 
-  Clock, 
+import {
+  Clock,
   MapPin,
   Car,
   Printer,
@@ -11,6 +10,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/prime";
 
 const WorkSchedule = () => {
   const scheduleData = [
@@ -207,12 +207,13 @@ const WorkSchedule = () => {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <button
+            <Button
+              label="In lịch tuần"
+              icon={<Printer size={18} />}
               onClick={() => window.print()}
-              className="bg-white border-2 border-gray-200 hover:border-red-600 text-gray-700 px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-sm"
-            >
-              <Printer size={18} /> In lịch tuần
-            </button>
+              outlined
+              className="!border-gray-200 hover:!border-red-600 !text-gray-700 font-bold"
+            />
             <div className="bg-red-50 border border-red-100 px-4 py-2.5 rounded-xl text-red-700 text-xs font-black flex items-center gap-2">
               <AlertCircle size={16} /> HOTLINE TRỰC BAN: 024.3998.5765
             </div>
@@ -329,7 +330,7 @@ const WorkSchedule = () => {
 
         {/* Footer Info */}
         <div className="mt-16 bg-primary-900 rounded-3xl p-8 text-white relative overflow-hidden shadow-2xl">
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="space-y-4 max-w-2xl">
               <h3 className="text-xl font-bold flex items-center gap-2 italic">
                 <Info size={24} className="text-secondary-400" /> Lưu ý dành cho

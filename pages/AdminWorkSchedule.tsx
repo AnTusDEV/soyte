@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import AdminLayout from "../components/AdminLayout";
 import { useSchedules } from "../services/useSchedules";
 import { WorkSchedule, User } from "../types";
@@ -6,8 +6,6 @@ import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import {
   Search,
-  Filter,
-  ChevronDown,
   Plus,
   Edit3,
   Trash2,
@@ -17,11 +15,11 @@ import {
   Clock,
   MapPin,
   User as UserIcon,
-  Users,
 } from "lucide-react";
 import ScheduleForm from "../components/ScheduleForm";
 import { api } from "../api";
-import { Dropdown } from "@/components/prime";
+import { Dropdown, Button, Toast } from "@/components/prime"; 
+import { confirmDialog } from "primereact/confirmdialog";
 
 const AdminWorkSchedule: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -33,11 +31,11 @@ const AdminWorkSchedule: React.FC = () => {
     WorkSchedule | undefined
   >(undefined);
   const [users, setUsers] = useState<User[]>([]);
+  const toast = useRef<Toast>(null);
 
   const {
     schedules,
     loading,
-    error,
     fetchSchedules,
     createSchedule,
     updateSchedule,
@@ -94,10 +92,20 @@ const AdminWorkSchedule: React.FC = () => {
     try {
       if (editingSchedule?.id) {
         await updateSchedule(editingSchedule.id, scheduleData);
-        alert("Cập nhật lịch trình thành công!");
+        toast.current?.show({
+          severity: "success",
+          summary: "Thành công",
+          detail: "Cập nhật lịch trình thành công!",
+          life: 3000,
+        });
       } else {
         await createSchedule(scheduleData);
-        alert("Tạo lịch trình mới thành công!");
+        toast.current?.show({
+          severity: "success",
+          summary: "Thành công",
+          detail: "Tạo lịch trình mới thành công!",
+          life: 3000,
+        });
       }
       handleCloseForm();
       fetchSchedules({
@@ -105,23 +113,47 @@ const AdminWorkSchedule: React.FC = () => {
         searchTerm: searchTerm,
       });
     } catch (err: any) {
-      alert(`Lỗi: ${err.message || "Không thể lưu lịch trình."}`);
+      toast.current?.show({
+        severity: "error",
+        summary: "Lỗi",
+        detail: `Lỗi: ${err.message || "Không thể lưu lịch trình."}`,
+        life: 3000,
+      });
     }
   };
 
   const handleDeleteSchedule = async (id: number) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa lịch trình này?")) {
-      try {
-        await deleteSchedule(id);
-        alert("Xóa lịch trình thành công!");
-        fetchSchedules({
-          status: filterStatus === "all" ? undefined : filterStatus,
-          searchTerm: searchTerm,
-        });
-      } catch (err: any) {
-        alert(`Lỗi: ${err.message || "Không thể xóa lịch trình."}`);
-      }
-    }
+    confirmDialog({
+      message: "Bạn có chắc chắn muốn xóa lịch trình này?",
+      header: "Xác nhận xóa",
+      icon: "pi pi-exclamation-triangle",
+      acceptLabel: "Xóa",
+      rejectLabel: "Hủy",
+      acceptClassName: "p-button-danger",
+      rejectClassName: "p-button-text",
+      accept: async () => {
+        try {
+          await deleteSchedule(id);
+          toast.current?.show({
+            severity: "success",
+            summary: "Thành công",
+            detail: "Xóa lịch trình thành công!",
+            life: 3000,
+          });
+          fetchSchedules({
+            status: filterStatus === "all" ? undefined : filterStatus,
+            searchTerm: searchTerm,
+          });
+        } catch (err: any) {
+          toast.current?.show({
+            severity: "error",
+            summary: "Lỗi",
+            detail: `Lỗi: ${err.message || "Không thể xóa lịch trình."}`,
+            life: 3000,
+          });
+        }
+      },
+    });
   };
   const statusOptions = [
     { label: "Tất cả trạng thái", value: "all" },
@@ -147,6 +179,7 @@ const AdminWorkSchedule: React.FC = () => {
 
   return (
     <AdminLayout title="Quản lý Lịch công tác">
+      <Toast ref={toast} />
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-8">
         <StatCard
           icon={CalendarDays}
@@ -167,12 +200,12 @@ const AdminWorkSchedule: React.FC = () => {
           color="green"
         />
         <div className="flex flex-col justify-center">
-          <button
+          <Button
             onClick={() => handleOpenForm()}
-            className="w-full bg-secondary-600 hover:bg-secondary-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-secondary-100 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-1"
+            className="w-full !bg-secondary-600 hover:!bg-secondary-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-secondary-100 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-1"
           >
             <Plus size={24} /> Thêm lịch trình
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -208,7 +241,7 @@ const AdminWorkSchedule: React.FC = () => {
               <tr className="bg-gray-50 text-left text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
                 <th className="px-6 py-4">Lịch trình</th>
                 <th className="px-6 py-4">Thời gian & Địa điểm</th>
-                <th className="px-6 py-4">Cán bộ</th> 
+                <th className="px-6 py-4">Cán bộ</th>
                 <th className="px-6 py-4 text-center">Mức độ</th>
                 <th className="px-6 py-4 text-center">Thao tác</th>
               </tr>
@@ -265,7 +298,7 @@ const AdminWorkSchedule: React.FC = () => {
                         {userMap[schedule.presider_id] || "N/A"}
                       </div>
                     </td>
-                  
+
                     <td className="px-6 py-4 text-center">
                       <span
                         className={`py-1 px-3 rounded-full text-xs font-bold ${
@@ -285,18 +318,19 @@ const AdminWorkSchedule: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 text-center">
                       <div className="flex items-center justify-center gap-2">
-                        <button
-                          className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition shadow-sm bg-white border border-gray-100"
+                        <Button
+                          icon={<Edit3 size={18} />}
+                          text
+                          rounded
                           onClick={() => handleOpenForm(schedule)}
-                        >
-                          <Edit3 size={18} />
-                        </button>
-                        <button
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition shadow-sm bg-white border border-gray-100"
+                        />
+                        <Button
+                          icon={<Trash2 size={18} />}
+                          text
+                          rounded
+                          severity="danger"
                           onClick={() => handleDeleteSchedule(schedule.id)}
-                        >
-                          <Trash2 size={18} />
-                        </button>
+                        />
                       </div>
                     </td>
                   </tr>

@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
+import { Button } from "@/components/prime";
 
 // Fix for default Leaflet icon
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -319,18 +320,17 @@ const HanoiSystem = () => {
                 { id: "TT", label: "TT Chuyên khoa" },
                 { id: "BT", label: "Trợ giúp" },
               ].map((btn) => (
-                <button
+                <Button
                   key={btn.id}
+                  label={btn.label}
                   onClick={() => setFilterType(btn.id as any)}
                   className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter border transition-all whitespace-nowrap
                         ${
                           filterType === btn.id
-                            ? "bg-primary-900 text-white border-primary-900 shadow-md"
-                            : "bg-white text-gray-600 border-gray-200 hover:bg-gray-100"
+                            ? "!bg-primary-900 !text-white !border-primary-900 shadow-md"
+                            : "!bg-white !text-gray-600 !border-gray-200 hover:!bg-gray-100"
                         }`}
-                >
-                  {btn.label}
-                </button>
+                />
               ))}
             </div>
           </div>
@@ -412,12 +412,13 @@ const HanoiSystem = () => {
                   <span className="text-[10px] font-black uppercase tracking-widest bg-white/20 px-2 py-1 rounded">
                     {selectedFacility.category}
                   </span>
-                  <button
+                  <Button
+                    icon={<X size={16} />}
+                    text
+                    rounded
                     onClick={() => setSelectedFacility(null)}
-                    className="hover:bg-white/20 rounded-full p-1"
-                  >
-                    <X size={16} />
-                  </button>
+                    className="!text-white hover:!bg-white/20"
+                  />
                 </div>
                 <h2 className="text-lg font-black mt-2 leading-tight uppercase">
                   {selectedFacility.name}
@@ -442,15 +443,18 @@ const HanoiSystem = () => {
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <button className="flex items-center justify-center gap-2 bg-primary-700 hover:bg-primary-800 text-white py-3.5 rounded-xl font-bold text-[11px] uppercase transition shadow-lg">
-                    <Navigation size={16} /> Chỉ đường
-                  </button>
-                  <a
-                    href={`tel:${selectedFacility.phone}`}
-                    className="flex items-center justify-center gap-2 bg-white border-2 border-gray-100 hover:border-primary-600 text-gray-700 py-3.5 rounded-xl font-bold text-[11px] uppercase transition"
-                  >
-                    <Phone size={16} /> Gọi điện
-                  </a>
+                  <Button
+                    label="Chỉ đường"
+                    icon={<Navigation size={16} />}
+                    className="!bg-primary-700 hover:!bg-primary-800 !text-white"
+                  />
+                  <Button
+                    label="Gọi điện"
+                    icon={<Phone size={16} />}
+                    outlined
+                    className="!border-gray-200 hover:!border-primary-600 !text-gray-700"
+                    onClick={() => window.location.href = `tel:${selectedFacility.phone}`}
+                  />
                 </div>
               </div>
             </div>

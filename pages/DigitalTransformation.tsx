@@ -67,7 +67,7 @@ const DigitalTransformation = () => {
           <Database size={400} />
         </div>
         <div className="container mx-auto px-4 relative z-10">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-4">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center text-secondary-400 border border-white/20 shadow-xl">
                 <Laptop2 size={36} />
@@ -89,7 +89,7 @@ const DigitalTransformation = () => {
 
       <div className="container mx-auto px-4 -mt-12 relative z-20">
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">
           {[
             { label: 'Hồ sơ sức khỏe điện tử', value: '8.400.000', change: '+12.5%', icon: Users, label2: 'Hồ sơ sức khỏe điện tử', color: 'text-blue-600', bg: 'bg-blue-50' },
             { label: 'Cơ sở y tế kết nối', value: '785', change: '+2.1%', icon: Building2, color: 'text-emerald-600', bg: 'bg-emerald-50' },
@@ -112,9 +112,9 @@ const DigitalTransformation = () => {
         </div>
 
         {/* Charts Row 1 */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4">
           <div className="lg:col-span-8 bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
                 <Activity className="text-primary-600" size={24} />
                 Phân tích Lượt khám chữa bệnh theo tuyến
@@ -142,7 +142,7 @@ const DigitalTransformation = () => {
           </div>
 
           <div className="lg:col-span-4 bg-white p-8 rounded-3xl shadow-xl border border-gray-100 flex flex-col">
-            <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2 mb-8">
+            <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2 mb-4">
               <Users className="text-secondary-600" size={24} />
               Hồ sơ theo độ tuổi
             </h3>
@@ -171,9 +171,9 @@ const DigitalTransformation = () => {
         </div>
 
         {/* Charts Row 2 */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4">
           <div className="lg:col-span-4 bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
-            <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2 mb-8">
+            <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2 mb-4">
               <ShieldCheck className="text-amber-600" size={24} />
               Tỷ lệ triển khai hạ tầng số
             </h3>
@@ -204,7 +204,7 @@ const DigitalTransformation = () => {
           </div>
 
           <div className="lg:col-span-8 bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
-             <div className="flex items-center justify-between mb-8">
+             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
                 <TrendingUp className="text-indigo-600" size={24} />
                 Tăng trưởng Hồ sơ sức khỏe (2025)

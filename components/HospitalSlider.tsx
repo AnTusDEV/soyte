@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/prime";
 
 const HOSPITALS = [
   {
@@ -102,7 +103,7 @@ const HospitalSlider = () => {
   return (
     <section className="py-12 bg-gray-50 border-t border-gray-100">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-xl md:text-2xl font-black text-primary-900 uppercase tracking-tight">
               Hệ thống cơ sở Y tế trực thuộc
@@ -110,20 +111,22 @@ const HospitalSlider = () => {
             <div className="w-16 h-1 bg-secondary-500 mt-2 rounded-full"></div>
           </div>
           <div className="flex gap-2">
-            <button
+            <Button
               onClick={prevSlide}
-              className="p-2 rounded-full border border-gray-200 bg-white hover:bg-primary-50 text-gray-400 hover:text-primary-600 transition-all shadow-sm active:scale-90"
+              icon={<ChevronLeft size={20} />}
+              rounded
+              text
+              className="p-2 !border-gray-200 !bg-white hover:!bg-primary-50 !text-gray-400 hover:!text-primary-600 shadow-sm active:scale-90"
               aria-label="Previous slide"
-            >
-              <ChevronLeft size={20} />
-            </button>
-            <button
+            />
+            <Button
               onClick={nextSlide}
-              className="p-2 rounded-full border border-gray-200 bg-white hover:bg-primary-50 text-gray-400 hover:text-primary-600 transition-all shadow-sm active:scale-90"
+              icon={<ChevronRight size={20} />}
+              rounded
+              text
+              className="p-2 !border-gray-200 !bg-white hover:!bg-primary-50 !text-gray-400 hover:!text-primary-600 shadow-sm active:scale-90"
               aria-label="Next slide"
-            >
-              <ChevronRight size={20} />
-            </button>
+            />
           </div>
         </div>
 

@@ -7,8 +7,8 @@ export { Calendar } from "primereact/calendar";
 export { Checkbox } from "primereact/checkbox";
 export { RadioButton } from "primereact/radiobutton";
 export { InputNumber } from "primereact/inputnumber";
-export { Password } from "primereact/password";
-
+export { Password } from "primereact/password"; 
+export { Editor } from "primereact/editor";
 // Button
 export { Button } from "primereact/button";
 
@@ -31,7 +31,7 @@ export { TabView, TabPanel } from "primereact/tabview";
 
 // Feedback
 export { Toast } from "primereact/toast";
-export { ConfirmDialog } from "primereact/confirmdialog";
+export { ConfirmDialog } from "primereact/confirmdialog"; 
 export { Message } from "primereact/message";
 export { Messages } from "primereact/messages";
 export { ProgressSpinner } from "primereact/progressspinner";

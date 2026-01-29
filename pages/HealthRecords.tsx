@@ -121,7 +121,7 @@ const HealthRecords = () => {
   return (
     <div className="bg-slate-50 min-h-screen font-sans pb-12">
       {/* Header Area */}
-      <div className="bg-primary-900 text-white py-12 px-4 shadow-lg mb-8 relative overflow-hidden">
+      <div className="bg-primary-900 text-white py-12 px-4 shadow-lg mb-4 relative overflow-hidden">
         <div className="absolute top-0 right-0 opacity-10 pointer-events-none -translate-y-1/4 translate-x-1/4">
           <Activity size={300} />
         </div>

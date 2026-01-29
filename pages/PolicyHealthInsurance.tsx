@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   FileText, 
@@ -17,6 +16,7 @@ import {
   Briefcase
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Button } from '@/components/prime';
 
 const PROCEDURES = [
   {
@@ -110,7 +110,7 @@ const PolicyHealthInsurance = () => {
           <ShieldCheck size={400} />
         </div>
         <div className="container mx-auto px-4 relative z-10 text-center md:text-left">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="max-w-2xl">
               <span className="bg-secondary-500 text-white text-[10px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest mb-4 inline-block shadow-lg">
                 Dịch vụ công trực tuyến
@@ -177,12 +177,17 @@ const PolicyHealthInsurance = () => {
                   {proc.description}
                 </p>
                 <div className="flex gap-3 pt-6 border-t border-gray-50">
-                  <button className="flex-1 bg-primary-600 hover:bg-primary-700 text-white py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg transition-all flex items-center justify-center gap-2 group/btn">
-                    Xem hướng dẫn <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
-                  </button>
-                  <button className="px-5 border-2 border-gray-100 hover:border-primary-600 hover:bg-primary-50 text-gray-400 hover:text-primary-700 rounded-xl transition-all">
-                    <FileText size={18} />
-                  </button>
+                  <Button 
+                    label="Xem hướng dẫn" 
+                    iconPos="right" 
+                    icon={<ArrowRight size={14} />} 
+                    className="flex-1 !bg-primary-600 hover:!bg-primary-700 !text-white"
+                  />
+                  <Button 
+                    icon={<FileText size={18} />} 
+                    outlined 
+                    className="!border-gray-100 hover:!border-primary-600 !text-gray-400 hover:!text-primary-700"
+                  />
                 </div>
               </div>
             );
@@ -196,12 +201,12 @@ const PolicyHealthInsurance = () => {
             </div>
             <h3 className="text-xl font-bold text-gray-800">Không tìm thấy thủ tục nào phù hợp</h3>
             <p className="text-gray-500 mt-2">Vui lòng thử lại với từ khóa khác hoặc liên hệ tổng đài hỗ trợ.</p>
-            <button 
+            <Button 
+              label="Xóa tìm kiếm"
               onClick={() => setSearchTerm('')}
-              className="mt-6 text-primary-600 font-black uppercase tracking-widest text-sm hover:underline"
-            >
-              Xóa tìm kiếm
-            </button>
+              text
+              className="!text-primary-600"
+            />
           </div>
         )}
 

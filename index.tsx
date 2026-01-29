@@ -28,10 +28,16 @@ root.render(
               "border border-gray-200 rounded-xl bg-gray-50 transition focus-within:border-primary-300",
           },
         },
+        inputtext: {
+          root: {
+            className:
+              "text-xs",
+          },
+        },
         calendar: {
           input: {
             className: "text-xs py-2 px-3 h-9 bg-gray-50",
-          }, 
+          },
           dayLabel: {
             className: "text-xs",
           },

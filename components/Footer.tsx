@@ -1,11 +1,12 @@
 import React from "react";
 import { Facebook, Twitter, Youtube, MapPin, Phone, Mail } from "lucide-react";
+import { Button } from "@/components/prime";
 
 const Footer = () => {
   return (
     <footer className="bg-primary-900 text-white pt-12 pb-6">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
           {/* Column 1: Info */}
           <div>
             <h3 className="text-xl font-bold mb-4 uppercase text-primary-100">
@@ -99,9 +100,7 @@ const Footer = () => {
                 placeholder="Email của bạn"
                 className="px-3 py-2 text-gray-900 text-sm rounded-l focus:outline-none w-full"
               />
-              <button className="bg-secondary-600 hover:bg-secondary-500 px-4 py-2 rounded-r text-sm font-bold transition">
-                Gửi
-              </button>
+              <Button label="Gửi" className="!bg-secondary-600 hover:!bg-secondary-500 px-4 py-2 rounded-r !text-sm font-bold" />
             </div>
             <div className="mt-6 flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-white">

@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { api } from "../api";
 import { useAuth } from "../AuthContext"; // Import useAuth
+import { Button } from "@/components/prime";
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -123,13 +124,14 @@ const Login: React.FC = () => {
                   className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary-100 focus:bg-white transition-all text-sm font-medium"
                   placeholder="••••••••"
                 />
-                <button
+                <Button
                   type="button"
+                  icon={showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  text
+                  rounded
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-600 transition-colors"
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
+                  className="absolute right-2 top-1/2 -translate-y-1/2 !text-gray-400 hover:!text-primary-600"
+                />
               </div>
             </div>
             <Link
@@ -139,24 +141,13 @@ const Login: React.FC = () => {
               <span>→ Đăng ký ngay </span>
             </Link>
             <div className="space-y-4">
-              <button
+              <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-4 bg-[#0088cc] text-white font-bold rounded-xl shadow-lg hover:bg-[#0077bb] transition-all flex items-center justify-center gap-2 disabled:opacity-70 active:scale-[0.98]"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 size={18} className="animate-spin" />
-                    <span className="uppercase tracking-widest">
-                      Đang kiểm tra...
-                    </span>
-                  </>
-                ) : (
-                  <span className="uppercase tracking-widest">
-                    Đăng nhập
-                  </span>
-                )}
-              </button>
+                loading={isLoading}
+                label={isLoading ? "Đang kiểm tra..." : "Đăng nhập"}
+                className="w-full py-4 !bg-[#0088cc] !text-white font-bold rounded-xl shadow-lg hover:!bg-[#0077bb] transition-all"
+              />
             </div>
           </form>
 

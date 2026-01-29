@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { MAIN_MENU } from "../constants";
 import { useAuth } from "../AuthContext"; // Import useAuth hook
+import { Button } from "@/components/prime";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -68,12 +69,13 @@ const Header = () => {
                     <LayoutDashboard size={14} /> QUẢN TRỊ
                   </Link>
                 )} 
-                <button
+                <Button
                   onClick={logout}
-                  className="flex items-center gap-1 hover:text-red-300 transition text-[10px] md:text-xs"
-                >
-                  <LogOut size={14} /> Thoát
-                </button>
+                  icon={<LogOut size={14} />}
+                  label="Thoát"
+                  text
+                  className="!text-white hover:!text-red-300 !text-[10px] md:!text-xs"
+                />
               </div>
             ) : (
               <>
@@ -123,18 +125,16 @@ const Header = () => {
                   placeholder="Tìm kiếm thông tin..."
                   className="w-full pl-5 pr-12 py-2.5 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all text-sm"
                 />
-                <button className="absolute right-1 top-1 bottom-1 px-4 bg-primary-600 text-white rounded-full hover:bg-primary-700">
-                  <Search size={16} />
-                </button>
+                <Button icon={<Search size={16} />} className="absolute right-1 top-1 bottom-1 px-4 !bg-primary-600 !text-white rounded-full hover:!bg-primary-700" />
               </div>
             </div>
 
-            <button
-              className="lg:hidden absolute top-4 right-4 text-gray-700 p-2"
+            <Button
+              className="lg:hidden absolute top-4 right-4 !text-gray-700 p-2"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+              icon={isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              text
+            />
           </div>
         </div>
       </div>
@@ -188,7 +188,7 @@ const Header = () => {
                             <li key={child.id}>
                               <Link
                                 to={child.path}
-                                className="block px-4 py-3 text-sm font-medium text-gray-700 hover:bg-primary-50 hover:text-primary-700 border-l-4 border-transparent hover:border-primary-500 transition-all"
+                                className="block px-4 py-3 text-sm font-medium text-gray-700 hover:bg-primary-50 hover:text-primary-700 border-l-4 border-primary-500 transition-all"
                               >
                                 {child.title}
                               </Link>

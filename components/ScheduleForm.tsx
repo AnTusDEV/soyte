@@ -1,16 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  X,
-  Save,
-  Upload,
-  Info,
-  Loader2, 
-  MapPin,
-  Building,
-} from "lucide-react";
+import { X, Save, Upload, Info, Loader2, MapPin, Building } from "lucide-react";
 import { api } from "../api";
 import { WorkSchedule, User } from "../types";
-import { Dropdown, Calendar } from "@/components/prime";
+import { Dropdown, Calendar, InputText, Button } from "@/components/prime";
+import { Toast } from "primereact/toast";
+
 interface ScheduleFormProps {
   initialData?: WorkSchedule;
   onClose: () => void;
@@ -51,12 +45,9 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
   const [uploading, setUploading] = useState(false);
   const [errors, setErrors] = useState<any>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const toast = useRef<Toast>(null);
+
   const presiderOptions =
-    users?.map((user) => ({
-      label: user.full_name,
-      value: user.id,
-    })) || [];
-  const attendeeOptions =
     users?.map((user) => ({
       label: user.full_name,
       value: user.id,
@@ -68,7 +59,12 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
         setUsers(fetchedUsers.data || []);
       } catch (error) {
         console.error("Failed to fetch users:", error);
-        // Handle error appropriately
+        toast.current?.show({
+          severity: "error",
+          summary: "Lỗi",
+          detail: "Không thể tải danh sách người dùng.",
+          life: 3000,
+        });
       }
     };
     fetchUsers();
@@ -91,7 +87,6 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
         attachments: initialData.attachments || [],
       });
     } else {
-      // Reset form for new schedule
       setFormData({
         title: "",
         content: "",
@@ -134,9 +129,20 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
         ...prev,
         attachments: [...(prev.attachments || []), ...newAttachments],
       }));
+      toast.current?.show({
+        severity: "success",
+        summary: "Thành công",
+        detail: "Tệp đã được tải lên thành công!",
+        life: 3000,
+      });
     } catch (err: any) {
       console.error("Upload error:", err);
-      alert("Lỗi tải tệp: " + err.message);
+      toast.current?.show({
+        severity: "error",
+        summary: "Lỗi",
+        detail: `Lỗi tải tệp: ${err.message}`,
+        life: 3000,
+      });
     } finally {
       setUploading(false);
       if (fileInputRef.current) {
@@ -178,8 +184,24 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
-    if (uploading) return;
+    if (!validate()) {
+      toast.current?.show({
+        severity: "warn",
+        summary: "Cảnh báo",
+        detail: "Vui lòng kiểm tra lại các trường bị lỗi.",
+        life: 3000,
+      });
+      return;
+    }
+    if (uploading) {
+      toast.current?.show({
+        severity: "info",
+        summary: "Thông báo",
+        detail: "Đang tải tệp lên, vui lòng đợi.",
+        life: 3000,
+      });
+      return;
+    }
 
     setLoading(true);
     try {
@@ -189,13 +211,21 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
         end_time: new Date(formData.end_time).toISOString(),
       };
       await onSave(scheduleToSave);
-      alert(
-        `Lịch trình đã được ${initialData ? "cập nhật" : "tạo mới"} thành công!`,
-      );
+      toast.current?.show({
+        severity: "success",
+        summary: "Thành công",
+        detail: `Lịch trình đã được ${initialData ? "cập nhật" : "tạo mới"} thành công!`,
+        life: 3000,
+      });
       onClose();
     } catch (error: any) {
       console.error("Error saving schedule:", error);
-      alert(`Lỗi lưu lịch trình: ${error.message}`);
+      toast.current?.show({
+        severity: "error",
+        summary: "Lỗi",
+        detail: `Lỗi lưu lịch trình: ${error.message}`,
+        life: 3000,
+      });
     } finally {
       setLoading(false);
     }
@@ -203,17 +233,19 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
 
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <Toast ref={toast} />
       <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[95vh]">
         <div className="bg-primary-700 p-4 flex justify-between items-center text-white shrink-0">
           <h3 className="font-bold flex items-center gap-2">
             {initialData ? "CHỈNH SỬA LỊCH TRÌNH" : "TẠO LỊCH TRÌNH MỚI"}
           </h3>
-          <button
+          <Button
+            icon={<X size={20} />}
+            text
+            rounded
             onClick={onClose}
-            className="hover:bg-white/20 p-1 rounded-full"
-          >
-            <X size={20} />
-          </button>
+            className="!text-white hover:!bg-white/20"
+          />
         </div>
 
         <form
@@ -231,15 +263,19 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
             <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
               Tiêu đề lịch trình <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
+            <InputText
               name="title"
               value={formData.title}
               onChange={handleInputChange}
               placeholder="Nhập tiêu đề lịch trình..."
               className={`w-full p-3 bg-gray-50 border ${
                 errors.title ? "border-red-500" : "border-gray-200"
-              } rounded-lg focus:ring-2 focus:ring-primary-100 outline-none font-bold text-gray-800`}
+              } rounded-lg font-bold text-gray-800`}
+              pt={{
+                root: {
+                  className: "focus:ring-2 focus:ring-primary-100 outline-none",
+                },
+              }}
             />
             {errors.title && (
               <p className="text-red-500 text-[10px] mt-1 font-bold">
@@ -430,19 +466,15 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
               Tệp đính kèm
             </label>
             <div className="flex items-center gap-2">
-              <button
+              <Button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                disabled={uploading}
-                className="flex-1 bg-white border-2 border-primary-600 text-primary-600 px-4 py-3 rounded-lg font-bold text-xs flex items-center justify-center gap-2 hover:bg-primary-50 transition-all disabled:opacity-50"
-              >
-                {uploading ? (
-                  <Loader2 size={16} className="animate-spin" />
-                ) : (
-                  <Upload size={16} />
-                )}
-                TẢI TỆP LÊN
-              </button>
+                loading={uploading}
+                label="TẢI TỆP LÊN"
+                icon={<Upload size={16} />}
+                outlined
+                className="flex-1 !border-primary-600 !text-primary-600 font-bold text-xs"
+              />
               <input
                 type="file"
                 ref={fileInputRef}
@@ -469,13 +501,13 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
                     >
                       {att.name}
                     </a>
-                    <button
-                      type="button"
+                    <Button
+                      icon={<X size={16} />}
+                      text
+                      rounded
+                      severity="danger"
                       onClick={() => handleRemoveAttachment(att.url)}
-                      className="text-red-500 hover:text-red-700 p-1 rounded-full"
-                    >
-                      <X size={16} />
-                    </button>
+                    />
                   </div>
                 ))}
               </div>
@@ -484,26 +516,21 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
         </form>
 
         <div className="p-4 border-t border-gray-100 flex gap-3 bg-gray-50 shrink-0">
-          <button
+          <Button
             type="submit"
             form="schedule-form"
-            disabled={loading || uploading}
-            className="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-xl shadow-primary-100"
-          >
-            {loading ? (
-              <Loader2 className="animate-spin" size={20} />
-            ) : (
-              <Save size={20} />
-            )}
-            {initialData ? "CẬP NHẬT LỊCH TRÌNH" : "TẠO LỊCH TRÌNH"}
-          </button>
-          <button
+            loading={loading || uploading}
+            className="flex-1 !bg-primary-600 hover:!bg-primary-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-xl shadow-primary-100"
+            label={initialData ? "CẬP NHẬT LỊCH TRÌNH" : "TẠO LỊCH TRÌNH"}
+            icon={<Save size={20} />}
+          />
+          <Button
             type="button"
             onClick={onClose}
-            className="px-8 bg-white border border-gray-200 hover:bg-gray-100 text-gray-600 font-bold py-4 rounded-xl transition-all"
-          >
-            HỦY BỎ
-          </button>
+            label="HỦY BỎ"
+            outlined
+            className="px-8 !border-gray-200 hover:!bg-gray-100 !text-gray-600 font-bold py-4 rounded-xl"
+          />
         </div>
       </div>
     </div>
