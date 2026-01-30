@@ -39,6 +39,7 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
     priority: "NORMAL",
     attendee_ids: [],
     attachments: [],
+    leader: "",
   });
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
@@ -74,6 +75,7 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
     if (initialData) {
       setFormData({
         title: initialData.title || "",
+        leader: initialData.leader || "",
         content: initialData.content || "",
         start_time: initialData.start_time
           ? initialData.start_time.slice(0, 16)
@@ -89,6 +91,7 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
     } else {
       setFormData({
         title: "",
+        leader: "",
         content: "",
         start_time: "",
         end_time: "",
@@ -522,7 +525,6 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
             loading={loading || uploading}
             className="flex-1 !bg-primary-600 hover:!bg-primary-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-xl shadow-primary-100"
             label={initialData ? "CẬP NHẬT LỊCH TRÌNH" : "TẠO LỊCH TRÌNH"}
-            icon={<Save size={20} />}
           />
           <Button
             type="button"

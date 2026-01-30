@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import ScheduleForm from "../components/ScheduleForm";
 import { api } from "../api";
-import { Dropdown, Button, Toast } from "@/components/prime"; 
+import { Dropdown, Button, Toast } from "@/components/prime";
 import { confirmDialog } from "primereact/confirmdialog";
 
 const AdminWorkSchedule: React.FC = () => {
@@ -180,7 +180,7 @@ const AdminWorkSchedule: React.FC = () => {
   return (
     <AdminLayout title="Quản lý Lịch công tác">
       <Toast ref={toast} />
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-4">
         <StatCard
           icon={CalendarDays}
           title="Tổng số lịch trình"

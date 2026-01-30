@@ -1,27 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Ambulance, 
-  MapPin, 
-  Phone, 
-  User, 
-  Stethoscope, 
-  AlertCircle, 
-  Siren, 
-  Activity, 
-  X,
-  Navigation,
-  Clock,
-  ShieldAlert,
-  Radio,
-  Building2,
-  Layers,
-  Search,
-  Filter,
+import {  
+  Phone,  
+  Siren,  
+  X, 
   Home as HomeIcon,
   ChevronLeft
 } from 'lucide-react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { Button } from '@/components/prime';
 

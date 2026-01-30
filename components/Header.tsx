@@ -1,6 +1,5 @@
-
-import React, { useState, useEffect } from "react";
-import { Link, useLocation, NavLink } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import {
   Menu,
   X,
@@ -10,18 +9,15 @@ import {
   LogOut,
   User,
   LayoutDashboard,
-  Users,
 } from "lucide-react";
 import { MAIN_MENU } from "../constants";
-import { useAuth } from "../AuthContext"; // Import useAuth hook
+import { useAuth } from "../AuthContext";
 import { Button } from "@/components/prime";
-
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [currentTime] = useState(new Date());
-  const { user, logout } = useAuth(); // Use the context 
-  
+  const { user, logout } = useAuth(); // Use the context
+
   const location = useLocation();
 
   useEffect(() => {
@@ -33,7 +29,13 @@ const Header = () => {
 
   const getFormattedDateTime = (date: Date) => {
     const days = [
-      "Chủ nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy",
+      "Chủ nhật",
+      "Thứ Hai",
+      "Thứ Ba",
+      "Thứ Tư",
+      "Thứ Năm",
+      "Thứ Sáu",
+      "Thứ Bảy",
     ];
     return `${days[date.getDay()]}, ${date.getDate()}/${
       date.getMonth() + 1
@@ -54,27 +56,28 @@ const Header = () => {
               <Phone size={14} className="mr-1.5 animate-pulse" />
               ĐƯỜNG DÂY NÓNG SỞ Y TẾ: 02439985765/ 0967981616
             </span>
-          </div> 
-            <div className="flex items-center space-x-3 md:space-x-4 font-medium">
-            {user ? ( 
-              <div className="relative flex items-center gap-3"> 
+          </div>
+          <div className="flex items-center space-x-3 md:space-x-4 font-medium">
+            {user ? (
+              <div className="relative flex items-center gap-3">
                 <span className="flex items-center gap-1.5 bg-white/10 px-2 py-0.5 rounded text-secondary-300">
-                  <User size={12} /> {user.full_name || 'Quản trị viên'}
-                </span> 
-                {user?.role === 'admin' && (
+                  <User size={12} /> {user.full_name || "Quản trị viên"}
+                </span>
+                {user?.role === "admin" && (
                   <Link
                     to="/admin/dashboard"
                     className="flex items-center gap-1 bg-secondary-500 hover:bg-secondary-600 px-2.5 py-1 rounded font-bold text-white transition-all shadow-lg text-[10px] md:text-xs"
                   >
                     <LayoutDashboard size={14} /> QUẢN TRỊ
                   </Link>
-                )} 
+                )}
                 <Button
                   onClick={logout}
-                  icon={<LogOut size={14} />}
                   label="Thoát"
+                  icon="pi pi-sign-out"
+                  iconPos="left"
+                  className="p-0 text-[10px] md:text-xs hover:text-red-300 transition"
                   text
-                  className="!text-white hover:!text-red-300 !text-[10px] md:!text-xs"
                 />
               </div>
             ) : (
@@ -94,7 +97,7 @@ const Header = () => {
           </div>
         </div>
       </div>
-      
+
       {/* ... rest of the component is unchanged ... */}
       <div className="bg-white py-6 md:py-8 shadow-sm relative z-20">
         <div className="container mx-auto px-4">
@@ -117,7 +120,7 @@ const Header = () => {
                 </p>
               </div>
             </Link>
-            
+
             <div className="hidden lg:flex items-center flex-1 max-w-sm justify-end">
               <div className="relative w-full group">
                 <input
@@ -125,16 +128,24 @@ const Header = () => {
                   placeholder="Tìm kiếm thông tin..."
                   className="w-full pl-5 pr-12 py-2.5 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all text-sm"
                 />
-                <Button icon={<Search size={16} />} className="absolute right-1 top-1 bottom-1 px-4 !bg-primary-600 !text-white rounded-full hover:!bg-primary-700" />
+                <Button
+                  className="absolute right-1 top-1 bottom-1 px-4 bg-primary-600 text-white rounded-full hover:bg-primary-700"
+                  aria-label="Search"
+                >
+                  <Search size={16} />
+                </Button>
               </div>
             </div>
 
             <Button
-              className="lg:hidden absolute top-4 right-4 !text-gray-700 p-2"
+              className="lg:hidden absolute top-4 right-4"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              icon={isMenuOpen ? <X size={24} /> : <Menu size={24} />}
               text
-            />
+              rounded
+              aria-label="Toggle menu"
+            >
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </Button>
           </div>
         </div>
       </div>
@@ -184,11 +195,11 @@ const Header = () => {
 
                       <div className="hidden lg:group-hover:block absolute left-0 top-full bg-white shadow-2xl rounded-b-lg w-72 z-50 animate-in fade-in slide-in-from-top-2 duration-200 border-t-4 border-secondary-500 ring-1 ring-black/5">
                         <ul className="py-2">
-                          {item.children?.map((child) => (
+                          {item.children?.map((child:any) => (
                             <li key={child.id}>
                               <Link
-                                to={child.path}
-                                className="block px-4 py-3 text-sm font-medium text-gray-700 hover:bg-primary-50 hover:text-primary-700 border-l-4 border-primary-500 transition-all"
+                                to={!child.linkUrl ? child.path : child.linkUrl}
+                                className="block px-4 py-3 text-sm font-medium text-gray-700 hover:bg-primary-50 hover:text-primary-700 border-l-4 border-transparent hover:border-primary-500 transition-all"
                               >
                                 {child.title}
                               </Link>

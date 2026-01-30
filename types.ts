@@ -12,6 +12,7 @@ export interface MenuItem {
   path: string;
   icon?: LucideIcon;
   isDashboard?: boolean;
+  linkUrl?: string;
   children?: MenuItem[];
 }
 
@@ -50,6 +51,7 @@ export interface ScheduleAttachment {
 export interface WorkSchedule {
   id: number;
   title: string;
+  leader: string;
   content: string;
   start_time: string; // ISO datetime string
   end_time: string; // ISO datetime string

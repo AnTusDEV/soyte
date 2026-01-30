@@ -258,7 +258,7 @@ const StatCard: React.FC<StatCardProps> = ({
     amber: "bg-amber-50 text-amber-600",
   };
   return (
-    <div className="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
       <div
         className={`w-12 h-12 ${colors[color]} rounded-xl flex items-center justify-center`}
       >

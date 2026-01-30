@@ -1,13 +1,11 @@
 
 import React, { useState } from 'react';
 import { 
-  Search, 
-  LayoutGrid, 
+  Search,  
   Share2, 
   Building2, 
   Clock, 
-  Download,  
-  ChevronRight,
+  Download,   
   FileDown
 } from 'lucide-react';
 import { Button } from '@/components/prime';

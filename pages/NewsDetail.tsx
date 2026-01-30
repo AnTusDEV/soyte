@@ -15,6 +15,7 @@ import {
   ChevronLeft,
 } from "lucide-react";
 import { SERVICE_CATEGORIES } from "../constants";
+import { Button } from "@/components/prime";
 // News Card for bottom grid
 const BottomRelatedCard = ({ post }: { post: any }) => (
   <Link to={`/news/detail/${post.id}`} className="group flex flex-col gap-3">

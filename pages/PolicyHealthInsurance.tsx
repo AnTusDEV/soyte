@@ -5,7 +5,6 @@ import {
   ShieldCheck, 
   ArrowRight, 
   Info, 
-  Calendar, 
   ChevronRight, 
   Home, 
   PhoneCall,
@@ -92,7 +91,7 @@ const PolicyHealthInsurance = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans pb-20">
+    <div className="min-h-screen bg-gray-50 font-sans ">
       {/* Breadcrumb */}
       <div className="bg-white border-b border-gray-200">
         <div className="container mx-auto px-4 py-3 flex items-center text-[10px] md:text-xs font-black text-gray-500 uppercase tracking-widest">

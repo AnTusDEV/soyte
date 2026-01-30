@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Video,
   MessageCircle,
@@ -10,14 +10,9 @@ import {
   Activity,
   Stethoscope,
   Filter,
-  User,
-  Clock,
-  CheckCircle2,
-  X,
-  ArrowRight,
-  Phone,
-  ChevronRight,
-  UserCheck,
+  User, 
+  X, 
+  ChevronRight, 
   Building2,
 } from "lucide-react";
 import { Toast } from "primereact/toast";
@@ -221,7 +216,7 @@ const HealthConsultation = () => {
           <h1 className="text-3xl md:text-5xl font-bold mb-4">
             Kết nối Bác sĩ - Tư vấn Sức khỏe 24/7
           </h1>
-          <p className="text-teal-100 text-lg max-w-2xl mx-auto mb-8">
+          <p className="text-teal-100 text-lg max-w-2xl mx-auto mb-4">
             Nền tảng khám bệnh từ xa chính thống của Sở Y tế Hà Nội. Kết nối
             trực tiếp qua Video Call với các bác sĩ đầu ngành.
           </p>

@@ -60,7 +60,7 @@ const COLORS = ['#0ea5e9', '#10b981', '#f59e0b', '#6366f1', '#ec4899', '#8b5cf6'
 
 const DigitalTransformation = () => {
   return (
-    <div className="min-h-screen bg-slate-50 font-sans pb-20">
+    <div className="min-h-screen bg-slate-50 font-sans ">
       {/* Header Section */}
       <div className="bg-primary-900 text-white pt-16 pb-24 relative overflow-hidden">
         <div className="absolute top-0 right-0 opacity-10 pointer-events-none -translate-y-1/4 translate-x-1/4">

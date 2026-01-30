@@ -137,7 +137,7 @@ const AdminDashboard = () => {
   return (
     <AdminLayout title="Bài viết">
       <Toast ref={toast} />
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-4">
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
           <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
             <FileText size={24} />

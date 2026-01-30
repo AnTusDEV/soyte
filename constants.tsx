@@ -18,6 +18,7 @@ import {
   Syringe,
   CalendarDays,
   Search,
+
 } from "lucide-react";
 import { MenuItem, NewsItem } from "./types";
 
@@ -34,9 +35,10 @@ export const SERVICE_CATEGORIES = [
   },
   {
     id: 2,
-    title: "Cảnh báo y tế – Truyền thông nguy cơ",
-    path: "/news/alerts",
-    icon: AlertTriangle,
+    title: "Lịch công tác",
+    // path: "http://lichcongtac.qnict.vn/sythanoi/",
+    path: "/schedule",
+    icon: CalendarDays,
     containerClass:
       "bg-gradient-to-br from-orange-50 via-orange-100 to-orange-50 border-orange-200 hover:shadow-orange-300",
     iconBoxClass: "bg-orange-500 text-white shadow-orange-400/50",
@@ -237,6 +239,7 @@ export const MAIN_MENU: MenuItem[] = [
         id: "news-events",
         title: "Tin tức – Sự kiện y tế",
         path: "/news/events",
+
         icon: Newspaper,
       },
       {
@@ -315,11 +318,12 @@ export const MAIN_MENU: MenuItem[] = [
   {
     id: "guide",
     title: "Giới thiệu/Liên hệ",
-    path: "/schedule",
+    path: "#",
     icon: HeartHandshake,
     children: [
       {
         id: "work-schedule",
+        // linkUrl :"http://lichcongtac.qnict.vn/sythanoi/",
         title: "Lịch công tác",
         path: "/schedule",
         icon: CalendarDays,
