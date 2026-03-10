@@ -64,8 +64,8 @@ export const SERVICE_CATEGORIES = [
   },
   {
     id: 4,
-    title: "Phòng bệnh – Nâng cao sức khỏe",
-    path: "/news/prevention",
+    title: "Phản ánh - Y Tế",
+    path: "",
     icon: ShieldPlus,
     containerClass:
       "bg-gradient-to-br from-emerald-50 via-emerald-100 to-emerald-50 border-emerald-200 hover:shadow-emerald-300",
@@ -144,8 +144,8 @@ export const SERVICE_CATEGORIES = [
   },
   {
     id: 12,
-    title: "Gương người tốt – việc tốt ngành Y",
-    path: "/news/good-deeds",
+    title: "Giám sát chất lượng dịch vụ y tế",
+    path: "",
     icon: Award,
     containerClass:
       "bg-gradient-to-br from-yellow-50 via-yellow-100 to-yellow-50 border-yellow-200 hover:shadow-yellow-300",
@@ -169,11 +169,11 @@ export const SERVICE_CATEGORIES_FILTER = [
     title: "Khám bệnh - chữa bệnh",
     path: "/examination",
   },
-  {
-    id: 4,
-    title: "Phòng bệnh – Nâng cao sức khỏe",
-    path: "/news/prevention",
-  },
+  // {
+  //   id: 4,
+  //   title: "Phòng bệnh – Nâng cao sức khỏe",
+  //   path: "/news/prevention",
+  // },
   {
     id: 5,
     title: "Bảo trợ xã hội",
@@ -189,11 +189,11 @@ export const SERVICE_CATEGORIES_FILTER = [
     title: "Chính sách y tế - bảo hiểm y tế",
     path: "/health-records",
   },
-  {
-    id: 8,
-    title: "Gương người tốt – việc tốt ngành Y",
-    path: "/good-deeds",
-  },
+  // {
+  //   id: 8,
+  //   title: "Gương người tốt – việc tốt ngành Y",
+  //   path: "/good-deeds",
+  // },
 ];
 export const MOCK_VIDEOS = [
   {
@@ -256,12 +256,12 @@ export const MAIN_MENU: MenuItem[] = [
         path: "/news/alerts",
         icon: AlertTriangle,
       },
-      {
-        id: "good-deeds",
-        title: "Gương người tốt – việc tốt",
-        path: "/news/good-deeds",
-        icon: Award,
-      },
+      // {
+      //   id: "good-deeds",
+      //   title: "Gương người tốt – việc tốt",
+      //   path: "/news/good-deeds",
+      //   icon: Award,
+      // },
     ],
   },
   {
@@ -528,16 +528,16 @@ export const CATEGORIES = [
     image: "https://suckhoethudo.vn/assets/kham benh-__1wzyZ_.png",
     data: [],
   },
-  {
-    id: 4,
-    title: "Phòng bệnh - Nâng cao sức khỏe",
-    icon: ShieldPlus,
-    iconColor: "text-orange-500",
-    hoverColor: "text-orange-600",
-    image: "https://suckhoethudo.vn/assets/phong benh-CTWuljBT.png",
-    data: [],
-    paddingClass: "md:pl-8",
-  },
+  // {
+  //   id: 4,
+  //   title: "Phòng bệnh - Nâng cao sức khỏe",
+  //   icon: ShieldPlus,
+  //   iconColor: "text-orange-500",
+  //   hoverColor: "text-orange-600",
+  //   image: "https://suckhoethudo.vn/assets/phong benh-CTWuljBT.png",
+  //   data: [],
+  //   paddingClass: "md:pl-8",
+  // },
   {
     id: 5,
     title: "Bảo trợ xã hội",
@@ -567,16 +567,16 @@ export const CATEGORIES = [
     data: [],
     paddingClass: "md:pl-8",
   },
-  {
-    id: 8,
-    title: "Gương người tốt - việc tốt",
-    icon: Award,
-    iconColor: "text-blue-500",
-    hoverColor: "text-blue-600",
-    image: "https://suckhoethudo.vn/assets/guong nguoi tot-C7NJJGDV.png",
-    data: [],
-    paddingClass: "md:pl-8",
-  },
+  // {
+  //   id: 8,
+  //   title: "Gương người tốt - việc tốt",
+  //   icon: Award,
+  //   iconColor: "text-blue-500",
+  //   hoverColor: "text-blue-600",
+  //   image: "https://suckhoethudo.vn/assets/guong nguoi tot-C7NJJGDV.png",
+  //   data: [],
+  //   paddingClass: "md:pl-8",
+  // },
 ];
 
 export const capcuu = [
