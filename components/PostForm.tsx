@@ -39,7 +39,7 @@ const PostForm: React.FC<PostFormProps> = ({
     summary: "",
     content: "",
     category: "",
-    status: "draft",
+    status: "published",
     imageUrl: "",
   });
   const [loading, setLoading] = useState(false);
