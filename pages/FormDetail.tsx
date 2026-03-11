@@ -1,18 +1,44 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { api } from "@/api";
+import { useParams } from "react-router-dom";
 
-const FormDetail: React.FC = () => {
-  const { formId } = useParams<{ formId: string }>();
+import BieuMau1Table from "../components/formDetail/Form1";
+import SurveyForm from "../components/formDetail/Form2";
 
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8 text-center">Chi tiết biểu mẫu</h1>
-      <p className="text-center text-lg">
-        Đây là chi tiết cho biểu mẫu có ID: <span className="font-semibold text-primary-600">{formId}</span>
-      </p>
-      {/* You can fetch and display form details based on the formId */}
-    </div>
-  );
-};
+export default function EvaluationTable() {
+  const { id } = useParams();
 
-export default FormDetail;
+  const [formType, setFormType] = useState("");
+  const [formData, setFormData] = useState(null);
+
+  useEffect(() => {
+    const fetchForm = async () => {
+      try {
+        const res = await api.get(`/forms/${id}`);
+
+        setFormType(res.data.type);
+        setFormData(res.data);
+      } catch (error) {
+        console.error("Fetch form error:", error);
+      }
+    };
+
+    if (id) fetchForm();
+  }, [id]);
+
+  if (!formData) return null;
+
+  if (formType === "phuluc") {
+    return <BieuMau1Table id={id} type={formType} formData={formData} />;
+  }
+
+  if (formType === "bieumau") {
+    return (
+      <div className="bg-[radial-gradient(circle_at_top,_#f8fbff,_#eef4ff_45%,_#f8fafc_100%)]">
+        <SurveyForm id={id} type={formType} formJson={formData} />
+      </div>
+    );
+  }
+
+  return <div>Không xác định loại biểu mẫu</div>;
+}
