@@ -5,7 +5,7 @@ import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
 import { api } from "@/api";
 
-export default function SurveyForm({ id,formJson }) {
+export default function SurveyForm({ id,type,formJson }) {
   
   const { info, data, name, description } = formJson;
 const toRoman = (num) => {
@@ -104,18 +104,20 @@ const toRoman = (num) => {
       });
     });
 
-    const infoOk = validateInfo();
+    // const infoOk = validateInfo();
 
-    if (Object.keys(newErrors).length > 0 || !infoOk) {
+    if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
     const datamap = convertSubmissionData(tableData);
     const payload = {
-            form_id: Number(id),         
-            submission_data: datamap,
-            status: "pending",
-          }; 
+      form_id: Number(id),
+      info: info,
+      type: type,
+      submission_data: datamap,
+      status: "pending",
+    }; 
     const res = await api.post("/feedbacks", payload); 
   };
   const updateAnswerValue = (sIndex, oIndex, value) => {

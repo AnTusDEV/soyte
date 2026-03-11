@@ -29,14 +29,13 @@ export default function EvaluationTable() {
   if (!formData) return null;
 
   if (formType === "phuluc") {
-    return (
-    <BieuMau1Table id={id} formData={formData} />);
+    return <BieuMau1Table id={id} type={formType} formData={formData} />;
   }
 
   if (formType === "bieumau") {
     return (
       <div className="bg-[radial-gradient(circle_at_top,_#f8fbff,_#eef4ff_45%,_#f8fafc_100%)]">
-        <SurveyForm id={id} formJson={formData} />
+        <SurveyForm id={id} type={formType} formJson={formData} />
       </div>
     );
   }
