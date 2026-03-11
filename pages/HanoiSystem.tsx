@@ -344,7 +344,7 @@ const HanoiSystem = () => {
           >
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
             <MapEventHandler coords={selectedFacility?.coords || null} />
-            {filteredFacilities.map((fac: any) => (
+            {filteredFacilities.filter((fac: any) => fac.coords && fac.coords.length === 2).map((fac: any) => (
               <Marker
                 key={fac.id}
                 position={fac.coords}
