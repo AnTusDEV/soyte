@@ -15,28 +15,24 @@ const { info, data, name, description } = formJson;
  const [errors, setErrors] = useState<Record<string, boolean>>({});
  const [formData, setFormData] = useState({});
  const [infoErrors, setInfoErrors] = useState({});
- const handleChange = (key, value) => {
+  const [tableData, setTableData] = useState(data);
+  const [formInfo, setFormInfo] = useState({
+    title: formJson.name,
+    description: formJson.description,
+  });
+ const handleChange = (fieldKey, fieldData) => {
    setFormData((prev) => ({
      ...prev,
-     [key]: value,
+     [fieldKey]: fieldData,
    }));
 
    setInfoErrors((prev) => ({
      ...prev,
-     [key]: false,
+     [fieldKey]: false,
    }));
  };
- const [tableData, setTableData] = useState(formJson.data);
- const [formInfo, setFormInfo] = useState({
-   title: formJson.name,
-   description: formJson.description,
- });
 
- const [visible, setVisible] = useState(false);
- const [creatorName, setCreatorName] = useState("");
- const [age, setAge] = useState("");
- const [birthday, setBirthday] = useState("");
- const [email, setEmail] = useState("");
+
  const [openSections, setOpenSections] = useState<Record<number, boolean>>({});
 
  const toRoman = (num: number) => {
@@ -202,26 +198,24 @@ info.forEach((item, index) => {
 
    try {
      const payload = {
+       name: name,
+       description: description,
        form_id: Number(id),
-       creator_name: creatorName.trim(),
-       age: age.trim(),
-       birthday,
-       email: email.trim(),
-       type,
+       info: formData,
+       type: type,
        submission_data: tableData,
        status: "pending",
      };
-
-     await api.post("/feedbacks", payload);
-
-     toast.current?.show({
-       severity: "success",
-       summary: "Thành công",
-       detail: "Lưu thành công",
-     });
-
-     setVisible(false);
-     navigate("/");
+    
+          await api.post("/feedbacks", payload);
+    
+          toast.current?.show({
+            severity: "success",
+            summary: "Thành công",
+            detail: "Lưu thành công",
+          });
+    
+          navigate("/");
    } catch (error) {
      console.error("Submit error:", error);
      toast.current?.show({
@@ -249,155 +243,42 @@ info.forEach((item, index) => {
 
       <div className="mb-6 rounded-[28px] border border-white/60 bg-white/70 p-5 text-center shadow-[0_10px_30px_rgba(15,23,42,0.06)] backdrop-blur-xl sm:p-7">
         <h3 className="text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">
-          {formInfo.title}
+          {name}
         </h3>
         <p className="mt-2 text-sm text-slate-500 sm:text-base">
-          {formInfo.description}
+          {description}
         </p>
       </div>
 
-      {/* <div className="mb-5 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold text-slate-700">
-            Họ và tên <span className="text-red-500">*</span>
-          </label>
-          <span className="relative w-full">
-            <i className="pi pi-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-            <InputText
-              value={creatorName}
-              onChange={(e) => {
-                setCreatorName(e.target.value);
-                if (e.target.value.trim()) {
-                  setErrors((prev) => ({ ...prev, creatorName: false }));
-                }
-              }}
-              placeholder="Nhập họ và tên"
-              className={`h-[46px] w-full rounded-2xl border bg-white/80 pl-11 pr-4 text-[15px] text-slate-700 shadow-sm outline-none transition-all duration-200 placeholder:text-slate-400 hover:shadow-md ${
-                errors.creatorName
-                  ? "border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-100"
-                  : "border-slate-200 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
-              }`}
-            />
-          </span>
-          {errors.creatorName && (
-            <small className="text-red-500">Vui lòng nhập họ và tên</small>
-          )}
-        </div>
+      
+        <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                {info
+                  .filter((item) => item.status)
+                  .map((item, index) => {
+                    const fieldKey =
+                      item.key || item.value || item.name || `info-${index}`;
+                    const hasError = !!infoErrors[fieldKey];
 
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold text-slate-700">
-            Tuổi <span className="text-red-500">*</span>
-          </label>
-          <span className="relative w-full">
-            <i className="pi pi-id-card absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-            <InputText
-              value={age}
-              onChange={(e) => {
-                const value = e.target.value.replace(/\D/g, "");
-                setAge(value);
-                if (value.trim()) {
-                  setErrors((prev) => ({ ...prev, age: false }));
-                }
-              }}
-              placeholder="Nhập tuổi"
-              className={`h-[46px] w-full rounded-2xl border bg-white/80 pl-11 pr-4 text-[15px] text-slate-700 shadow-sm outline-none transition-all duration-200 placeholder:text-slate-400 hover:shadow-md ${
-                errors.age
-                  ? "border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-100"
-                  : "border-slate-200 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
-              }`}
-            />
-          </span>
-          {errors.age && (
-            <small className="text-red-500">Vui lòng nhập tuổi</small>
-          )}
+                    return (
+                      <div
+                        key={fieldKey}
+                        className={`rounded-[24px] p-4 shadow-sm backdrop-blur-xl ${
+                          hasError
+                            ? "border border-red-400 bg-red-50/80 ring-2 ring-red-200"
+                            : "border border-white/60 bg-white/70"
+                        }`}
+                      >
+                        <SurveyInfo
+                          info={item}
+                          fieldKey={fieldKey}
+                          value={formData[fieldKey]}
+                          onChange={handleChange}
+                          error={hasError}
+                        />
+                      </div>
+                    );
+                  })}
         </div>
-
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold text-slate-700">
-            Ngày sinh <span className="text-red-500">*</span>
-          </label>
-          <span className="relative w-full">
-            <i className="pi pi-calendar absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-            <InputText
-              value={birthday}
-              onChange={(e) => {
-                setBirthday(e.target.value);
-                if (e.target.value) {
-                  setErrors((prev) => ({ ...prev, birthday: false }));
-                }
-              }}
-              type="date"
-              className={`h-[46px] w-full rounded-2xl border bg-white/80 pl-11 pr-4 text-[15px] text-slate-700 shadow-sm outline-none transition-all duration-200 hover:shadow-md ${
-                errors.birthday
-                  ? "border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-100"
-                  : "border-slate-200 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
-              }`}
-            />
-          </span>
-          {errors.birthday && (
-            <small className="text-red-500">Vui lòng chọn ngày sinh</small>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold text-slate-700">
-            Email <span className="text-red-500">*</span>
-          </label>
-          <span className="relative w-full">
-            <i className="pi pi-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-            <InputText
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                if (
-                  e.target.value.trim() &&
-                  isValidEmail(e.target.value.trim())
-                ) {
-                  setErrors((prev) => ({ ...prev, email: false }));
-                }
-              }}
-              type="email"
-              placeholder="example@email.com"
-              className={`h-[46px] w-full rounded-2xl border bg-white/80 pl-11 pr-4 text-[15px] text-slate-700 shadow-sm outline-none transition-all duration-200 placeholder:text-slate-400 hover:shadow-md ${
-                errors.email
-                  ? "border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-100"
-                  : "border-slate-200 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
-              }`}
-            />
-          </span>
-          {errors.email && (
-            <small className="text-red-500">Vui lòng nhập email hợp lệ</small>
-          )}
-        </div>
-      </div> */}
-<div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {info
-          .filter((item) => item.status)
-          .map((item, index) => {
-            const fieldKey =
-              item.key || item.value || item.name || `info-${index}`;
-            const hasError = !!infoErrors[fieldKey];
-
-            return (
-              <div
-                key={fieldKey}
-                className={`rounded-[24px] p-4 shadow-sm backdrop-blur-xl ${
-                  hasError
-                    ? "border border-red-400 bg-red-50/80 ring-2 ring-red-200"
-                    : "border border-white/60 bg-white/70"
-                }`}
-              >
-                <SurveyInfo
-                  info={item}
-                  fieldKey={fieldKey}
-                  value={formJson[fieldKey]}
-                  onChange={handleChange}
-                  error={hasError}
-                />
-              </div>
-            );
-          })}
-      </div>
       <div className="overflow-hidden rounded-[30px] border border-slate-200 bg-white/70 shadow-[0_12px_40px_rgba(15,23,42,0.08)] backdrop-blur-xl">
         {tableData.map((section, sIndex) => {
           const sectionHasError = section.option.some((_, oIndex) => {

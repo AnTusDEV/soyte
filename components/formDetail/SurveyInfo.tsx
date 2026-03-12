@@ -1,4 +1,5 @@
 import { ALL_FACILITIES } from "@/constants";
+import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 const PAGE_SIZE = 10;
@@ -105,9 +106,14 @@ export default function SurveyInfo({ info, fieldKey, value, onChange, error }) {
         return (
           <input
             type="text"
-            value={value || ""}
+            value={value?.value || ""}
             className={commonInputClass}
-            onChange={(e) => onChange(fieldKey, e.target.value)}
+            onChange={(e) =>
+              onChange(fieldKey, {
+                key: info.key,
+                value: e.target.value,
+              })
+            }
             placeholder={info.placeholder || "Nhập nội dung"}
           />
         );
@@ -116,20 +122,31 @@ export default function SurveyInfo({ info, fieldKey, value, onChange, error }) {
         return (
           <input
             type="number"
-            value={value || ""}
+            value={value?.value || ""}
             className={commonInputClass}
-            onChange={(e) => onChange(fieldKey, e.target.value)}
+            onChange={(e) =>
+              onChange(fieldKey, {
+                key: info.key,
+                value: e.target.value,
+              })
+            }
             placeholder={info.placeholder || "Nhập số"}
           />
         );
 
       case "date":
         return (
-          <input
-            type="date"
-            value={value || ""}
-            className={commonInputClass}
-            onChange={(e) => onChange(fieldKey, e.target.value)}
+          <Calendar
+            value={value?.value ? new Date(value.value) : null}
+            onChange={(e) =>
+              onChange(fieldKey, {
+                key: info.key,
+                value: e.value ? new Date(e.value).toISOString() : "",
+              })
+            }
+            dateFormat="dd/mm/yy"
+            className="w-full"
+            inputClassName={commonInputClass}
           />
         );
 
@@ -137,25 +154,32 @@ export default function SurveyInfo({ info, fieldKey, value, onChange, error }) {
       case "facility_multiselect":
         return (
           <Dropdown
-            value={value ?? null}
+            value={value?.value?.key ?? null}
             options={visibleOptions}
             optionLabel="value"
             optionValue="key"
             placeholder="Chọn"
             filter
-            filterBy={null}
-            onFilter={(e) => setSearchText(e.filter)}
             filterPlaceholder="Tìm kiếm..."
             className="w-full"
             pt={dropdownPt}
-            onChange={(e) => onChange(fieldKey, e.value)}
+            onFilter={(e) => setSearchText(e.filter)}
+            onChange={(e) => {
+              const selectedOption =
+                visibleOptions.find(
+                  (opt) => String(opt.key) === String(e.value),
+                ) || null;
+
+              onChange(fieldKey, {
+                key: info.key,
+                value: selectedOption,
+              });
+            }}
           />
         );
 
-
       default:
         return null;
-
     }
   };
 

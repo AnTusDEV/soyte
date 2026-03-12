@@ -42,15 +42,15 @@ export default function SurveyForm({ id, type, formJson }) {
   const [openSections, setOpenSections] = useState({});
   const [checkRating, setcheckRating] = useState(false);
   const [errors, setErrors] = useState({});
-  const handleChange = (key, value) => {
+  const handleChange = (fieldKey, fieldData) => {
     setFormData((prev) => ({
       ...prev,
-      [key]: value,
+      [fieldKey]: fieldData,
     }));
 
     setInfoErrors((prev) => ({
       ...prev,
-      [key]: false,
+      [fieldKey]: false,
     }));
   };
   const validateInfo = () => {
@@ -184,7 +184,9 @@ export default function SurveyForm({ id, type, formJson }) {
 
       const payload = {
         form_id: Number(id),
-        info: info,
+        name: name,
+        description: description,
+        info: formData,
         type: type,
         submission_data: tableData,
         status: "pending",
@@ -288,7 +290,7 @@ export default function SurveyForm({ id, type, formJson }) {
                   : "border border-transparent"
               }`}
             >
-              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 md:justify-end">
+              <div className="flex flex-nowrap items-center justify-center md:justify-end gap-1 overflow-x-auto">
                 {[1, 2, 3, 4, 5, 0].map((score) => {
                   const active = item.ratingVote?.value === score;
 
@@ -297,17 +299,18 @@ export default function SurveyForm({ id, type, formJson }) {
                       key={score}
                       htmlFor={`vote-${sIndex}-${oIndex}-${score}`}
                       className={`
-                        inline-flex h-10 min-w-[56px] cursor-pointer select-none
-                        items-center justify-center gap-2 rounded-full border px-3
-                        text-sm font-medium transition-all duration-200 sm:min-w-[60px] sm:px-4
-                        ${
-                          active
-                            ? "border-blue-500 bg-blue-500 text-white shadow-md shadow-blue-200"
-                            : hasError
-                              ? "border-red-300 bg-white text-slate-700 hover:border-red-400"
-                              : "border-slate-300 bg-white text-slate-700 hover:border-slate-400 hover:bg-slate-50"
-                        }
-                      `}
+              inline-flex h-9 cursor-pointer select-none
+              items-center justify-center gap-1 rounded-full border
+              px-2 text-xs font-medium transition-all duration-200
+              sm:h-10 sm:px-3 sm:text-sm
+              ${
+                active
+                  ? "border-blue-500 bg-blue-500 text-white shadow-md shadow-blue-200"
+                  : hasError
+                    ? "border-red-300 bg-white text-slate-700 hover:border-red-400"
+                    : "border-slate-300 bg-white text-slate-700 hover:border-slate-400 hover:bg-slate-50"
+              }
+            `}
                     >
                       <RadioButton
                         inputId={`vote-${sIndex}-${oIndex}-${score}`}
@@ -316,19 +319,18 @@ export default function SurveyForm({ id, type, formJson }) {
                         checked={active}
                         onChange={() => updateRatingVote(sIndex, oIndex, score)}
                         className={`
-                          shrink-0
-                          [&_.p-radiobutton-box]:h-5
-                          [&_.p-radiobutton-box]:w-5
-                          [&_.p-radiobutton-box]:border-2
-                          [&_.p-radiobutton-box]:shadow-none
-                          ${
-                            active
-                              ? "[&_.p-radiobutton-box]:border-white/90 [&_.p-radiobutton-box]:bg-transparent"
-                              : "[&_.p-radiobutton-box]:border-slate-400 [&_.p-radiobutton-box]:bg-white"
-                          }
-                          [&_.p-radiobutton-icon]:scale-75
-                          [&_.p-radiobutton-icon]:bg-white
-                        `}
+                shrink-0
+                [&_.p-radiobutton-box]:h-4
+                [&_.p-radiobutton-box]:w-4
+                sm:[&_.p-radiobutton-box]:h-5
+                sm:[&_.p-radiobutton-box]:w-5
+                [&_.p-radiobutton-box]:border-2
+                ${
+                  active
+                    ? "[&_.p-radiobutton-box]:border-white/90"
+                    : "[&_.p-radiobutton-box]:border-slate-400"
+                }
+              `}
                       />
                       <span className="leading-none">{score}</span>
                     </label>

@@ -48,7 +48,21 @@ const FormList: React.FC = () => {
             <Home size={14} /> Trang chủ
           </Link>
           <ChevronRight size={14} className="mx-2 text-gray-300" />
-          <span className="text-primary-700">Chính sách - BHYT</span>
+          {type === "phuluc" && (
+            <>
+              <span className="text-primary-700">
+                Phản ánh y tế
+              </span>
+              
+            </>
+          )}
+          {type === "bieumau" && (
+            <>
+              <span className="text-primary-700">
+                Giám sát chất lượng dịch vụ y tế
+              </span>
+            </>
+          )}
         </div>
       </div>
 
