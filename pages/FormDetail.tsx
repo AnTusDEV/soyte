@@ -29,7 +29,7 @@ export default function EvaluationTable() {
   if (!formData) return null;
 
   if (formType === "phuluc") {
-    return <BieuMau1Table id={id} type={formType} formData={formData} />;
+    return <BieuMau1Table id={id} type={formType} formJson={formData} />;
   }
 
   if (formType === "bieumau") {

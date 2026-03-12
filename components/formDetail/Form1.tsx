@@ -6,16 +6,30 @@ import { RadioButton } from "primereact/radiobutton";
 import React, { useRef, useState } from "react";
 import { Toast } from "primereact/toast";
 import { useNavigate } from "react-router-dom";
+import SurveyInfo from "./SurveyInfo";
 
-export default function BieuMau1Table({ id, type, formData }) {
+export default function BieuMau1Table({ id, type, formJson }) {
  const toast = useRef<Toast>(null);
  const navigate = useNavigate();
-
+const { info, data, name, description } = formJson;
  const [errors, setErrors] = useState<Record<string, boolean>>({});
- const [tableData, setTableData] = useState(formData.data);
+ const [formData, setFormData] = useState({});
+ const [infoErrors, setInfoErrors] = useState({});
+ const handleChange = (key, value) => {
+   setFormData((prev) => ({
+     ...prev,
+     [key]: value,
+   }));
+
+   setInfoErrors((prev) => ({
+     ...prev,
+     [key]: false,
+   }));
+ };
+ const [tableData, setTableData] = useState(formJson.data);
  const [formInfo, setFormInfo] = useState({
-   title: formData.name,
-   description: formData.description,
+   title: formJson.name,
+   description: formJson.description,
  });
 
  const [visible, setVisible] = useState(false);
@@ -110,27 +124,22 @@ const validateForm = () => {
   const newErrors: Record<string, boolean> = {};
   const sectionsToOpen: Record<number, boolean> = {};
   let isValid = true;
+  const newInfoErrors = {};
+  
+info.forEach((item, index) => {
+  if (!item.status) return;
 
-  if (!creatorName.trim()) {
-    newErrors["creatorName"] = true;
+  const key = item.key || item.name || `info-${index}`;
+  const value = formData[key];
+
+  const isEmpty =
+    value === undefined || value === null || String(value).trim() === "";
+
+  if (isEmpty) {
+    newInfoErrors[key] = true;
     isValid = false;
   }
-
-  if (!age.trim()) {
-    newErrors["age"] = true;
-    isValid = false;
-  }
-
-  if (!birthday) {
-    newErrors["birthday"] = true;
-    isValid = false;
-  }
-
-  if (!email.trim() || !isValidEmail(email.trim())) {
-    newErrors["email"] = true;
-    isValid = false;
-  }
-
+});
   tableData.forEach((section: any, sectionIndex: number) => {
     section.option.forEach((item: any, optionIndex: number) => {
       const progressValue = item?.progress?.value;
@@ -168,7 +177,7 @@ const validateForm = () => {
   });
 
   setErrors(newErrors);
-
+  setInfoErrors(newInfoErrors);
   if (!isValid) {
     setOpenSections((prev) => ({
       ...prev,
@@ -180,7 +189,7 @@ const validateForm = () => {
 };
  const submitForm = async () => {
    const isValid = validateForm();
-  console.log("data", tableData);
+  
   
    if (!isValid) {
      toast.current?.show({
@@ -247,7 +256,7 @@ const validateForm = () => {
         </p>
       </div>
 
-      <div className="mb-5 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+      {/* <div className="mb-5 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         <div className="flex flex-col gap-2">
           <label className="text-sm font-semibold text-slate-700">
             Họ và tên <span className="text-red-500">*</span>
@@ -360,8 +369,35 @@ const validateForm = () => {
             <small className="text-red-500">Vui lòng nhập email hợp lệ</small>
           )}
         </div>
-      </div>
+      </div> */}
+<div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {info
+          .filter((item) => item.status)
+          .map((item, index) => {
+            const fieldKey =
+              item.key || item.value || item.name || `info-${index}`;
+            const hasError = !!infoErrors[fieldKey];
 
+            return (
+              <div
+                key={fieldKey}
+                className={`rounded-[24px] p-4 shadow-sm backdrop-blur-xl ${
+                  hasError
+                    ? "border border-red-400 bg-red-50/80 ring-2 ring-red-200"
+                    : "border border-white/60 bg-white/70"
+                }`}
+              >
+                <SurveyInfo
+                  info={item}
+                  fieldKey={fieldKey}
+                  value={formJson[fieldKey]}
+                  onChange={handleChange}
+                  error={hasError}
+                />
+              </div>
+            );
+          })}
+      </div>
       <div className="overflow-hidden rounded-[30px] border border-slate-200 bg-white/70 shadow-[0_12px_40px_rgba(15,23,42,0.08)] backdrop-blur-xl">
         {tableData.map((section, sIndex) => {
           const sectionHasError = section.option.some((_, oIndex) => {

@@ -1,8 +1,22 @@
 import { ALL_FACILITIES } from "@/constants";
 import { Dropdown } from "primereact/dropdown";
-import React from "react";
-
+import React, { useEffect, useMemo, useRef, useState } from "react";
+const PAGE_SIZE = 10;
 export default function SurveyInfo({ info, fieldKey, value, onChange, error }) {
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  const [searchText, setSearchText] = useState("");
+  const panelRef = useRef(null);
+  const handlePanelScroll = (e) => {
+    const el = e.target;
+    const isNearBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 20;
+
+    if (isNearBottom && visibleCount < filteredOptions.length) {
+      setVisibleCount((prev) =>
+        Math.min(prev + PAGE_SIZE, filteredOptions.length),
+      );
+    }
+  };
   const commonInputClass = `
     w-full h-[46px] rounded-xl border bg-white px-4 text-[15px] text-slate-700
     shadow-sm outline-none transition-all duration-200
@@ -36,6 +50,7 @@ export default function SurveyInfo({ info, fieldKey, value, onChange, error }) {
     },
     wrapper: {
       className: "max-h-60",
+      onScroll: handlePanelScroll,
     },
     item: ({ context }) => ({
       className: `
@@ -53,15 +68,40 @@ export default function SurveyInfo({ info, fieldKey, value, onChange, error }) {
     },
   };
 
-  const selectOptions = info.option?.length
-    ? info.option
-    : ALL_FACILITIES.filter(({ type }) =>
-        info.facilityTypeFilter?.includes(type),
-      ).map(({ id, name }) => ({
-        key: id,
-        value: name,
-      }));
+  const selectOptions = useMemo(() => {
+    if (info.option?.length) return info.option;
 
+    if (!info.facilityTypeFilter?.length) return [];
+
+    return ALL_FACILITIES.filter(({ type }) =>
+      info.facilityTypeFilter.includes(type),
+    ).map(({ id, name }) => ({
+      key: id,
+      value: name,
+    }));
+  }, [info.option, info.facilityTypeFilter]);
+  
+  
+  const filteredOptions = useMemo(() => {
+    const keyword = searchText.trim().toLowerCase();
+
+    if (!keyword) return selectOptions;
+
+    return selectOptions.filter((item) =>
+      String(item.value).toLowerCase().includes(keyword),
+    );
+  }, [selectOptions, searchText]);
+  const visibleOptions = useMemo(() => {
+    return filteredOptions.slice(0, visibleCount);
+  }, [filteredOptions, visibleCount]);
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [searchText, selectOptions]);
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [selectOptions]);
+
+  
   const renderField = () => {
     switch (info.type) {
       case "text":
@@ -101,11 +141,13 @@ export default function SurveyInfo({ info, fieldKey, value, onChange, error }) {
         return (
           <Dropdown
             value={value ?? null}
-            options={selectOptions}
+            options={visibleOptions}
             optionLabel="value"
             optionValue="key"
             placeholder="Chọn"
             filter
+            filterBy={null}
+            onFilter={(e) => setSearchText(e.filter)}
             filterPlaceholder="Tìm kiếm..."
             className="w-full"
             pt={dropdownPt}
