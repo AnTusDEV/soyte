@@ -38,7 +38,6 @@ export default function SurveyInfo({ info }) {
             onChange={(e) => handleChange(field.value, e.target.value)}
           >
             <option value="">Chọn</option>
-
             {field.option.map((op) => (
               <option key={op.key} value={op.key}>
                 {op.value}
@@ -47,8 +46,10 @@ export default function SurveyInfo({ info }) {
           </select>
         );
 
+
       default:
         return null;
+
     }
   };
 
@@ -59,3 +60,4 @@ export default function SurveyInfo({ info }) {
     </div>
   );
 }
+
