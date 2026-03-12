@@ -124,7 +124,7 @@ const FeedbacksManagement: React.FC = () => {
             tableStyle={{ minWidth: '50rem' }}
             emptyMessage="Không có dữ liệu phản hồi"
           >
-            <Column field="id" header="ID" sortable style={{ width: '5rem' }} body={(row) => row.id || row._id || '-'}></Column>
+            <Column field="id" header="STT" sortable style={{ width: '5rem' }} body={(row) => row.id || row._id || '-'}></Column>
             <Column header="Người gửi" sortable style={{ width: '15rem' }} body={nameBodyTemplate}></Column>
             {/* <Column field="phone" header="Số điện thoại" style={{ width: '10rem' }}></Column>
             <Column field="email" header="Email" style={{ width: '15rem' }}></Column>

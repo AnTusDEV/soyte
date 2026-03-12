@@ -5,3 +5,109 @@
 .p-sidebar-content {
   padding: 0px;
 }
+
+/* ── Facility MultiSelect Panel ── */
+.facility-ms-panel {
+  border-radius: 12px !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12), 0 2px 8px rgba(99,102,241,0.08) !important;
+  border: 1px solid #e0e7ff !important;
+  overflow: hidden !important;
+  max-width: 600px !important;
+}
+
+/* Header (select all row) */
+.facility-ms-panel .p-multiselect-header {
+  padding: 10px 14px !important;
+  background: #f8fafc !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  gap: 10px !important;
+}
+
+/* Filter input */
+.facility-ms-panel .p-multiselect-filter {
+  padding: 8px 12px !important;
+  border: 1.5px solid #c7d2fe !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  width: 100% !important;
+}
+
+.facility-ms-panel .p-multiselect-filter:focus {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15) !important;
+  outline: none !important;
+}
+
+/* Items */
+.facility-ms-panel .p-multiselect-item {
+  padding: 10px 14px !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  gap: 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  font-size: 13px !important;
+  transition: background 0.12s !important;
+}
+
+.facility-ms-panel .p-multiselect-item:hover {
+  background: #f8fafc !important;
+}
+
+.facility-ms-panel .p-multiselect-item.p-highlight {
+  background: #eef2ff !important;
+  color: #4338ca !important;
+  font-weight: 500 !important;
+}
+
+/* ── Checkbox base ── */
+.facility-ms-panel .p-checkbox {
+  flex-shrink: 0 !important;
+}
+
+.facility-ms-panel .p-checkbox .p-checkbox-box {
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 6px !important;
+  border: 2px solid #94a3b8 !important;
+  background: #fff !important;
+  transition: all 0.15s ease !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.facility-ms-panel .p-multiselect-item:hover .p-checkbox .p-checkbox-box {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15) !important;
+}
+
+/* ── Checkbox SELECTED – PrimeReact v10 dùng data-p-highlight thay vì .p-highlight ── */
+.facility-ms-panel .p-checkbox .p-checkbox-box[data-p-highlight="true"],
+.facility-ms-panel .p-checkbox[data-p-highlight="true"] .p-checkbox-box {
+  background: #6366f1 !important;
+  border-color: #6366f1 !important;
+  box-shadow: 0 2px 8px rgba(99,102,241,0.35) !important;
+}
+
+/* Icon checkmark bên trong (SVG dùng fill="currentColor") */
+.facility-ms-panel .p-checkbox .p-checkbox-box[data-p-highlight="true"] .p-checkbox-icon,
+.facility-ms-panel .p-checkbox[data-p-highlight="true"] .p-checkbox-box .p-checkbox-icon {
+  color: #fff !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* SVG path dùng fill="currentColor" → inherit color: white từ trên */
+.facility-ms-panel .p-checkbox .p-checkbox-box[data-p-highlight="true"] svg,
+.facility-ms-panel .p-checkbox[data-p-highlight="true"] .p-checkbox-box svg {
+  color: #fff !important;
+  display: block !important;
+  visibility: visible !important;
+}
+
+.facility-ms-panel .p-checkbox .p-checkbox-box[data-p-highlight="true"] svg path,
+.facility-ms-panel .p-checkbox[data-p-highlight="true"] .p-checkbox-box svg path {
+  fill: currentColor !important;
+}

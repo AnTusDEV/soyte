@@ -6,10 +6,9 @@ export default function SurveyInfo({ info, fieldKey, value, onChange, error }) {
   const commonInputClass = `
     w-full h-[46px] rounded-xl border bg-white px-4 text-[15px] text-slate-700
     shadow-sm outline-none transition-all duration-200
-    ${
-      error
-        ? "border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-100"
-        : "border-slate-300 hover:border-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
+    ${error
+      ? "border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-100"
+      : "border-slate-300 hover:border-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
     }
   `;
 
@@ -17,10 +16,9 @@ export default function SurveyInfo({ info, fieldKey, value, onChange, error }) {
     root: {
       className: `
         w-full rounded-xl border bg-white text-[15px] text-slate-700 shadow-sm transition-all duration-200
-        ${
-          error
-            ? "border-red-500 ring-2 ring-red-100"
-            : "border-slate-300 hover:border-slate-400 focus-within:border-blue-400 focus-within:ring-4 focus-within:ring-blue-100"
+        ${error
+          ? "border-red-500 ring-2 ring-red-100"
+          : "border-slate-300 hover:border-slate-400 focus-within:border-blue-400 focus-within:ring-4 focus-within:ring-blue-100"
         }
       `,
     },
@@ -40,10 +38,9 @@ export default function SurveyInfo({ info, fieldKey, value, onChange, error }) {
     item: ({ context }) => ({
       className: `
         px-4 py-2 text-[14px] cursor-pointer transition-colors
-        ${
-          context.selected
-            ? "bg-blue-500 text-white"
-            : "text-slate-700 hover:bg-blue-50"
+        ${context.selected
+          ? "bg-blue-500 text-white"
+          : "text-slate-700 hover:bg-blue-50"
         }
       `,
     }),
@@ -56,11 +53,11 @@ export default function SurveyInfo({ info, fieldKey, value, onChange, error }) {
   const selectOptions = info.option?.length
     ? info.option
     : ALL_FACILITIES.filter(({ type }) =>
-        info.facilityTypeFilter?.includes(type),
-      ).map(({ id, name }) => ({
-        key: id,
-        value: name,
-      }));
+      info.facilityTypeFilter?.includes(type),
+    ).map(({ id, name }) => ({
+      key: id,
+      value: name,
+    }));
 
   const renderField = () => {
     switch (info.type) {
@@ -104,8 +101,7 @@ export default function SurveyInfo({ info, fieldKey, value, onChange, error }) {
             options={selectOptions}
             optionLabel="value"
             optionValue="key"
-            placeholder="Chọn"
-            filter
+            placeholder="Chọn" filter
             filterPlaceholder="Tìm kiếm..."
             className="w-full"
             pt={dropdownPt}
@@ -113,8 +109,10 @@ export default function SurveyInfo({ info, fieldKey, value, onChange, error }) {
           />
         );
 
+
       default:
         return null;
+
     }
   };
 
@@ -132,3 +130,4 @@ export default function SurveyInfo({ info, fieldKey, value, onChange, error }) {
     </div>
   );
 }
+
