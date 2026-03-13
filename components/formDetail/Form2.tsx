@@ -6,7 +6,7 @@ import { api } from "@/api";
 import { Toast } from "primereact/toast";
 import { useNavigate } from "react-router-dom";
 
-const RATING_OPTIONS = [1, 2, 3, 4, 5, 0];
+const RATING_OPTIONS = [0, 1, 2, 3, 4, 5];
 
 const RATING_GUIDE = [
   { score: 1, text1: "Rất không hài lòng", text2: "hoặc: Rất kém" },
@@ -81,7 +81,7 @@ const QuestionCard = memo(function QuestionCard({
                         sm:h-10 sm:px-4 sm:text-sm
                         ${
                           active
-                            ? "border-blue-500 bg-blue-500 text-white shadow-md shadow-blue-200"
+                            ? "border-primary-700 bg-primary-700 text-white shadow-md shadow-blue-200"
                             : hasError
                               ? "border-red-300 bg-white text-slate-700 hover:border-red-400"
                               : "border-slate-300 bg-white text-slate-700 hover:border-slate-400 hover:bg-slate-50"
@@ -301,6 +301,8 @@ export default function SurveyForm({ id, type, formJson }: any) {
   };
 
   const [formData, setFormData] = useState<Record<string, any>>({});
+  const [customerName, setCustomerName] = useState("");
+  const [fullNameError, setFullNameError] = useState(false);
   const [infoErrors, setInfoErrors] = useState<Record<string, boolean>>({});
   const [tableData, setTableData] = useState<any[]>(data);
   const [openSection, setOpenSection] = useState<number | null>(() => {
@@ -362,6 +364,13 @@ export default function SurveyForm({ id, type, formJson }: any) {
     const newInfoErrors: Record<string, boolean> = {};
     let firstErrorSection: number | null = null;
     let isValid = true;
+
+     if (!customerName.trim()) {
+       setFullNameError(true);
+       isValid = false;
+     } else {
+       setFullNameError(false);
+     }
 
     info.forEach((item: any, index: number) => {
       if (!item.status) return;
@@ -455,9 +464,12 @@ export default function SurveyForm({ id, type, formJson }: any) {
     try {
       const payload = {
         form_id: Number(id),
-        name,
-        description,
-        info: formData,
+        creator_name: customerName,
+        info: {
+          title: name,
+          description,
+          ...formData,
+        },
         type,
         submission_data: tableData,
         status: "pending",
@@ -477,7 +489,7 @@ export default function SurveyForm({ id, type, formJson }: any) {
       }
 
       navigateTimeoutRef.current = setTimeout(() => {
-        navigate("/");
+        navigate(-1);
       }, 500);
     } catch (error) {
       console.error("Submit error:", error);
@@ -562,6 +574,44 @@ export default function SurveyForm({ id, type, formJson }: any) {
       </div>
 
       <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div
+          className={`rounded-[24px] p-4 shadow-sm backdrop-blur-xl ${
+            fullNameError
+              ? "border border-red-400 bg-red-50/80 ring-2 ring-red-200"
+              : "border border-white/60 bg-white/70"
+          }`}
+        >
+          <div className="mb-2 min-h-[48px]">
+            <label className="mb-1 block font-medium text-slate-700">
+              Họ và Tên
+            </label>
+          </div>
+          <input
+            type="text"
+            value={customerName}
+            className={`
+              w-full h-[46px] rounded-xl border bg-white px-4 text-[15px] text-slate-700
+              shadow-sm outline-none transition-all duration-200
+              ${
+                fullNameError
+                  ? "border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-100"
+                  : "border-slate-300 hover:border-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
+              }
+            `}
+            placeholder={info.placeholder || "Nhập nội dung"}
+            onChange={(e) => {
+              setCustomerName(e.target.value);
+              if (customerName && e.target.value.trim()) {
+                setFullNameError(false);
+              }
+            }}
+          />
+          {fullNameError && (
+            <div className="mt-2 text-sm text-red-500">
+              Vui lòng nhập thông tin này
+            </div>
+          )}
+        </div>
         {(info ?? [])
           .filter((item: any) => item?.status)
           .map((item: any, index: number) => {
@@ -590,23 +640,22 @@ export default function SurveyForm({ id, type, formJson }: any) {
       </div>
 
       {!checkRating && (
-        <div className="mb-6 overflow-hidden rounded-[28px] border border-slate-200 bg-white/75 shadow-[0_10px_30px_rgba(15,23,42,0.06)] backdrop-blur-xl">
+        <div className="mb-6 overflow-hidden rounded-[28px]  border border-slate-200 bg-white/75 shadow-[0_10px_30px_rgba(15,23,42,0.06)] backdrop-blur-xl">
           <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6">
             {RATING_GUIDE.map((item, idx, arr) => (
               <div
                 key={item.score}
-                className={`p-4 text-center ${
+                className={`p-4 text-center  ${
                   idx !== arr.length - 1
                     ? "border-b border-slate-200 md:border-b-0 xl:border-r"
                     : ""
                 }`}
               >
-                <div className="mb-2 flex justify-center">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 bg-white text-sm font-semibold text-slate-700 shadow-sm">
+                <div className="mb-2 flex justify-center ">
+                  <div className="flex h-9 w-9 items-center  justify-center rounded-full border border-slate-300 bg-white text-sm font-semibold text-slate-700 shadow-sm">
                     {item.score}
                   </div>
                 </div>
-                <div className="text-sm text-slate-500">là:</div>
                 <div className="mt-1 text-sm font-semibold text-slate-700">
                   {item.text1}
                 </div>
@@ -652,7 +701,7 @@ export default function SurveyForm({ id, type, formJson }: any) {
                   } text-xs`}
                 />
 
-                <span className="min-w-[30px] font-semibold">
+                <span className="min-w-[30px] font-semibold ">
                   {toRoman(sIndex)}
                 </span>
 

@@ -435,6 +435,7 @@ export default function BieuMau1Table({ id, type, formJson }: any) {
   const [tableData, setTableData] = useState<any[]>(() => data || []);
   const [openSection, setOpenSection] = useState<number | null>(0);
   const sectionRefs = useRef<Record<number, HTMLDivElement | null>>({});
+  const navigateTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const visibleInfo = useMemo(() => {
     return (info ?? [])
       .filter((item) => item?.status)
@@ -674,10 +675,12 @@ useEffect(() => {
 
     try {
       const payload = {
-        name,
-        description,
         form_id: Number(id),
-        info: formData,
+        info: {
+          title: name,
+          description,
+          ...formData,
+        },
         type,
         submission_data: tableData,
         status: "pending",
@@ -691,7 +694,13 @@ useEffect(() => {
         detail: "Lưu thành công",
       });
 
-      navigate("/");
+     if (navigateTimeoutRef.current) {
+       clearTimeout(navigateTimeoutRef.current);
+     }
+
+     navigateTimeoutRef.current = setTimeout(() => {
+       navigate(-1);
+     }, 500);
     } catch (error) {
       console.error("Submit error:", error);
       toast.current?.show({
