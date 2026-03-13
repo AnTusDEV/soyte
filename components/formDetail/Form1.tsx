@@ -435,6 +435,8 @@ export default function BieuMau1Table({ id, type, formJson }: any) {
   const [tableData, setTableData] = useState<any[]>(() => data || []);
   const [openSection, setOpenSection] = useState<number | null>(0);
   const sectionRefs = useRef<Record<number, HTMLDivElement | null>>({});
+  const [customerName, setCustomerName] = useState("");
+  const [fullNameError, setFullNameError] = useState(false);
   const navigateTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const visibleInfo = useMemo(() => {
     return (info ?? [])
@@ -661,10 +663,16 @@ useEffect(() => {
     return isValid;
   }, [formData, tableData, visibleInfo]);
 
-  const submitForm = useCallback(async () => {
+  const submitForm = useCallback(async () => { 
+    let isValid2 = true;
+    if (!customerName.trim()) {
+      setFullNameError(true);
+      isValid2 = false;
+    } else {
+      setFullNameError(false);
+    }
     const isValid = validateForm();
-
-    if (!isValid) {
+    if (!isValid || !isValid2) {
       toast.current?.show({
         severity: "error",
         summary: "Thiếu thông tin",
@@ -676,6 +684,7 @@ useEffect(() => {
     try {
       const payload = {
         form_id: Number(id),
+        creator_name: customerName,
         info: {
           title: name,
           description,
@@ -713,6 +722,7 @@ useEffect(() => {
     validateForm,
     name,
     description,
+    customerName,
     id,
     formData,
     type,
@@ -734,6 +744,44 @@ useEffect(() => {
       </div>
 
       <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div
+          className={`rounded-[24px] p-4 shadow-sm backdrop-blur-xl ${
+            fullNameError
+              ? "border border-red-400 bg-red-50/80 ring-2 ring-red-200"
+              : "border border-white/60 bg-white/70"
+          }`}
+        >
+          <div className="mb-2 min-h-[48px]">
+            <label className="mb-1 block font-medium text-slate-700">
+              Họ và Tên
+            </label>
+          </div>
+          <input
+            type="text"
+            value={customerName}
+            className={`
+              w-full h-[46px] rounded-xl border bg-white px-4 text-[15px] text-slate-700
+              shadow-sm outline-none transition-all duration-200
+              ${
+                fullNameError
+                  ? "border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-100"
+                  : "border-slate-300 hover:border-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
+              }
+            `}
+            placeholder={info.placeholder || "Nhập nội dung"}
+            onChange={(e) => {
+              setCustomerName(e.target.value);
+              if (customerName && e.target.value.trim()) {
+                setFullNameError(false);
+              }
+            }}
+          />
+          {fullNameError && (
+            <div className="mt-2 text-sm text-red-500">
+              Vui lòng nhập thông tin này
+            </div>
+          )}
+        </div>
         {visibleInfo.map(({ item, fieldKey }: any) => (
           <SurveyInfoCard
             key={fieldKey}
