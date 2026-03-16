@@ -17,6 +17,7 @@ import AdminLayout from "../components/AdminLayout";
 import { Dropdown, Button } from "@/components/prime";
 import { Toast } from "primereact/toast";
 import { confirmDialog } from "primereact/confirmdialog";
+import FacilityForm from "../components/FacilityForm";
 
 const FACILITY_TYPES = [
   { id: "all", title: "Tất cả các loại" },
@@ -34,6 +35,8 @@ const SocialFacilitiesManagement = () => {
   const [filterType, setFilterType] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingFacility, setEditingFacility] = useState<any>(null);
 
   const toast = useRef<Toast>(null);
 
@@ -41,7 +44,7 @@ const SocialFacilitiesManagement = () => {
     setLoading(true);
     try {
       // Fetch all facilities at once for FE pagination
-      const response = await api.get(`/social-facilities?limit=1000`);
+      const response = await api.get(`/social-facilities`);
       if (response && response.success) {
         setAllFacilities(response.data);
       } else {
@@ -132,11 +135,10 @@ const SocialFacilitiesManagement = () => {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
         <button
           onClick={() => setFilterType("all")}
-          className={`p-4 rounded-2xl shadow-sm border transition-all duration-300 flex flex-col items-center justify-center text-center transform hover:-translate-y-1 active:scale-95 ${
-            filterType === "all"
-              ? "bg-primary-50 border-primary-500 ring-2 ring-primary-100 ring-offset-2 shadow-md"
-              : "bg-white border-gray-100 hover:border-primary-500 hover:shadow-md"
-          }`}
+          className={`p-4 rounded-2xl shadow-sm border transition-all duration-300 flex flex-col items-center justify-center text-center transform hover:-translate-y-1 active:scale-95 ${filterType === "all"
+            ? "bg-primary-50 border-primary-500 ring-2 ring-primary-100 ring-offset-2 shadow-md"
+            : "bg-white border-gray-100 hover:border-primary-500 hover:shadow-md"
+            }`}
         >
           <p className="text-gray-400 text-[9px] font-black uppercase mb-1">
             Tổng số
@@ -149,11 +151,10 @@ const SocialFacilitiesManagement = () => {
           <button
             key={stat.id}
             onClick={() => setFilterType(stat.id)}
-            className={`p-4 rounded-2xl shadow-sm border transition-all duration-300 flex flex-col items-center justify-center text-center transform hover:-translate-y-1 active:scale-95 ${
-              filterType === stat.id
-                ? "bg-primary-50 border-primary-500 ring-2 ring-primary-100 ring-offset-2 shadow-md"
-                : "bg-white border-gray-100 hover:border-primary-500 hover:shadow-md"
-            }`}
+            className={`p-4 rounded-2xl shadow-sm border transition-all duration-300 flex flex-col items-center justify-center text-center transform hover:-translate-y-1 active:scale-95 ${filterType === stat.id
+              ? "bg-primary-50 border-primary-500 ring-2 ring-primary-100 ring-offset-2 shadow-md"
+              : "bg-white border-gray-100 hover:border-primary-500 hover:shadow-md"
+              }`}
           >
             <p className="text-gray-400 text-[9px] font-black uppercase mb-1">
               {stat.title}
@@ -183,11 +184,8 @@ const SocialFacilitiesManagement = () => {
           <div className="flex items-center gap-3 w-full md:w-auto">
             <Button
               onClick={() => {
-                toast.current?.show({
-                  severity: "info",
-                  summary: "Thông báo",
-                  detail: "Chức năng thêm mới đang được phát triển",
-                });
+                setEditingFacility(null);
+                setIsFormOpen(true);
               }}
               className="!bg-secondary-600 hover:!bg-secondary-700 text-white font-black py-2.5 px-6 rounded-xl shadow-lg shadow-secondary-100 flex items-center gap-2 transition-all transform hover:-translate-y-0.5"
             >
@@ -247,9 +245,6 @@ const SocialFacilitiesManagement = () => {
                           {FACILITY_TYPES.find((t) => t.id === item.type)?.title ||
                             item.type}
                         </span>
-                        {/* <span className="text-[11px] text-gray-500 font-medium">
-                          {item.category}
-                        </span> */}
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -274,7 +269,10 @@ const SocialFacilitiesManagement = () => {
                           icon={<Edit3 size={18} />}
                           text
                           rounded
-                          tooltip="Chỉnh sửa (Sắp ra mắt)"
+                          onClick={() => {
+                            setEditingFacility(item);
+                            setIsFormOpen(true);
+                          }}
                         />
                         <Button
                           icon={<Trash2 size={18} />}
@@ -292,7 +290,6 @@ const SocialFacilitiesManagement = () => {
           </table>
         </div>
 
-        {/* Pagination Controls */}
         <div className="px-6 py-4 border-t border-gray-100 flex justify-between items-center bg-gray-50/30">
           <div className="text-sm text-gray-600">
             Hiển thị <span className="font-bold">{paginatedFacilities.length}</span> trên{" "}
@@ -324,6 +321,17 @@ const SocialFacilitiesManagement = () => {
           )}
         </div>
       </div>
+
+      {isFormOpen && (
+        <FacilityForm
+          initialData={editingFacility}
+          onClose={() => setIsFormOpen(false)}
+          onSave={() => {
+            setIsFormOpen(false);
+            fetchFacilities();
+          }}
+        />
+      )}
     </AdminLayout>
   );
 };
