@@ -1,10 +1,7 @@
 <div align="center">
-  <img width="1200" height="475" alt="Banner Sở Y Tế Hà Nội" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-  
-  # 🏥 Cổng Thông Tin & Quản Trị - Sở Y Tế Hà Nội
-  
+  # 🏥 Cổng Thông Tin & Quản Trị - Sở Y Tế Hà Nội 
   **Giải pháp quản lý y tế hiện đại, trực quan và hiệu quả.**
-  **Author : An Tú
+  **Author : An Tú**
 </div>
 
 ---
