@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Toast } from "primereact/toast";
 import { confirmDialog } from "primereact/confirmdialog";
-import { Button, InputText, Checkbox } from "@/components/prime";
+import { Button, InputText, Checkbox, Tooltip } from "@/components/prime";
 
 interface User {
   id: string;
@@ -73,7 +73,10 @@ const UserManagement: React.FC = () => {
 
   const handleOpenEditModal = (user: User) => {
     setEditingUser({ ...user });
-    setSelectedPermissions(user.permissions || []);
+    const perms = Array.isArray(user.permissions)
+      ? user.permissions.map((p: any) => typeof p === 'object' ? p.name : p)
+      : [];
+    setSelectedPermissions(perms);
     setIsEditModalOpen(true);
     fetchPermissions();
   };
@@ -215,6 +218,7 @@ const UserManagement: React.FC = () => {
               <tr className="bg-gray-50 text-left text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
                 <th className="px-6 py-4">Tên người dùng</th>
                 <th className="px-6 py-4">Vai trò</th>
+                <th className="px-6 py-4">Quyền hạn</th>
                 <th className="px-6 py-4">Trạng thái</th>
                 <th className="px-6 py-4 text-center">Thao tác</th>
               </tr>
@@ -222,7 +226,7 @@ const UserManagement: React.FC = () => {
             <tbody className="divide-y divide-gray-50">
               {loading ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-20 text-center">
+                  <td colSpan={5} className="px-6 py-20 text-center">
                     <Loader2
                       size={40}
                       className="animate-spin text-primary-600 mx-auto mb-4"
@@ -253,6 +257,42 @@ const UserManagement: React.FC = () => {
                       >
                         {user.role}
                       </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-wrap gap-1">
+                        {user.permissions && user.permissions.length > 0 ? (
+                          <>
+                            {user.permissions.slice(0, 2).map((perm: any, idx) => (
+                              <span
+                                key={idx}
+                                className="px-2 py-0.5 bg-primary-50 text-primary-700 border border-primary-100 rounded text-[9px] font-bold whitespace-nowrap"
+                              >
+                                {typeof perm === 'object' ? perm.description : perm}
+                              </span>
+                            ))}
+                            {user.permissions.length > 2 && (
+                              <>
+                                <span
+                                  id={`user-perm-${user.id}`}
+                                  className="px-2 py-0.5 bg-gray-100 text-gray-600 border border-gray-200 rounded text-[9px] font-bold whitespace-nowrap cursor-help hover:bg-gray-200 transition-colors"
+                                >
+                                  +{user.permissions.length - 2}
+                                </span>
+                                <Tooltip
+                                  target={`#user-perm-${user.id}`}
+                                  content={user.permissions.slice(2).map((p: any) => typeof p === 'object' ? p.description : p).join(", ")}
+                                  position="top"
+                                  className="text-[10px] font-bold"
+                                />
+                              </>
+                            )}
+                          </>
+                        ) : (
+                          <span className="text-[10px] text-gray-400 italic">
+                            Chưa phân quyền
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <span
@@ -410,13 +450,8 @@ const UserManagement: React.FC = () => {
                             />
                             <div>
                               <p className="text-xs font-bold text-gray-700 group-hover:text-primary-600">
-                                {permission.name}
+                                {permission.description}
                               </p>
-                              {permission.description && (
-                                <p className="text-[10px] text-gray-400 line-clamp-1">
-                                  {permission.description}
-                                </p>
-                              )}
                             </div>
                           </div>
                         ))}

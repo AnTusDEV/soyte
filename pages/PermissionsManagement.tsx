@@ -124,33 +124,6 @@ const PermissionsManagement: React.FC = () => {
     }
   };
 
-  const handleDelete = (id: number) => {
-    confirmDialog({
-      message: "Bạn có chắc chắn muốn xóa quyền này?",
-      header: "Xác nhận xóa",
-      icon: "pi pi-exclamation-triangle",
-      acceptClassName: "p-button-danger",
-      acceptLabel: "Xóa",
-      rejectLabel: "Hủy",
-      accept: async () => {
-        try {
-          await api.deletePermission(id);
-          toast.current?.show({
-            severity: "success",
-            summary: "Thành công",
-            detail: "Đã xóa quyền",
-          });
-          fetchPermissions();
-        } catch (error) {
-          toast.current?.show({
-            severity: "error",
-            summary: "Lỗi",
-            detail: "Không thể xóa quyền",
-          });
-        }
-      },
-    });
-  };
 
   return (
     <AdminLayout title="Quản lý Quyền hệ thống">
@@ -261,13 +234,6 @@ const PermissionsManagement: React.FC = () => {
                           rounded
                           onClick={() => handleOpenForm(item)}
                         />
-                        <Button
-                          icon={<Trash2 size={18} />}
-                          text
-                          rounded
-                          severity="danger"
-                          onClick={() => handleDelete(item.id)}
-                        />
                       </div>
                     </td>
                   </tr>
@@ -306,8 +272,10 @@ const PermissionsManagement: React.FC = () => {
                     setFormData({ ...formData, name: e.target.value })
                   }
                   placeholder="Ví dụ: Xem danh sách bài viết"
-                  className={`w-full p-3 bg-gray-50 border ${errors.name ? "border-red-500" : "border-gray-200"
-                    } rounded-lg font-bold text-gray-800 focus:ring-2 focus:ring-primary-100 outline-none`}
+                  disabled={!!editingPermission}
+                  className={`w-full p-3 ${editingPermission ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-gray-50 text-gray-800"
+                    } border ${errors.name ? "border-red-500" : "border-gray-200"
+                    } rounded-lg font-bold focus:ring-2 focus:ring-primary-100 outline-none`}
                 />
                 {errors.name && (
                   <p className="text-red-500 text-[10px] mt-1 font-bold">
