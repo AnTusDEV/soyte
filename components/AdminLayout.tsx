@@ -67,6 +67,11 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
     return false;
   };
 
+  const checkPermission = (itemPermission?: string) => {
+    if (!itemPermission) return true;
+    return user?.permissions?.includes(itemPermission);
+  };
+
   return (
     <div className="flex min-h-screen bg-slate-100 font-sans">
       <Toast />
@@ -90,11 +95,13 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
 
         <nav className="flex-grow p-4">
           <ul className="space-y-1">
-            {adminMenu.map((item) => {
-              const Icon = item.icon;
-              const hasChildren = Boolean(item.children?.length);
-              const isOpen = Boolean(openMenus[item.key]);
-              const parentActive = isParentActive(item);
+            {adminMenu
+              .filter((item) => checkPermission(item.permission))
+              .map((item) => {
+                const Icon = item.icon;
+                const hasChildren = Boolean(item.children?.length);
+                const isOpen = Boolean(openMenus[item.key]);
+                const parentActive = isParentActive(item);
 
               return (
                 <li key={item.key}>
@@ -111,7 +118,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
                       >
                         <span className="flex items-center gap-3">
                           <Icon size={18} />
-                          <span>{item.label}</span>
+                          <span>{item.label}</span>                   
                         </span>
 
                         <ChevronDown
@@ -144,6 +151,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
                                   }`}
                                 >
                                   {child.label}
+
                                 </Link>
                               </li>
                             );

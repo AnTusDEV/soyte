@@ -68,5 +68,6 @@ export interface WorkSchedule {
 
 export interface User {
   id: number;
-  full_name: string; 
+  full_name: string;
+  permissions?: string[];
 }

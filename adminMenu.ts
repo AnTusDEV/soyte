@@ -17,6 +17,7 @@ export type MenuItem = {
   key: string;
   label: string;
   icon: any;
+  permission: string;
   to?: string;
   children?: MenuChild[];
 };
@@ -26,30 +27,35 @@ export const adminMenu: MenuItem[] = [
     key: "posts",
     label: "Quản lý bài viết",
     icon: LayoutDashboard,
+    permission: "posts",
     to: "/admin/dashboard",
   },
   {
     key: "users",
     label: "Quản lý người dùng",
     icon: User,
+    permission: "users",
     to: "/admin/users",
   },
   {
     key: "schedules",
     label: "Quản lý lịch công tác",
     icon: CalendarDays,
+    permission: "work_schedule",
     to: "/admin/schedules",
   },
   {
     key: "templates",
     label: "Quản lý biểu mẫu",
     icon: NotebookText,
+    permission: "forms",
     to: "/admin/templates",
   },
   {
     key: "feedbacks",
     label: "Quản lý phản hồi",
     icon: MessageSquare,
+    permission: "feedback",
     children: [
       {
         key: "feedback-list",
@@ -67,6 +73,7 @@ export const adminMenu: MenuItem[] = [
     key: "facilities",
     label: "Quản lý CSYT",
     icon: Building2,
+    permission: "users",
     to: "/admin/social-facilities",
   },
 ];

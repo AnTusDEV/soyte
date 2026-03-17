@@ -9,6 +9,7 @@ interface User {
   email: string;
   full_name: string;
   role: 'admin' | 'user';
+  permissions: string[];
 }
 
 // Define the shape of the context value
