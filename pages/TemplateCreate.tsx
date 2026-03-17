@@ -697,7 +697,7 @@ const TemplateCreate: React.FC = () => {
 
           <div className="flex-grow p-6 bg-white flex flex-col">
             <div className="rounded-xl border border-primary-200 overflow-x-auto shadow-sm relative">
-              {template.type === 'evaluate' ? (
+              {template.type === 'reflect' ? (
                 <table className="w-full border-collapse min-w-max text-slate-700">
                   <thead className="bg-[var(--primary-color,#003159)] text-white">
                     <tr>
