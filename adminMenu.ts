@@ -122,4 +122,17 @@ export const adminMenu: MenuItem[] = [
     permission: "permissions",
     to: "/admin/permissions",
   },
+  {
+    key: "Report",
+    label: "Báo cáo",
+    icon: NotebookText,
+    permission: "report",
+    children: [
+      {
+        key: "report-DCBC",
+        label: "Đề cương báo cáo",
+        to: "/admin/report/DCBC",
+      }
+    ],
+  },
 ];
