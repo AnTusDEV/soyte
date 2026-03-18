@@ -212,15 +212,14 @@ const TemplateCreate: React.FC = () => {
                 <div className="flex flex-col md:flex-row items-center gap-3">
                   {/* Từ ngày */}
                   <div className="w-full relative">
+                    <i className="pi pi-calendar absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10 pointer-events-none text-lg"></i>
                     <Calendar
                       value={template.startDate}
                       onChange={(e) => setTemplate({ ...template, startDate: e.value })}
                       className="w-full"
-                      inputClassName="w-full border border-slate-300 focus:border-primary-500 shadow-sm p-4 rounded-xl text-base transition-colors"
+                      inputClassName="w-full bg-white border border-slate-300 focus:border-primary-500 shadow-sm p-4 pl-12 rounded-xl text-base transition-colors"
                       placeholder="Từ ngày (dd/mm/yyyy)..."
-                      showIcon
                       dateFormat="dd/mm/yy"
-                      iconPos="left"
                     />
                   </div>
 
@@ -233,15 +232,14 @@ const TemplateCreate: React.FC = () => {
 
                   {/* Đến ngày */}
                   <div className="w-full relative">
+                    <i className="pi pi-calendar absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10 pointer-events-none text-lg"></i>
                     <Calendar
                       value={template.endDate}
                       onChange={(e) => setTemplate({ ...template, endDate: e.value })}
                       className="w-full"
-                      inputClassName="w-full border border-slate-300 focus:border-primary-500 shadow-sm p-4 rounded-xl text-base transition-colors"
+                      inputClassName="w-full bg-white border border-slate-300 focus:border-primary-500 shadow-sm p-4 pl-12 rounded-xl text-base transition-colors"
                       placeholder="Đến ngày (dd/mm/yyyy)..."
-                      showIcon
                       dateFormat="dd/mm/yy"
-                      iconPos="left"
                     />
                   </div>
                 </div>

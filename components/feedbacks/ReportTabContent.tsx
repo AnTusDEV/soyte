@@ -59,13 +59,49 @@ export const ReportTabContent: React.FC<ReportTabContentProps> = ({ formId, feed
         return filteredFacilities.length;
     }, [formTemplate]);
 
-    // Thống kê tổng hợp
-    const summaryStats = [
-        { id: 1, name: 'Đơn vị báo cáo', count: feedbacks.length, rate: totalUnits > 0 ? `${((feedbacks.length / totalUnits) * 100).toFixed(1)}%` : '0%' }, // Dữ liệu tạm
-        { id: 2, name: 'Đơn vị không báo cáo', count: Math.max(0, totalUnits - feedbacks.length), rate: totalUnits > 0 ? `${(Math.max(0, totalUnits - feedbacks.length) / totalUnits * 100).toFixed(1)}%` : '0%' }, // Dữ liệu tạm
-        { id: 3, name: 'Đơn vị báo cáo đúng hạn', count: 0, rate: '0%' }, // Dữ liệu tạm
-        { id: 4, name: 'Đơn vị báo cáo không đúng hạn', count: 0, rate: '0%' }, // Dữ liệu tạm
-    ];
+    // Thống kê tổng hợp tình hình báo cáo 
+    const summaryStats = useMemo(() => {
+        const reportedCount = feedbacks.length;
+        const unReportingCount = Math.max(0, totalUnits - reportedCount);
+
+        let onTimeCount = 0;
+        let lateCount = 0;
+
+        // Phân loại "Đúng hạn" và "Không đúng hạn" dựa trên cấu hình thời gian áp dụng của biểu mẫu
+        if (formTemplate && (formTemplate.startDate || formTemplate.endDate)) {
+            const startLimit = formTemplate.startDate ? new Date(formTemplate.startDate) : null;
+            const endLimit = formTemplate.endDate ? new Date(formTemplate.endDate) : null;
+
+            // Thiết lập mốc thời gian so sánh (đầu ngày bắt đầu và cuối ngày kết thúc)
+            if (startLimit) startLimit.setHours(0, 0, 0, 0);
+            if (endLimit) endLimit.setHours(23, 59, 59, 999);
+
+            feedbacks.forEach(fb => {
+                // Ưu tiên các trường thời gian có sẵn: createdAt, created_at hoặc date
+                const submissionDate = new Date(fb.createdAt || fb.created_at || fb.date || Date.now());
+
+                // Điều kiện đúng hạn: Sau (hoặc bằng) ngày bắt đầu VÀ Trước (hoặc bằng) ngày kết thúc
+                const isAfterStart = !startLimit || submissionDate >= startLimit;
+                const isBeforeEnd = !endLimit || submissionDate <= endLimit;
+
+                if (isAfterStart && isBeforeEnd) {
+                    onTimeCount++;
+                } else {
+                    lateCount++;
+                }
+            });
+        } else {
+            // Nếu biểu mẫu không quy định thời gian, coi như tất cả báo cáo gửi lên là đúng hạn
+            onTimeCount = reportedCount;
+        }
+
+        return [
+            { id: 1, name: 'Đơn vị báo cáo', count: reportedCount, rate: totalUnits > 0 ? `${((reportedCount / totalUnits) * 100).toFixed(1)}%` : '0%' },
+            { id: 2, name: 'Đơn vị không báo cáo', count: unReportingCount, rate: totalUnits > 0 ? `${(unReportingCount / totalUnits * 100).toFixed(1)}%` : '0%' },
+            { id: 3, name: 'Đơn vị báo cáo đúng hạn', count: onTimeCount, rate: totalUnits > 0 ? `${((onTimeCount / totalUnits) * 100).toFixed(1)}%` : '0%' },
+            { id: 4, name: 'Đơn vị báo cáo không đúng hạn', count: lateCount, rate: totalUnits > 0 ? `${((lateCount / totalUnits) * 100).toFixed(1)}%` : '0%' },
+        ];
+    }, [feedbacks, totalUnits, formTemplate]);
     useEffect(() => {
         const fetchDetailsAndTemplate = async () => {
             setLoading(true);
