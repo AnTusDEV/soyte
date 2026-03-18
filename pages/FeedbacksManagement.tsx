@@ -538,7 +538,7 @@ const FeedbacksManagement: React.FC = () => {
           </div>
 
           {/* Chart 3: Area Line - Xu hướng phiếu phản ánh */}
-          {/* <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 flex flex-col transition-transform hover:-translate-y-1 hover:shadow-md">
+          <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 flex flex-col transition-transform hover:-translate-y-1 hover:shadow-md">
             <h3 className="text-sm font-bold text-primary-900 mb-1">Xu hướng phiếu phản ánh</h3>
             <p className="text-xs text-slate-400 mb-4">Số phiếu tiếp nhận theo thời gian</p>
             <div className="w-full h-[220px] relative mt-auto">
@@ -565,21 +565,14 @@ const FeedbacksManagement: React.FC = () => {
                 className="w-full h-full"
               />
             </div>
-          </div> */}
-          {/* Chart 4: */}
-            {stats?.summary?.map((item, index) => (
-              <SatisfactionTrendChart
-                key={item.id}
-                categories={stats.categories}
-                summaryItem={item}
-              />
-            ))}        
+          </div>
+                
         </div>
       )}
 
       {/* ── CHARTS: EVALUATE ─────────────────────────────────── */}
       {type === 'evaluate' && stats && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
 
           {/* Chart 1: Horizontal Bar - Phân bố sao đánh giá */}
           <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 flex flex-col transition-transform hover:-translate-y-1 hover:shadow-md md:col-span-1">
@@ -635,7 +628,7 @@ const FeedbacksManagement: React.FC = () => {
 
 
           {/* Chart 3: Area Line - Xu hướng phiếu đánh giá */}
-          <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 flex flex-col transition-transform hover:-translate-y-1 hover:shadow-md">
+          {/* <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 flex flex-col transition-transform hover:-translate-y-1 hover:shadow-md">
             <h3 className="text-sm font-bold text-primary-900 mb-1">Xu hướng phiếu khảo sát</h3>
             <p className="text-xs text-slate-400 mb-4">Số phiếu nộp theo thời gian</p>
             <div className="w-full h-[220px] relative mt-auto">
@@ -662,8 +655,15 @@ const FeedbacksManagement: React.FC = () => {
                 className="w-full h-full"
               />
             </div>
-          </div>
-
+          </div> */}
+          {/* Chart 4: */}
+            {stats?.summary?.map((item, index) => (
+              <SatisfactionTrendChart
+                key={item.id}
+                categories={stats.categories}
+                summaryItem={item}
+              />
+            ))}  
         </div>
       )}
 
