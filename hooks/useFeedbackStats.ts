@@ -3,14 +3,13 @@ import { feedBacksSevice } from '../services/feedBacksSevice';
 import { Toast } from 'primereact/toast';
 import { DashboardStats } from '../types/DashboardStats';
 
-export const useFeedbackStats = (toastRef?: React.RefObject<Toast | null>) => {
+export const useFeedbackStats = (type?: string,toastRef?: React.RefObject<Toast | null>) => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
 
   const fetchDashboardStats = useCallback(async (payload: { startDate: string, endDate: string }) => {
     try {
-      const response = await feedBacksSevice.fetchStats(payload);
+      const response = await feedBacksSevice.fetchStats(payload,type);
       const data = response.data?.data || response.data;
-      console.log(data);
       setStats(data);
     } catch (error) {
       console.error("Lỗi lấy thống kê:", error);

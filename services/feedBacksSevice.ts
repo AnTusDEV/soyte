@@ -9,8 +9,8 @@ export const feedBacksSevice = {
         return api.get(`/feedbacks/${id}`);
     },
 
-    async fetchStats(payload: { startDate: string, endDate: string, type?: string }) {
-        return api.get('/feedbacks/stats', payload);
+    async fetchStats(payload: { startDate: string, endDate: string }, type?: string) {
+        return api.get('/feedbacks/stats', { ...payload, type });
     },
 
     async fetchFeedBacksByType(type: string) {
