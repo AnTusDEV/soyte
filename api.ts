@@ -1,8 +1,5 @@
-// const BASE_URL = 'https://160.30.252.5:7002/api';
-// const BASE_URL = 'https://localhost:7002/api';
-//const BASE_URL = "https://10.10.10.19:7002/api";
 const BASE_URL = 'https://suckhoethudo.vn:7005/api';
-//const BASE_URL = 'https://10.10.10.19:7002/api';
+// const BASE_URL = 'https://192.168.2.4:7002/api';
 
 export const api = {
   async get(endpoint: string, params?: Record<string, any>) {
@@ -122,5 +119,25 @@ export const api = {
 
   async getUsers() {
     return this.get('/users');
+  },
+
+  async getPermissions(params?: any) {
+    return this.get('/permissions', params);
+  },
+
+  async createPermission(data: any) {
+    return this.post('/permissions', data);
+  },
+
+  async updatePermission(id: number | string, data: any) {
+    return this.put(`/permissions/${id}`, data);
+  },
+
+  async deletePermission(id: number | string) {
+    return this.delete(`/permissions/${id}`);
+  },
+
+  async updateUser(id: number | string, data: any) {
+    return this.put(`/users/${id}`, data);
   }
 };
