@@ -6,36 +6,40 @@ type SeriesItem = {
   data: number[];
 };
 
-type ChartResponse = {
-  categories: string[];
+type SummaryItem = {
+  id: number;
+  name: string;
   series: SeriesItem[];
 };
 
 type Props = {
-  chartResponse: ChartResponse;
-  title?: string;
+  categories: string[];
+  summaryItem: SummaryItem;
 };
 
 export default function SatisfactionTrendChart({
-  chartResponse,
-  title = "Xu hướng mức độ hài lòng",
+  categories,
+  summaryItem,
 }: Props) {
   const chartData = useMemo(() => {
     const palette = [
-      "#25A7C8", // xanh dương nhạt (cyan)
-      "#F59E0B", // vàng cam
-      "#10B981", // xanh lá
-      "#EF4444", // đỏ
-      "#8B5CF6", // tím
-      "#EC4899", // hồng
-      "#F97316", // cam
-      "#6366F1", // indigo
+      "#25A7C8",
+      "#F59E0B",
+      "#10B981",
+      "#EF4444",
+      "#8B5CF6",
+      "#EC4899",
+      "#F97316",
+      "#6366F1",
+      "#14B8A6",
+      "#84CC16",
     ];
 
     return {
-      labels: chartResponse.categories,
-      datasets: chartResponse.series.map((item, index) => {
+      labels: categories,
+      datasets: (summaryItem?.series || []).map((item, index) => {
         const color = palette[index % palette.length];
+
         return {
           label: item.name,
           data: item.data,
@@ -50,11 +54,37 @@ export default function SatisfactionTrendChart({
           pointBorderWidth: 0,
           borderWidth: 2,
           tension: 0.25,
-          fill: false
+          fill: false,
         };
-      })
+      }),
     };
-  }, [chartResponse]);
+  }, [categories, summaryItem]);
+
+const yRange = useMemo(() => {
+  const allValues =
+    summaryItem?.series?.flatMap((item) =>
+      (item.data || []).filter(
+        (v) => typeof v === "number" && !Number.isNaN(v)
+      )
+    ) || [];
+
+  if (!allValues.length) {
+    return {
+      min: 0,
+      max: 5,
+      stepSize: 0.5,
+    };
+  }
+
+  const rawMin = Math.min(...allValues);
+  const rawMax = Math.max(...allValues);
+
+  return {
+    min: Math.max(0, Math.floor(rawMin * 10) / 10 - 0.2),
+    max: rawMax >= 5 ? 5.2 : Math.min(5, Math.ceil(rawMax * 10) / 10 + 0.2),
+    stepSize: 0.5,
+  };
+}, [summaryItem]);
 
   const options = useMemo(() => {
     return {
@@ -65,16 +95,16 @@ export default function SatisfactionTrendChart({
           top: 8,
           right: 12,
           bottom: 0,
-          left: 8
-        }
+          left: 8,
+        },
       },
       interaction: {
         mode: "index" as const,
-        intersect: false
+        intersect: false,
       },
       plugins: {
         title: {
-          display: false
+          display: false,
         },
         legend: {
           position: "bottom" as const,
@@ -88,9 +118,9 @@ export default function SatisfactionTrendChart({
             color: "#6B7280",
             font: {
               size: 12,
-              family: "Inter, sans-serif"
-            }
-          }
+              family: "Inter, sans-serif",
+            },
+          },
         },
         tooltip: {
           enabled: true,
@@ -106,10 +136,12 @@ export default function SatisfactionTrendChart({
               return items?.[0]?.label || "";
             },
             label: function (context: any) {
-              return `${context.dataset.label}: ${Number(context.parsed.y).toFixed(2)}`;
-            }
-          }
-        }
+              return `${context.dataset.label}: ${Number(
+                context.parsed.y
+              ).toFixed(2)}`;
+            },
+          },
+        },
       },
       scales: {
         x: {
@@ -117,53 +149,63 @@ export default function SatisfactionTrendChart({
           grid: {
             color: "#E5E7EB",
             drawBorder: false,
-            drawTicks: false
+            drawTicks: false,
           },
           ticks: {
             color: "#9CA3AF",
-            autoSkip: false,
+            autoSkip: true,
+            maxTicksLimit: 12,
             maxRotation: 45,
             minRotation: 45,
             padding: 8,
             font: {
               size: 11,
-              family: "Inter, sans-serif"
-            }
-          }
+              family: "Inter, sans-serif",
+            },
+          },
         },
         y: {
-          min: 3.9,
-          max: 4.5,
+          min: yRange.min,
+          max: yRange.max,
           ticks: {
-            stepSize: 0.1,
+            stepSize: yRange.stepSize,
             color: "#4B5563",
             padding: 8,
             callback: function (value: number) {
-              return Number(value).toFixed(2);
+              return Number(value).toFixed(1);
             },
             font: {
               size: 11,
-              family: "Inter, sans-serif"
-            }
+              family: "Inter, sans-serif",
+            },
           },
           grid: {
             color: "#D1D5DB",
-            drawBorder: false
-          }
-        }
-      }
+            drawBorder: false,
+          },
+        },
+      },
     };
-  }, []);
+  }, [yRange]);
 
   return (
-    <div className="rounded-3xl border border-slate-200 bg-[#f6f7f9] p-5 shadow-sm">
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-[16px] font-semibold text-slate-700">{title}</h3>
-      </div>
+ <div className="rounded-3xl border border-slate-200 bg-[#f8fafc] p-5 shadow-sm">
+    <div className="mb-4 flex items-center justify-between">
+      <h3 className="text-[16px] font-semibold text-slate-700">
+        {summaryItem?.name || "Biểu đồ"}
+      </h3>
+    </div>
 
-      <div className="h-[320px] w-full rounded-2xl bg-white/70 p-3">
-        <Chart type="line" data={chartData} options={options} className="h-full w-full" />
+    <div className="rounded-[24px] border border-slate-100 bg-white p-4 shadow-sm">
+      <div className="h-[320px] w-full">
+        <Chart
+          type="line"
+          data={chartData}
+          options={options}
+          className="h-full w-full"
+        />
       </div>
     </div>
-  );
+  </div>
+);
 }
