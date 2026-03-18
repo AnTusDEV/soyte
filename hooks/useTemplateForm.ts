@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { formService } from '../services/formService';
 import { Toast } from 'primereact/toast';
 import { useNavigate } from 'react-router-dom';
@@ -55,6 +55,10 @@ export const useTemplateForm = (
       }
     }
   }, [id, toastRef]);
+
+  useEffect(() => {
+    fetchTemplate();
+  }, [fetchTemplate]);
 
   const validateTemplate = () => {
     if (!template.name || template.name.trim() === "") {

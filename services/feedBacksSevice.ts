@@ -13,7 +13,7 @@ export const feedBacksSevice = {
         return api.get('/feedbacks/stats', payload);
     },
 
-    async fetchFeedBacksByType(type: string) {
-        return api.get(`/feedbacks?type=${type}`);
+    async fetchFeedBacksByType(type: string, startDate?: string, endDate?: string) {
+        return api.get(`/feedbacks`, { type, startDate, endDate, limit: 1000 });
     },
 };

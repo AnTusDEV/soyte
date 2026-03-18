@@ -38,11 +38,11 @@ export const formatDateVN = (dateStr: string) => {
 };
 
 export const formatDisplayDateTime = (dateStr: string) => {
-    if(!dateStr) return "—";
-    try {
-        const date = new Date(dateStr);
-        return `${date.toLocaleDateString("vi-VN")} ${date.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}`;
-    } catch {
-        return "—";
-    }
+  if (!dateStr) return "—";
+  try {
+    const date = new Date(dateStr);
+    return `${date.toLocaleDateString("vi-VN")} ${date.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}`;
+  } catch {
+    return "—";
+  }
 };

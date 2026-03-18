@@ -58,6 +58,7 @@ export const FeedbackDetailsDialog: React.FC<FeedbackDetailsDialogProps> = ({
   infoLabels,
   type
 }) => {
+  console.log(selectedFeedback)
   return (
     <Dialog
       header="Chi tiết phiếu đã điền"
@@ -134,112 +135,165 @@ export const FeedbackDetailsDialog: React.FC<FeedbackDetailsDialogProps> = ({
               Nội dung biểu mẫu
             </h4>
 
-            {type === 'evaluate' ? (
-              <div className="space-y-6">
-                {selectedFeedback.data?.map((group: any, groupIdx: number) => (
-                  <div key={groupIdx} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div className="bg-primary-50 px-5 py-3 border-b border-primary-100 flex items-center justify-between">
-                      <h5 className="font-bold text-primary-900 text-sm">
-                        {groupIdx + 1}. {group.name}
-                      </h5>
-                    </div>
-                    <div className="divide-y divide-slate-100">
-                      {group.option?.map((opt: any, optIdx: number) => (
-                        <div key={optIdx} className="p-5 hover:bg-slate-50/50 transition-colors">
-                          <p className="font-medium text-slate-800 mb-3 text-sm leading-relaxed">
-                            {optIdx + 1}. {opt.content}
-                          </p>
-                          <div className="pl-4 border-l-[3px] border-primary-200 py-1">
-                            <span className="text-xs font-semibold text-slate-500 block mb-1.5 uppercase tracking-wide">Câu trả lời:</span>
-                            {/* Render answer based on type */}
-                            {opt.answerType === 'score1_5' ? (
-                              <div className="mt-1">
-                                <RatingBadge value={Number(opt.answerValue) || 0} />
-                              </div>
-                            ) : (
-                              <p className="text-sm text-primary-900 font-medium break-words">
-                                {opt.answerValue ? String(opt.answerValue) : "Chưa có câu trả lời"}
-                              </p>
-                            )}
-                          </div>
-                          {opt.note && (
-                            <div className="mt-3 text-xs bg-slate-50 px-3 py-2 rounded-lg border border-slate-100 text-slate-600">
-                              <span className="font-medium italic">Ghi chú:</span> {opt.note}
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {selectedFeedback.data?.map((group: any, groupIdx: number) => (
-                  <div key={groupIdx} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div className="bg-primary-50 px-5 py-3 border-b border-primary-100">
-                      <h5 className="font-bold text-primary-900 text-sm">
-                        {groupIdx + 1}. {group.name}
-                      </h5>
-                    </div>
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left text-sm whitespace-nowrap md:whitespace-normal">
-                        <thead className="bg-slate-50 text-xs uppercase text-slate-500 font-semibold border-b border-slate-200">
-                          <tr>
-                            <th className="px-5 py-3 w-10 text-center">STT</th>
-                            <th className="px-5 py-3">Nội dung</th>
-                            <th className="px-5 py-3 w-32 border-l border-slate-200">Tiến độ</th>
-                            <th className="px-5 py-3 w-32 border-l border-slate-200">Đánh giá</th>
-                            <th className="px-5 py-3 w-48 border-l border-slate-200">Ghi chú</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100">
-                          {group.option?.map((opt: any, optIdx: number) => {
-                            const tiendoLabel = ["Chưa thực hiện", "Đang thực hiện", "Đã thực hiện"][opt.progress?.value] || "Chưa xác định";
-                            const danhgiaLabel = opt.rating?.value === 1 ? "Đạt" : (opt.rating?.value === 0 ? "Không đạt" : "Chưa đánh giá");
+            {type === 'reflect' && selectedFeedback.sections?.length > 0 && (
+              <div className="flex-grow flex flex-col">
+                <div className="rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                  <table className="w-full border-collapse text-slate-700 table-fixed">
+                    <thead className="bg-primary-800 text-white">
+                      <tr>
+                        <th rowSpan={2} className="border border-white/30 p-2 w-[4%] text-center align-middle font-bold text-[11px]">STT</th>
+                        <th rowSpan={2} className="border border-white/30 p-2 w-[28%] text-center align-middle font-bold text-[11px]">Nội dung thực hiện</th>
+                        <th rowSpan={2} className="border border-white/30 p-2 w-[16%] text-center align-middle font-bold text-[11px]">Phương thức thực hiện</th>
+                        <th rowSpan={2} className="border border-white/30 p-2 w-[14%] text-center align-middle font-bold text-[11px]">Sản phẩm đầu ra</th>
+                        <th colSpan={3} className="border border-white/30 p-1.5 w-[18%] text-center align-middle font-bold text-[11px]">Tiến độ</th>
+                        <th colSpan={2} className="border border-white/30 p-1.5 w-[10%] text-center align-middle font-bold text-[11px]">Đánh giá</th>
+                        <th rowSpan={2} className="border border-white/30 p-2 w-[10%] text-center align-middle font-bold text-[11px]">Ghi chú</th>
+                      </tr>
+                      <tr>
+                        <th className="border border-white/30 p-1.5 text-center text-[10px] font-bold leading-tight">Đã làm</th>
+                        <th className="border border-white/30 p-1.5 text-center text-[10px] font-bold leading-tight">Đang làm</th>
+                        <th className="border border-white/30 p-1.5 text-center text-[10px] font-bold leading-tight">Chưa làm</th>
+                        <th className="border border-white/30 p-1.5 text-center text-[10px] font-bold leading-tight">Đạt</th>
+                        <th className="border border-white/30 p-1.5 text-center text-[10px] font-bold leading-tight">K.Đạt</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(() => {
+                        let globalIdx = 0;
+                        const roman = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV"];
+                        return selectedFeedback.sections.map((group: any, gi: number) => (
+                          <React.Fragment key={gi}>
+                            <tr className="bg-primary-800">
+                              <td className="p-2.5 text-center">
+                                <span className="inline-flex w-6 h-6 rounded-full bg-white/20 text-white text-xs font-bold items-center justify-center">
+                                  {roman[gi] || gi + 1}
+                                </span>
+                              </td>
+                              <td colSpan={9} className="p-2.5 font-bold text-white text-sm">
+                                {group.name || `Nhóm nội dung ${gi + 1}`}
+                              </td>
+                            </tr>
+                            {group.option && Array.isArray(group.option) && group.option.map((opt: any, oi: number) => {
+                              globalIdx++;
+                              return (
+                                <tr key={oi} className="hover:bg-slate-50 transition-colors bg-white">
+                                  <td className="border border-slate-300 p-2 text-center text-slate-600 font-medium">{globalIdx}</td>
+                                  <td className="border border-slate-300 p-3 text-sm leading-relaxed"><div className="whitespace-pre-wrap">{opt.content}</div></td>
+                                  <td className="border border-slate-300 p-3 text-sm leading-relaxed"><div className="whitespace-pre-wrap">{opt.method}</div></td>
+                                  <td className="border border-slate-300 p-3 text-sm leading-relaxed"><div className="whitespace-pre-wrap">{opt.productOut}</div></td>
+                                  
+                                  <td className="border border-slate-300 p-2 text-center bg-slate-50/30">
+                                    <div className="flex justify-center">
+                                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${Number(opt.tiendo) === 1 ? 'bg-primary-600 border-primary-600' : 'bg-white border-slate-300'}`}>
+                                        {Number(opt.tiendo) === 1 && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td className="border border-slate-300 p-2 text-center bg-slate-50/30">
+                                    <div className="flex justify-center">
+                                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${Number(opt.tiendo) === 2 ? 'bg-primary-600 border-primary-600' : 'bg-white border-slate-300'}`}>
+                                        {Number(opt.tiendo) === 2 && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td className="border border-slate-300 p-2 text-center bg-slate-50/30">
+                                    <div className="flex justify-center">
+                                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${Number(opt.tiendo) === 3 ? 'bg-primary-600 border-primary-600' : 'bg-white border-slate-300'}`}>
+                                        {Number(opt.tiendo) === 3 && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                                      </div>
+                                    </div>
+                                  </td>
 
-                            return (
-                              <tr key={optIdx} className="hover:bg-slate-50/50">
-                                <td className="px-5 py-4 text-center font-medium text-slate-400">
-                                  {optIdx + 1}
-                                </td>
-                                <td className="px-5 py-4">
-                                  <p className="font-medium text-slate-800 break-words">{opt.content}</p>
-                                </td>
-                                <td className="px-5 py-4 border-l border-slate-100">
-                                  <span className={`inline-flex px-2 py-1 rounded text-xs font-semibold ${
-                                    opt.progress?.value === 2 ? 'bg-emerald-100 text-emerald-700' :
-                                    opt.progress?.value === 1 ? 'bg-amber-100 text-amber-700' :
-                                    opt.progress?.value === 0 ? 'bg-red-100 text-red-700' :
-                                    'bg-slate-100 text-slate-600'
-                                  }`}>
-                                    {tiendoLabel}
-                                  </span>
-                                </td>
-                                <td className="px-5 py-4 border-l border-slate-100">
-                                  <span className={`inline-flex px-2 py-1 rounded text-xs font-semibold ${
-                                    opt.rating?.value === 1 ? 'bg-green-100 text-green-700' :
-                                    opt.rating?.value === 0 ? 'bg-red-100 text-red-700' :
-                                    'bg-slate-100 text-slate-600'
-                                  }`}>
-                                    {danhgiaLabel}
-                                  </span>
-                                </td>
-                                <td className="px-5 py-4 border-l border-slate-100 text-slate-600 text-xs italic break-words">
-                                  {opt.note || <span className="text-slate-300">Không có</span>}
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                ))}
+                                  <td className="border border-slate-300 p-2 text-center bg-green-50/30">
+                                    <div className="flex justify-center">
+                                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${Number(opt.danhgia) === 1 ? 'bg-green-600 border-green-600' : 'bg-white border-slate-300'}`}>
+                                        {Number(opt.danhgia) === 1 && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td className="border border-slate-300 p-2 text-center bg-red-50/30">
+                                    <div className="flex justify-center">
+                                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${(Number(opt.danhgia) === 0 || Number(opt.danhgia) === 2) ? 'bg-red-600 border-red-600' : 'bg-white border-slate-300'}`}>
+                                        {(Number(opt.danhgia) === 0 || Number(opt.danhgia) === 2) && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                                      </div>
+                                    </div>
+                                  </td>
+                                  
+                                  <td className="border border-slate-200 p-3 text-sm leading-relaxed"><div className="whitespace-pre-wrap">{opt.ghichu}</div></td>
+                                </tr>
+                              );
+                            })}
+                          </React.Fragment>
+                        ));
+                      })()}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
 
-            {(!selectedFeedback.data || selectedFeedback.data.length === 0) && (
+            {type === 'evaluate' && selectedFeedback.sections?.length > 0 && (
+              <div className="flex-grow flex flex-col gap-4">
+                {(() => {
+                  let globalIdx = 0;
+                  const roman = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV"];
+                  return selectedFeedback.sections.map((section: any, sIdx: number) => (
+                    <div key={sIdx} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                      <div className="bg-primary-800 px-4 py-2.5 flex items-center gap-2">
+                        <span className="inline-flex w-6 h-6 rounded-full bg-white/20 text-white text-xs font-bold items-center justify-center flex-shrink-0">
+                          {roman[sIdx] || sIdx + 1}
+                        </span>
+                        <span className="text-white font-semibold text-sm uppercase tracking-wide">
+                          {section.name}
+                        </span>
+                      </div>
+                      <div className="divide-y divide-slate-100">
+                        {section.option && Array.isArray(section.option) && section.option.map((opt: any, oIdx: number) => {
+                          globalIdx++;
+                          const rv = opt.ratingVote?.value;
+                          const hasRV = rv !== undefined && rv !== null;
+                          const aType: string = opt.answerType || "score1_5";
+                          const av = opt.answerValue;
+                          const hasAv = av !== null && av !== undefined && av !== "" && av !== -1;
+
+                          return (
+                            <div key={oIdx} className="px-4 py-3 flex flex-col sm:flex-row sm:items-start gap-4">
+                              <span className="flex-shrink-0 w-6 text-center text-slate-500 text-sm font-medium mt-0.5">
+                                {globalIdx}
+                              </span>
+                              <div className="flex-grow min-w-0">
+                                <p className="text-slate-700 text-sm leading-relaxed">{opt.content}</p>
+                                {opt.note && <p className="text-slate-400 text-xs mt-0.5 italic">Ghi chú: {opt.note}</p>}
+                              </div>
+                              <div className="flex-shrink-0 flex items-center justify-end min-w-[130px]">
+                                {aType === "score1_5" && hasRV && <RatingBadge value={Number(rv)} />}
+                                {aType === "single_choice" && hasAv && (
+                                  <span className="text-xs bg-primary-50 text-primary-800 border border-primary-200 px-2.5 py-1.5 rounded-full font-medium max-w-[220px] text-right break-words">
+                                    {String(av)}
+                                  </span>
+                                )}
+                                {aType === "percentage" && hasAv && (
+                                  <span className="inline-flex items-center gap-1 text-sm font-bold text-primary-700 bg-primary-50 border border-primary-200 px-3 py-1.5 rounded-full">
+                                    <i className="pi pi-chart-bar text-xs" />{av}%
+                                  </span>
+                                )}
+                                {aType === "text" && hasAv && (
+                                  <span className="text-xs text-slate-600 bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-lg max-w-[220px] text-right break-words">
+                                    {String(av)}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ));
+                })()}
+              </div>
+            )}
+
+            {(!selectedFeedback.sections || selectedFeedback.sections.length === 0) && (
               <div className="text-center py-10 bg-white rounded-2xl border border-slate-200">
                 <i className="pi pi-inbox text-4xl text-slate-300 mb-3 block"></i>
                 <p className="text-slate-500 font-medium">Không có dữ liệu chi tiết</p>
