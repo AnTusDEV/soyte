@@ -1,10 +1,23 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useMemo } from "react";
 import AdminLayout from "../components/AdminLayout";
-import { Toast } from "@/components/prime";
+import { Toast, DataTable, Column, Dialog, Button, Dropdown, Calendar } from "@/components/prime";
 import { feedBacksSevice } from "../services/feedBacksSevice";
 import { formService } from "../services/formService";
 import { Chart } from "primereact/chart";
 import { DashboardStats } from "../types/DashboardStats";
+
+// ── types ───────────────────────────────────────────────────────────────────
+
+interface FeedbackItem {
+  id: string;
+  _id?: string;
+  form_id: string;
+  type: 'phuluc' | 'bieumau';
+  info: any;
+  sections: any[];
+  created_at: string;
+  creator_name?: string;
+}
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -51,28 +64,26 @@ const RatingBadge: React.FC<{ value: number }> = ({ value }) => {
   );
 };
 
+// HÀM FORMAT NGÀY CHO PAYLOAD
+const formatDatePayload = (date: Date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
+
 // HÀM HỖ TRỢ LẤY NGÀY ĐẦU VÀ CUỐI THÁNG 
 const getDefaultDates = () => {
   const now = new Date();
   const year = now.getFullYear();
-  const month = now.getMonth(); // Tháng trong JS bắt đầu từ 0 (0 = Tháng 1)
+  const month = now.getMonth();
 
-  // Ngày đầu tháng: Truyền vào mùng 1
   const firstDay = new Date(year, month, 1);
-  // Ngày cuối tháng: Truyền vào ngày 0 của tháng tiếp theo (mẹo nhỏ trong JS)
   const lastDay = new Date(year, month + 1, 0);
 
-  // Hàm fomat ngày sang YYYY-MM-DD
-  const formatDate = (date: Date) => {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
-  };
-
   return {
-    startDate: formatDate(firstDay),
-    endDate: formatDate(lastDay)
+    startDate: formatDatePayload(firstDay),
+    endDate: formatDatePayload(lastDay)
   };
 };
 
@@ -91,9 +102,17 @@ const FeedbacksManagement: React.FC = () => {
   const [selectedFeedback, setSelectedFeedback] = useState<FeedbackItem | null>(null);
   const [dialogVisible, setDialogVisible] = useState(false);
   const [infoLabels, setInfoLabels] = useState<Record<string, string>>({});
-  const [dateFilter, setDateFilter] = useState<{ startDate: string, endDate: string }>(getDefaultDates());
-  const [filterType, setFilterType] = useState<string>("this_month");
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  
+  // State for Lazy Loading DataTable
+  const [loading, setLoading] = useState(false);
+  const [feedbacks, setFeedbacks] = useState<any[]>([]);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [lazyParams, setLazyParams] = useState({
+    first: 0,
+    rows: 10,
+    page: 1,
+  });
 
   const filterOptions = [
     { label: 'Tháng này', value: 'this_month' },
@@ -148,7 +167,6 @@ const FeedbacksManagement: React.FC = () => {
       const response = await feedBacksSevice.fetchStats(payload);
       const data = response.data?.data || response.data;
       setStats(data);
-
     } catch (error) {
       console.error("Lỗi lấy thống kê:", error);
       toast.current?.show({
@@ -216,15 +234,15 @@ const FeedbacksManagement: React.FC = () => {
   const chartOptions = {
     plugins: {
       legend: {
-        position: 'right' as const, // Chuyển chú thích sang bên phải (bạn có thể đổi thành 'left' nếu muốn)
+        position: 'right' as const,
         labels: {
-          usePointStyle: true, // Đổi hình hộp chữ nhật thành hình tròn cho hiện đại
-          padding: 20 // Tăng khoảng cách để chữ dễ nhìn hơn
+          usePointStyle: true,
+          padding: 20
         }
       }
     },
-    cutout: '60%', // Giữ nguyên độ rỗng ở giữa
-    maintainAspectRatio: false // Thêm thuộc tính này để biểu đồ không bị thu nhỏ quá mức
+    cutout: '60%',
+    maintainAspectRatio: false
   };
 
   // Cấu hình biểu đồ đường
@@ -237,8 +255,8 @@ const FeedbacksManagement: React.FC = () => {
           label: 'Số lượng phản hồi',
           data: stats.trend.map(t => t.count),
           fill: false,
-          borderColor: '#3b82f6', // Màu xanh dương
-          tension: 0.4, // Làm cong đường nối
+          borderColor: '#3b82f6',
+          tension: 0.4,
           backgroundColor: '#3b82f6'
         }
       ]
@@ -246,10 +264,10 @@ const FeedbacksManagement: React.FC = () => {
   }, [stats]);
 
   const lineChartOptions = {
-    plugins: { legend: { display: false } }, // Tắt chú thích vì chỉ có 1 đường
+    plugins: { legend: { display: false } },
     maintainAspectRatio: false,
     scales: {
-      y: { beginAtZero: true, ticks: { precision: 0 } } // Trục Y hiển thị số nguyên
+      y: { beginAtZero: true, ticks: { precision: 0 } }
     }
   };
 
@@ -270,7 +288,7 @@ const FeedbacksManagement: React.FC = () => {
             dist.star1,
             dist.star0
           ],
-          backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#f97316', '#ef4444', '#94a3b8'], // Đổi màu theo từng mức độ
+          backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#f97316', '#ef4444', '#94a3b8'],
           borderRadius: 4
         }
       ]
@@ -278,7 +296,7 @@ const FeedbacksManagement: React.FC = () => {
   }, [stats]);
 
   const barChartOptions = {
-    indexAxis: 'y' as const, // QUAN TRỌNG: Lật biểu đồ thành cột ngang
+    indexAxis: 'y' as const,
     plugins: { legend: { display: false } },
     maintainAspectRatio: false,
     scales: {
@@ -352,6 +370,25 @@ const FeedbacksManagement: React.FC = () => {
     }
   };
 
+  // DataTable Templates
+  const sttBodyTemplate = (rowData: any, options: any) => {
+    return options.rowIndex + 1 + (lazyParams.page - 1) * lazyParams.rows;
+  };
+
+  const nameBodyTemplate = (rowData: any) => {
+    return rowData.creator_name || "N/A";
+  };
+
+  const dateBodyTemplate = (rowData: any) => {
+    return rowData.created_at ? new Date(rowData.created_at).toLocaleDateString("vi-VN") : "N/A";
+  };
+
+  const actionBodyTemplate = (rowData: any) => {
+    return (
+      <Button icon="pi pi-eye" rounded text severity="info" onClick={() => viewDetails(rowData)} />
+    );
+  };
+
   return (
     <AdminLayout title="Quản lý góp ý - phản hồi">
       <Toast ref={toast} />
@@ -376,120 +413,68 @@ const FeedbacksManagement: React.FC = () => {
 
         {filterType === 'custom' && (
           <div className="flex flex-wrap items-center gap-4 animate-in fade-in slide-in-from-right-2 duration-300">
-
-            {/* ── Ô TỪ NGÀY ── */}
             <div className="flex items-center gap-2">
               <span className="text-sm text-slate-600 whitespace-nowrap">Từ ngày:</span>
-              <div className="bg-white border border-slate-300 rounded-md overflow-hidden hover:border-primary-500 focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-200 transition-all w-[140px]">
+              <div className="bg-white border border-slate-300 rounded-md overflow-hidden hover:border-primary-500 focus-within:border-primary-500 transition-all w-[140px]">
                 <Calendar
                   value={dateFilter.startDate ? new Date(dateFilter.startDate) : null}
                   onChange={(e) => handleCustomDateChange(e.value as Date, 'startDate')}
                   className="w-full"
-                  inputClassName="w-full h-9 border-none bg-transparent px-3 text-sm text-slate-700 placeholder:text-slate-400 focus:ring-0 outline-none cursor-pointer"
+                  inputClassName="w-full h-9 border-none bg-transparent px-3 text-sm text-slate-700"
                   dateFormat="dd/mm/yy"
                   placeholder="dd/mm/yyyy"
-                  showIcon
                 />
               </div>
             </div>
-
-            {/* ── Ô ĐẾN NGÀY ── */}
             <div className="flex items-center gap-2">
               <span className="text-sm text-slate-600 whitespace-nowrap">Đến ngày:</span>
-              <div className="bg-white border border-slate-300 rounded-md overflow-hidden hover:border-primary-500 focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-200 transition-all w-[140px]">
+              <div className="bg-white border border-slate-300 rounded-md overflow-hidden hover:border-primary-500 focus-within:border-primary-500 transition-all w-[140px]">
                 <Calendar
                   value={dateFilter.endDate ? new Date(dateFilter.endDate) : null}
                   onChange={(e) => handleCustomDateChange(e.value as Date, 'endDate')}
                   className="w-full"
-                  inputClassName="w-full h-9 border-none bg-transparent px-3 text-sm text-slate-700 placeholder:text-slate-400 focus:ring-0 outline-none cursor-pointer"
+                  inputClassName="w-full h-9 border-none bg-transparent px-3 text-sm text-slate-700"
                   dateFormat="dd/mm/yy"
                   placeholder="dd/mm/yyyy"
-                  showIcon
                 />
               </div>
             </div>
-
           </div>
         )}
       </div>
 
-      {/* ── THỐNG KÊ TỔNG QUAN ──────────────────────────────────────── */}
-      {/* ── BIỂU ĐỒ THỐNG KÊ (Chỉ hiện khi có dữ liệu phụ lục) ── */}
       {stats?.phuluc && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-          {/* Biểu đồ Tiến độ */}
-          <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 flex flex-col transition-transform hover:-translate-y-1 hover:shadow-md">
+          <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 flex flex-col">
             <h3 className="text-base font-bold text-primary-900 mb-4">Tỉ lệ Tiến độ thực hiện</h3>
-
             <div className="w-full max-w-[350px] mx-auto h-[200px] relative">
               <Chart type="doughnut" data={tiendoChartData} options={chartOptions} className="w-full h-full" />
             </div>
           </div>
-
-          {/* Biểu đồ Đánh giá */}
-          <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 flex flex-col transition-transform hover:-translate-y-1 hover:shadow-md">
+          <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 flex flex-col">
             <h3 className="text-base font-bold text-primary-900 mb-4">Tỉ lệ Đánh giá chất lượng</h3>
-
             <div className="w-full max-w-[350px] mx-auto h-[200px] relative">
               <Chart type="doughnut" data={danhgiaChartData} options={chartOptions} className="w-full h-full" />
             </div>
           </div>
         </div>
       )}
-      {/* ── BIỂU ĐỒ XU HƯỚNG VÀ PHÂN BỔ ĐÁNH GIÁ ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
 
-        {/* Biểu đồ đường: Xu hướng phản hồi */}
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 transition-transform hover:-translate-y-1 hover:shadow-md flex flex-col">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 flex flex-col">
           <h3 className="text-base font-bold text-primary-900 mb-4">Tổng hợp số lượng phản hồi</h3>
           <div className="w-full h-[250px] relative mt-auto">
             {stats && <Chart type="line" data={lineChartData} options={lineChartOptions} className="w-full h-full" />}
           </div>
         </div>
-
-        {/* Biểu đồ cột ngang: Tổng hợp đánh giá từ Tệ đến Tốt */}
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 transition-transform hover:-translate-y-1 hover:shadow-md flex flex-col">
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 flex flex-col">
           <h3 className="text-base font-bold text-primary-900 mb-4">Tổng hợp mức độ hài lòng</h3>
           <div className="w-full h-[250px] relative mt-auto">
             {stats && <Chart type="bar" data={barChartData} options={barChartOptions} className="w-full h-full" />}
           </div>
         </div>
-
       </div>
-      {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-5 flex items-center gap-4 transition-transform hover:-translate-y-1 hover:shadow-md">
-          <div className="w-12 h-12 rounded-full bg-primary-50 flex items-center justify-center text-primary-600 flex-shrink-0">
-            <i className="pi pi-comments text-xl"></i>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-slate-500 mb-0.5">Tổng số ý kiến</p>
-            <h3 className="text-2xl font-bold text-primary-900">{stats?.overview.total ?? 0}</h3>
-          </div>
-        </div>
 
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-5 flex items-center gap-4 transition-transform hover:-translate-y-1 hover:shadow-md">
-          <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center text-green-600 flex-shrink-0">
-            <i className="pi pi-check-circle text-xl"></i>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-slate-500 mb-0.5">Đã tiếp nhận</p>
-            <h3 className="text-2xl font-bold text-slate-800">{stats?.overview.accepted ?? 0}</h3>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-5 flex items-center gap-4 transition-transform hover:-translate-y-1 hover:shadow-md">
-          <div className="w-12 h-12 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-600 flex-shrink-0">
-            <i className="pi pi-star-fill text-xl"></i>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-slate-500 mb-0.5">Đánh giá trung bình</p>
-            <h3 className="text-2xl font-bold text-slate-800">
-              {stats?.overview.averageRating ?? 0} <span className="text-sm font-normal text-slate-500">/ 5</span>
-            </h3>
-          </div>
-        </div>
-      </div> */}
-      {/* ── LIST TABLE ─────────────────────────────────────────────── */}
       <div className="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden p-6">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-primary-900">Danh sách ý kiến</h2>
@@ -516,7 +501,6 @@ const FeedbacksManagement: React.FC = () => {
         </div>
       </div>
 
-      {/* ── DETAIL DIALOG ──────────────────────────────────────────── */}
       <Dialog
         header="Chi tiết phiếu đã điền"
         visible={dialogVisible}
@@ -529,8 +513,6 @@ const FeedbacksManagement: React.FC = () => {
       >
         {selectedFeedback && (
           <div className="flex flex-col h-full text-sm">
-
-            {/* ── TITLE + META STRIP ───────────────────────────────── */}
             <div className="bg-white border-b border-slate-100 px-6 py-4 flex-shrink-0">
               <div className="flex flex-wrap items-start justify-between gap-4 mb-3">
                 <h3 className="font-bold text-primary-900 text-base leading-snug">
@@ -553,17 +535,8 @@ const FeedbacksManagement: React.FC = () => {
                   </span>
                 </div>
               </div>
-
-              {selectedFeedback.info?.description && (
-                <div className="pt-3 border-t border-slate-50">
-                  <p className="text-slate-500 text-xs leading-relaxed italic">
-                    {selectedFeedback.info.description}
-                  </p>
-                </div>
-              )}
             </div>
 
-            {/* ── INFO CARDS (dynamic numeric keys) ────────────────── */}
             {selectedFeedback.info && parseInfoEntries(selectedFeedback.info, infoLabels).length > 0 && (
               <div className="px-6 pt-4 pb-3 flex-shrink-0 bg-slate-50 border-b border-slate-100">
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -577,184 +550,114 @@ const FeedbacksManagement: React.FC = () => {
               </div>
             )}
 
-            {/* ── PHỤ LỤC TABLE ────────────────────────────────────── */}
-            {selectedFeedback.type === 'phuluc' &&
-              selectedFeedback.sections?.length > 0 && (
-                <div className="flex-grow px-6 py-5 flex flex-col">
-                  <div className="rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                    <table className="w-full border-collapse text-slate-700 table-fixed">
-                      <thead className="bg-primary-800 text-white">
-                        <tr>
-                          <th rowSpan={2} className="border border-white/30 p-2 w-[4%] text-center align-middle font-bold text-[11px]">STT</th>
-                          <th rowSpan={2} className="border border-white/30 p-2 w-[28%] text-center align-middle font-bold text-[11px]">Nội dung thực hiện</th>
-                          <th rowSpan={2} className="border border-white/30 p-2 w-[16%] text-center align-middle font-bold text-[11px]">Phương thức thực hiện</th>
-                          <th rowSpan={2} className="border border-white/30 p-2 w-[14%] text-center align-middle font-bold text-[11px]">Sản phẩm đầu ra</th>
-                          <th colSpan={3} className="border border-white/30 p-1.5 w-[18%] text-center align-middle font-bold text-[11px]">Tiến độ</th>
-                          <th colSpan={2} className="border border-white/30 p-1.5 w-[10%] text-center align-middle font-bold text-[11px]">Đánh giá</th>
-                          <th rowSpan={2} className="border border-white/30 p-2 w-[10%] text-center align-middle font-bold text-[11px]">Ghi chú</th>
-                        </tr>
-                        <tr>
-                          {/* Các cột con không cần đặt width nữa, trình duyệt sẽ tự động chia đều từ thẻ cha */}
-                          <th className="border border-white/30 p-1.5 text-center text-[10px] font-bold leading-tight">Đã làm</th>
-                          <th className="border border-white/30 p-1.5 text-center text-[10px] font-bold leading-tight">Đang làm</th>
-                          <th className="border border-white/30 p-1.5 text-center text-[10px] font-bold leading-tight">Chưa làm</th>
-                          <th className="border border-white/30 p-1.5 text-center text-[10px] font-bold leading-tight">Đạt</th>
-                          <th className="border border-white/30 p-1.5 text-center text-[10px] font-bold leading-tight">K.Đạt</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {(() => {
-                          let globalIdx = 0;
-                          const roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV'];
-                          return selectedFeedback.sections.map((group: any, gi: number) => (
-                            <React.Fragment key={gi}>
-                              <tr className="bg-primary-800">
-                                <td className="p-2.5 text-center">
-                                  <span className="inline-flex w-6 h-6 rounded-full bg-white/20 text-white text-xs font-bold items-center justify-center">
-                                    {roman[gi] || gi + 1}
-                                  </span>
-                                </td>
-                                <td colSpan={9} className="p-2.5 font-bold text-white text-sm">
-                                  {group.name || `Nhóm nội dung ${gi + 1}`}
-                                </td>
-                              </tr>
-                              {group.option && Array.isArray(group.option) && group.option.map((opt: any, oi: number) => {
-                                globalIdx++;
-                                return (
-                                  <tr key={oi} className="hover:bg-slate-50 transition-colors bg-white">
-                                    <td className="border border-slate-300 p-2 text-center text-slate-600 font-medium">{globalIdx}</td>
-                                    <td className="border border-slate-300 p-3 text-sm leading-relaxed"><div className="whitespace-pre-wrap">{opt.content}</div></td>
-                                    <td className="border border-slate-300 p-3 text-sm leading-relaxed"><div className="whitespace-pre-wrap">{opt.method}</div></td>
-                                    <td className="border border-slate-300 p-3 text-sm leading-relaxed"><div className="whitespace-pre-wrap">{opt.productOut}</div></td>
-
-                                    <td className="border border-slate-300 p-2 text-center bg-slate-50/30">
-                                      <div className="flex justify-center">
-                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${Number(opt.tiendo) === 1 ? 'bg-primary-600 border-primary-600' : 'bg-white border-slate-300'}`}>
-                                          {Number(opt.tiendo) === 1 && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
-                                        </div>
-                                      </div>
-                                    </td>
-                                    <td className="border border-slate-300 p-2 text-center bg-slate-50/30">
-                                      <div className="flex justify-center">
-                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${Number(opt.tiendo) === 2 ? 'bg-primary-600 border-primary-600' : 'bg-white border-slate-300'}`}>
-                                          {Number(opt.tiendo) === 2 && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
-                                        </div>
-                                      </div>
-                                    </td>
-                                    <td className="border border-slate-300 p-2 text-center bg-slate-50/30">
-                                      <div className="flex justify-center">
-                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${Number(opt.tiendo) === 3 ? 'bg-primary-600 border-primary-600' : 'bg-white border-slate-300'}`}>
-                                          {Number(opt.tiendo) === 3 && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
-                                        </div>
-                                      </div>
-                                    </td>
-
-                                    <td className="border border-slate-300 p-2 text-center bg-green-50/30">
-                                      <div className="flex justify-center">
-                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${Number(opt.danhgia) === 1 ? 'bg-green-600 border-green-600' : 'bg-white border-slate-300'}`}>
-                                          {Number(opt.danhgia) === 1 && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
-                                        </div>
-                                      </div>
-                                    </td>
-                                    <td className="border border-slate-300 p-2 text-center bg-red-50/30">
-                                      <div className="flex justify-center">
-                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${Number(opt.danhgia) === 0 || Number(opt.danhgia) === 2 ? 'bg-red-600 border-red-600' : 'bg-white border-slate-300'}`}>
-                                          {(Number(opt.danhgia) === 0 || Number(opt.danhgia) === 2) && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
-                                        </div>
-                                      </div>
-                                    </td>
-
-                                    <td className="border border-slate-200 p-3 text-sm leading-relaxed"><div className="whitespace-pre-wrap">{opt.ghichu}</div></td>
-                                  </tr>
-                                );
-                              })}
-                            </React.Fragment>
-                          ));
-                        })()}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-
-            {/* ── BIỂU MẪU SECTIONS ────────────────────────────────── */}
-            {selectedFeedback.type === 'bieumau' &&
-              selectedFeedback.sections?.length > 0 && (
-                <div className="flex-grow px-6 py-5 flex flex-col gap-4">
-                  {(() => {
-                    let globalIdx = 0;
-                    const roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV'];
-                    return selectedFeedback.sections.map((section: any, sIdx: number) => (
-                      <div key={sIdx} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-
-                        {/* Section header - Styled like Phụ lục group */}
-                        <div className="bg-primary-800 px-4 py-2.5 flex items-center gap-2">
-                          <span className="inline-flex w-6 h-6 rounded-full bg-white/20 text-white text-xs font-bold items-center justify-center flex-shrink-0">
-                            {roman[sIdx] || sIdx + 1}
-                          </span>
-                          <span className="text-white font-semibold text-sm uppercase tracking-wide">
-                            {section.name}
-                          </span>
-                        </div>
-
-                        {/* Questions - Styled numbers like Phụ lục STT */}
-                        <div className="divide-y divide-slate-100">
-                          {section.option && Array.isArray(section.option) && section.option.map((opt: any, oIdx: number) => {
-                            globalIdx++;
-                            const rv = opt.ratingVote?.value;
-                            const hasRV = rv !== undefined && rv !== null;
-                            const aType: string = opt.answerType || "score1_5";
-                            const av = opt.answerValue;
-                            const hasAv = av !== null && av !== undefined && av !== "" && av !== -1;
-
-                            return (
-                              <div key={oIdx} className="px-4 py-3 flex flex-col sm:flex-row sm:items-start gap-4">
-                                {/* Number - Continuous numbering like Phụ lục STT */}
-                                <span className="flex-shrink-0 w-6 text-center text-slate-500 text-sm font-medium mt-0.5">
-                                  {globalIdx}
+            {selectedFeedback.type === 'phuluc' && selectedFeedback.sections?.length > 0 && (
+              <div className="flex-grow px-6 py-5 flex flex-col">
+                <div className="rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                  <table className="w-full border-collapse text-slate-700 table-fixed">
+                    <thead className="bg-primary-800 text-white">
+                      <tr>
+                        <th rowSpan={2} className="border border-white/30 p-2 w-[4%] text-center align-middle font-bold text-[11px]">STT</th>
+                        <th rowSpan={2} className="border border-white/30 p-2 w-[28%] text-center align-middle font-bold text-[11px]">Nội dung thực hiện</th>
+                        <th rowSpan={2} className="border border-white/30 p-2 w-[16%] text-center align-middle font-bold text-[11px]">Phương thức thực hiện</th>
+                        <th rowSpan={2} className="border border-white/30 p-2 w-[14%] text-center align-middle font-bold text-[11px]">Sản phẩm đầu ra</th>
+                        <th colSpan={3} className="border border-white/30 p-1.5 w-[18%] text-center align-middle font-bold text-[11px]">Tiến độ</th>
+                        <th colSpan={2} className="border border-white/30 p-1.5 w-[10%] text-center align-middle font-bold text-[11px]">Đánh giá</th>
+                        <th rowSpan={2} className="border border-white/30 p-2 w-[10%] text-center align-middle font-bold text-[11px]">Ghi chú</th>
+                      </tr>
+                      <tr>
+                        <th className="border border-white/30 p-1.5 text-center text-[10px] font-bold leading-tight">Đã làm</th>
+                        <th className="border border-white/30 p-1.5 text-center text-[10px] font-bold leading-tight">Đang làm</th>
+                        <th className="border border-white/30 p-1.5 text-center text-[10px] font-bold leading-tight">Chưa làm</th>
+                        <th className="border border-white/30 p-1.5 text-center text-[10px] font-bold leading-tight">Đạt</th>
+                        <th className="border border-white/30 p-1.5 text-center text-[10px] font-bold leading-tight">K.Đạt</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(() => {
+                        let globalIdx = 0;
+                        const roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV'];
+                        return selectedFeedback.sections.map((group: any, gi: number) => (
+                          <React.Fragment key={gi}>
+                            <tr className="bg-primary-800">
+                              <td className="p-2.5 text-center">
+                                <span className="inline-flex w-6 h-6 rounded-full bg-white/20 text-white text-xs font-bold items-center justify-center">
+                                  {roman[gi] || gi + 1}
                                 </span>
-
-                                <div className="flex-grow min-w-0">
-                                  <p className="text-slate-700 text-sm leading-relaxed">{opt.content}</p>
-                                  {opt.note && <p className="text-slate-400 text-xs mt-0.5 italic">Ghi chú: {opt.note}</p>}
-                                </div>
-
-                                <div className="flex-shrink-0 flex items-center justify-end min-w-[130px]">
-                                  {aType === "score1_5" && hasRV && <RatingBadge value={Number(rv)} />}
-
-                                  {aType === "single_choice" && hasAv && (
-                                    <span className="text-xs bg-primary-50 text-primary-800 border border-primary-200 px-2.5 py-1.5 rounded-full font-medium max-w-[220px] text-right break-words">
-                                      {String(av)}
-                                    </span>
-                                  )}
-
-                                  {aType === "percentage" && hasAv && (
-                                    <span className="inline-flex items-center gap-1 text-sm font-bold text-primary-700 bg-primary-50 border border-primary-200 px-3 py-1.5 rounded-full">
-                                      <i className="pi pi-chart-bar text-xs" />{av}%
-                                    </span>
-                                  )}
-
-                                  {aType === "text" && hasAv && (
-                                    <span className="text-xs text-slate-600 bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-lg max-w-[220px] text-right break-words">
-                                      {String(av)}
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ));
-                  })()}
+                              </td>
+                              <td colSpan={9} className="p-2.5 font-bold text-white text-sm">{group.name}</td>
+                            </tr>
+                            {group.option?.map((opt: any, oi: number) => {
+                              globalIdx++;
+                              return (
+                                <tr key={oi} className="hover:bg-slate-50 transition-colors bg-white">
+                                  <td className="border border-slate-300 p-2 text-center text-slate-600 font-medium">{globalIdx}</td>
+                                  <td className="border border-slate-300 p-3 text-sm"><div className="whitespace-pre-wrap">{opt.content}</div></td>
+                                  <td className="border border-slate-300 p-3 text-sm"><div className="whitespace-pre-wrap">{opt.method}</div></td>
+                                  <td className="border border-slate-300 p-3 text-sm"><div className="whitespace-pre-wrap">{opt.productOut}</div></td>
+                                  <td className="border border-slate-300 p-2 text-center">
+                                    <div className={`w-5 h-5 mx-auto rounded-full border-2 ${Number(opt.tiendo) === 1 ? 'bg-primary-600 border-primary-600' : 'bg-white border-slate-300'}`} />
+                                  </td>
+                                  <td className="border border-slate-300 p-2 text-center">
+                                    <div className={`w-5 h-5 mx-auto rounded-full border-2 ${Number(opt.tiendo) === 2 ? 'bg-primary-600 border-primary-600' : 'bg-white border-slate-300'}`} />
+                                  </td>
+                                  <td className="border border-slate-300 p-2 text-center">
+                                    <div className={`w-5 h-5 mx-auto rounded-full border-2 ${Number(opt.tiendo) === 3 ? 'bg-primary-600 border-primary-600' : 'bg-white border-slate-300'}`} />
+                                  </td>
+                                  <td className="border border-slate-300 p-2 text-center">
+                                    <div className={`w-5 h-5 mx-auto rounded-full border-2 ${Number(opt.danhgia) === 1 ? 'bg-green-600 border-green-600' : 'bg-white border-slate-300'}`} />
+                                  </td>
+                                  <td className="border border-slate-300 p-2 text-center">
+                                    <div className={`w-5 h-5 mx-auto rounded-full border-2 ${Number(opt.danhgia) === 0 || Number(opt.danhgia) === 2 ? 'bg-red-600 border-red-600' : 'bg-white border-slate-300'}`} />
+                                  </td>
+                                  <td className="border border-slate-300 p-3 text-sm"><div className="whitespace-pre-wrap">{opt.ghichu}</div></td>
+                                </tr>
+                              );
+                            })}
+                          </React.Fragment>
+                        ));
+                      })()}
+                    </tbody>
+                  </table>
                 </div>
-              )}
+              </div>
+            )}
 
-            {/* ── FOOTER ───────────────────────────────────────────── */}
-            {/* <div className="p-4 border-t border-slate-200 bg-white flex-shrink-0 flex justify-end">
-              <Button label="Đóng" icon="pi pi-times" onClick={() => setDialogVisible(false)} className="p-button-outlined border-slate-300 text-slate-700 hover:bg-slate-100 font-bold px-6 py-2" />
-            </div> */}
-
+            {selectedFeedback.type === 'bieumau' && selectedFeedback.sections?.length > 0 && (
+              <div className="flex-grow px-6 py-5 flex flex-col gap-4">
+                {(() => {
+                  let globalIdx = 0;
+                  const roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV'];
+                  return selectedFeedback.sections.map((section: any, sIdx: number) => (
+                    <div key={sIdx} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                      <div className="bg-primary-800 px-4 py-2.5 flex items-center gap-2">
+                        <span className="inline-flex w-6 h-6 rounded-full bg-white/20 text-white text-xs font-bold items-center justify-center">{roman[sIdx] || sIdx + 1}</span>
+                        <span className="text-white font-semibold text-sm uppercase tracking-wide">{section.name}</span>
+                      </div>
+                      <div className="divide-y divide-slate-100">
+                        {section.option?.map((opt: any, oIdx: number) => {
+                          globalIdx++;
+                          return (
+                            <div key={oIdx} className="px-4 py-3 flex flex-col sm:flex-row sm:items-start gap-4">
+                              <span className="flex-shrink-0 w-6 text-center text-slate-500 text-sm font-medium mt-0.5">{globalIdx}</span>
+                              <div className="flex-grow min-w-0">
+                                <p className="text-slate-700 text-sm leading-relaxed">{opt.content}</p>
+                                {opt.note && <p className="text-slate-400 text-xs mt-0.5 italic">Ghi chú: {opt.note}</p>}
+                              </div>
+                              <div className="flex-shrink-0 flex items-center justify-end min-w-[130px]">
+                                {opt.answerType === "score1_5" && opt.ratingVote?.value !== undefined && <RatingBadge value={Number(opt.ratingVote.value)} />}
+                                {opt.answerType === "single_choice" && opt.answerValue && <span className="text-xs bg-primary-50 text-primary-800 border border-primary-200 px-2.5 py-1.5 rounded-full font-medium">{String(opt.answerValue)}</span>}
+                                {opt.answerType === "percentage" && opt.answerValue !== undefined && <span className="text-sm font-bold text-primary-700 bg-primary-50 px-3 py-1.5 rounded-full">{opt.answerValue}%</span>}
+                                {opt.answerType === "text" && opt.answerValue && <span className="text-xs text-slate-600 bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-lg">{String(opt.answerValue)}</span>}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ));
+                })()}
+              </div>
+            )}
           </div>
         )}
       </Dialog>
