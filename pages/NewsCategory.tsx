@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
-import { MOCK_NEWS, MAIN_MENU, SERVICE_CATEGORIES_FILTER } from "../constants";
+import { MAIN_MENU, SERVICE_CATEGORIES_FILTER } from "../constants";
 import { api } from "../api";
 import {
   ChevronRight,
@@ -58,7 +58,7 @@ const NewsCategory = () => {
           ? latestData.data
           : latestData.data?.data || [];
         setLatestNews(latestItems);
-        setLatestNews3( [...latestItems].sort(() => 0.5 - Math.random()).slice(0, 3));
+        setLatestNews3([...latestItems].sort(() => 0.5 - Math.random()).slice(0, 3));
 
         // 2. Fetch Spotlight (1 post)
         if (latestItems.length > 0) {
@@ -101,7 +101,7 @@ const NewsCategory = () => {
           order: "createdAt.desc",
         };
         console.log(category);
-        
+
         if (category) params.category_id = category.id;
 
         const response = await api.get("/posts", params);
@@ -139,9 +139,7 @@ const NewsCategory = () => {
     )?.title ||
     "Tin tức y tế";
 
-  // Using first post from MOCK_NEWS as fallback spotlight for layout if API fails
-  const spotlightItem = dbSpotlight || MOCK_NEWS[0];
-  const featuredHighlights = MOCK_NEWS.slice(4, 7);
+  const spotlightItem = dbSpotlight || [];
 
   return (
     <div className="bg-white min-h-screen font-sans text-gray-800 pb-12">

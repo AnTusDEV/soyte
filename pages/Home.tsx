@@ -414,42 +414,42 @@ const Home = () => {
               <div className="space-y-4 max-h-[400px] overflow-y-auto no-scrollbar pr-2">
                 {loading
                   ? [...Array(5)].map((_, i) => (
-                      <div key={i} className="flex gap-4 animate-pulse">
-                        <div className="w-24 h-16 bg-gray-200 rounded flex-shrink-0"></div>
-                        <div className="flex-grow space-y-2">
-                          <div className="h-4 bg-gray-200 rounded w-full"></div>
-                          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                    <div key={i} className="flex gap-4 animate-pulse">
+                      <div className="w-24 h-16 bg-gray-200 rounded flex-shrink-0"></div>
+                      <div className="flex-grow space-y-2">
+                        <div className="h-4 bg-gray-200 rounded w-full"></div>
+                        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                      </div>
+                    </div>
+                  ))
+                  : latestTenPosts.map((post) => (
+                    <Link
+                      key={post.id}
+                      to={`/news/detail/${post.id}`}
+                      className="flex gap-4 group border-b border-gray-50 pb-4 last:border-0 last:pb-0 items-start"
+                    >
+                      <div className="w-24 h-16 rounded overflow-hidden flex-shrink-0 bg-gray-100">
+                        <img
+                          src={post.imageUrl}
+                          className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                          alt=""
+                        />
+                      </div>
+                      <div className="flex-grow">
+                        <h4 className="text-sm font-bold text-gray-800 group-hover:text-red-600 line-clamp-2 leading-snug">
+                          {post.title}
+                        </h4>
+                        <div className="flex items-center gap-2 mt-2">
+                          <span className="text-[10px] font-bold text-gray-400 flex items-center gap-1">
+                            <Clock size={12} />{" "}
+                            {new Date(post.createdAt).toLocaleDateString(
+                              "vi-VN",
+                            )}
+                          </span>
                         </div>
                       </div>
-                    ))
-                  : latestTenPosts.map((post) => (
-                      <Link
-                        key={post.id}
-                        to={`/news/detail/${post.id}`}
-                        className="flex gap-4 group border-b border-gray-50 pb-4 last:border-0 last:pb-0 items-start"
-                      >
-                        <div className="w-24 h-16 rounded overflow-hidden flex-shrink-0 bg-gray-100">
-                          <img
-                            src={post.imageUrl}
-                            className="w-full h-full object-cover transition-transform group-hover:scale-110"
-                            alt=""
-                          />
-                        </div>
-                        <div className="flex-grow">
-                          <h4 className="text-sm font-bold text-gray-800 group-hover:text-red-600 line-clamp-2 leading-snug">
-                            {post.title}
-                          </h4>
-                          <div className="flex items-center gap-2 mt-2">
-                            <span className="text-[10px] font-bold text-gray-400 flex items-center gap-1">
-                              <Clock size={12} />{" "}
-                              {new Date(post.createdAt).toLocaleDateString(
-                                "vi-VN",
-                              )}
-                            </span>
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
+                    </Link>
+                  ))}
               </div>
             </div>
           </div>
@@ -522,11 +522,10 @@ const Home = () => {
                       label={channel}
                       onClick={() => setActiveChannel(channel)}
                       className={`px-6 py-3 text-sm font-bold uppercase transition-colors relative
-                              ${
-                                activeChannel === channel
-                                  ? "!text-red-500 !bg-[#0f172a]"
-                                  : "!text-gray-400 hover:!text-white hover:!bg-gray-800"
-                              }`}
+                              ${activeChannel === channel
+                          ? "!text-red-500 !bg-[#0f172a]"
+                          : "!text-gray-400 hover:!text-white hover:!bg-gray-800"
+                        }`}
                     >
                       {activeChannel === channel && (
                         <span className="absolute top-0 left-0 right-0 h-0.5 bg-red-600"></span>
@@ -580,11 +579,10 @@ const Home = () => {
                           key={video.id}
                           onClick={() => setCurrentVideo(video)}
                           className={`flex flex-col gap-2 p-2 rounded cursor-pointer mb-2 transition border border-transparent
-                                       ${
-                                         currentVideo.id === video.id
-                                           ? "bg-gray-700 border-gray-600"
-                                           : "hover:bg-gray-800"
-                                       }
+                                       ${currentVideo.id === video.id
+                              ? "bg-gray-700 border-gray-600"
+                              : "hover:bg-gray-800"
+                            }
                                     `}
                         >
                           <div className="w-full aspect-video bg-gray-900 rounded overflow-hidden flex-shrink-0 relative">
@@ -599,11 +597,10 @@ const Home = () => {
                           </div>
                           <div className="flex-1">
                             <h5
-                              className={`text-xs font-bold leading-snug line-clamp-3 ${
-                                currentVideo.id === video.id
+                              className={`text-xs font-bold leading-snug line-clamp-3 ${currentVideo.id === video.id
                                   ? "text-red-400"
                                   : "text-gray-300"
-                              }`}
+                                }`}
                             >
                               {video.title}
                             </h5>

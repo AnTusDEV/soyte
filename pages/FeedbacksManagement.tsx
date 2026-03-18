@@ -37,7 +37,7 @@ const FeedbacksManagement: React.FC = () => {
     danhgiaChartData,
     barChartData,
     getPercentValue
-  } = useFeedbackStats(toast);
+  } = useFeedbackStats(type,toast);
 
   const handleFilterChange = (newType: string) => {
     setFilterType(newType);
