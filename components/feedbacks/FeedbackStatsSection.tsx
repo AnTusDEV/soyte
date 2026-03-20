@@ -6,6 +6,7 @@ import SatisfactionComponentChart from '../SatisfactionRadarChart';
 import OverviewStats from '../StatsChart';
 import SectionStackedChart from '../SectionStackedChart';
 import SummaryCards from '../SummaryCards';
+import CombinedProgressQualityChart from '../CombinedProgressQualityChart';
 
 interface FeedbackStatsSectionProps {
   type?: string;
@@ -109,7 +110,7 @@ export const FeedbackStatsSection: React.FC<FeedbackStatsSectionProps> = ({
                         {stats.reflect.tiendo.daLam}
                       </p>
                       <p className="text-[11px] text-slate-500 font-semibold uppercase tracking-wide mt-1">
-                        Đã làm
+                        Đã thực hiện
                       </p>
                     </div>
                     <div className="w-[1px] bg-slate-200 h-10 self-center"></div>
@@ -118,7 +119,7 @@ export const FeedbackStatsSection: React.FC<FeedbackStatsSectionProps> = ({
                         {stats.reflect.tiendo.dangLam}
                       </p>
                       <p className="text-[11px] text-slate-500 font-semibold uppercase tracking-wide mt-1">
-                        Đang làm
+                        Đang thực hiện
                       </p>
                     </div>
                     <div className="w-[1px] bg-slate-200 h-10 self-center"></div>
@@ -127,14 +128,13 @@ export const FeedbackStatsSection: React.FC<FeedbackStatsSectionProps> = ({
                         {stats.reflect.tiendo.chuaLam}
                       </p>
                       <p className="text-[11px] text-slate-500 font-semibold uppercase tracking-wide mt-1">
-                        Chưa làm
+                        Chưa thực hiện
                       </p>
                     </div>
                   </div>
                 )}
               </div>
             </div>
-
             {/* Chart 2: Doughnut - Đánh giá chất lượng */}
             <div className="rounded-3xl border border-slate-200 bg-[#f8fafc] p-5 shadow-sm flex flex-col transition-transform md:col-span-1">
               {/* Tiêu đề & Mô tả */}
@@ -182,7 +182,6 @@ export const FeedbackStatsSection: React.FC<FeedbackStatsSectionProps> = ({
                 )}
               </div>
             </div>
-
             {/* Chart 3: Area Line - Xu hướng phiếu phản ánh (Đã được định dạng đồng bộ để sẵn sàng sử dụng) */}
             {/* <div className="rounded-3xl border border-slate-200 bg-[#f8fafc] p-5 shadow-sm flex flex-col transition-transform md:col-span-2 lg:col-span-2">
             <div className="mb-4 flex flex-col justify-center">
@@ -228,6 +227,7 @@ export const FeedbackStatsSection: React.FC<FeedbackStatsSectionProps> = ({
               data={stats?.reflect?.bySection}
               type="tiendo"
             />
+            <CombinedProgressQualityChart data={stats?.reflect} rateMode="total" />
           </div>
         </>
       )}

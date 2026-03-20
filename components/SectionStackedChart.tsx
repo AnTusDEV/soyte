@@ -67,7 +67,7 @@ const MiniSectionChart: React.FC<Props> = ({
       <div className="rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm">
         <div
           className={`space-y-4 ${
-            rows.length > 5 ? "max-h-[320px] overflow-y-auto pr-2" : ""
+            rows.length > 9 ? "max-h-[320px] overflow-y-auto pr-2" : ""
           }`}
         >
           {rows.map((row, index) => (
@@ -110,19 +110,19 @@ const MiniSectionChart: React.FC<Props> = ({
           <div className="flex flex-wrap gap-4 text-xs font-medium text-slate-500">
             <div className="flex items-center gap-2">
               <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-              Tích cực
+              Đã thực hiện
             </div>
 
             {type === "tiendo" && (
               <div className="flex items-center gap-2">
                 <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
-                Trung bình
+                Đang thực hiện
               </div>
             )}
 
             <div className="flex items-center gap-2">
               <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
-              Tiêu cực
+              Chưa thực hiện
             </div>
           </div>
         </div>
