@@ -131,6 +131,7 @@ const TableOptionRow = memo(function TableOptionRow({
   oIndex,
   progressError,
   ratingError,
+  isValidate,
   onUpdateNote,
   onUpdateProgress,
   onUpdateRating,
@@ -140,6 +141,7 @@ const TableOptionRow = memo(function TableOptionRow({
   oIndex: number;
   progressError: boolean;
   ratingError: boolean;
+  isValidate: boolean;
   onUpdateNote: (
     sectionIndex: number,
     optionIndex: number,
@@ -234,7 +236,7 @@ const TableOptionRow = memo(function TableOptionRow({
               progressError ? "text-red-500" : "text-slate-400"
             }`}
           >
-            Tiến độ thực hiện <span className="text-red-500">*</span>
+            Tiến độ thực hiện {isValidate && <span className="text-red-500">*</span>}
           </div>
 
           <div
@@ -277,7 +279,7 @@ const TableOptionRow = memo(function TableOptionRow({
               ratingError ? "text-red-500" : "text-slate-400"
             }`}
           >
-            Đánh giá <span className="text-red-500">*</span>
+            Đánh giá {isValidate && <span className="text-red-500">*</span>}
           </div>
 
           <div
@@ -390,6 +392,7 @@ const TableSection = memo(function TableSection({
               oIndex={oIndex}
               progressError={!!errors[`progress-${sIndex}-${oIndex}`]}
               ratingError={!!errors[`rating-${sIndex}-${oIndex}`]}
+              isValidate={section.isValidate !== false && item.isValidate !== false}
               onUpdateNote={onUpdateNote}
               onUpdateProgress={onUpdateProgress}
               onUpdateRating={onUpdateRating}
@@ -416,6 +419,7 @@ export default function BieuMau1Table({ id, type, formJson }: any) {
   const [customerName, setCustomerName] = useState("");
   const [fullNameError, setFullNameError] = useState(false);
   const navigateTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const prevOpenSection = useRef(openSection);
   const visibleInfo = useMemo(() => {
     return (info ?? [])
       .filter((item) => item?.status)
@@ -448,18 +452,28 @@ export default function BieuMau1Table({ id, type, formJson }: any) {
 const toggleSection = useCallback((index: number) => {
   setOpenSection((prev) => (prev === index ? null : index));
 }, []);
+
 useEffect(() => {
-  if (openSection === null) return;
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  };
+  scrollToTop();
+  requestAnimationFrame(scrollToTop);
+}, []);
 
-  const el = sectionRefs.current[openSection];
-  if (!el) return;
-
-  requestAnimationFrame(() => {
-    el.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-  });
+useEffect(() => {
+  if (prevOpenSection.current !== openSection) {
+    prevOpenSection.current = openSection;
+    
+    if (openSection !== null) {
+      const el = sectionRefs.current[openSection];
+      if (el) {
+        const yOffset = -220; 
+        const y = el.getBoundingClientRect().top + window.scrollY + yOffset;
+        window.scrollTo({ top: y, behavior: "smooth" });
+      }
+    }
+  }
 }, [openSection]);
   const clearFieldError = useCallback((key: string) => {
     setErrors((prev) => {
@@ -587,7 +601,10 @@ useEffect(() => {
     });
 
     tableData.forEach((section: any, sectionIndex: number) => {
-      section.option.forEach((item: any, optionIndex: number) => {
+        if (section.isValidate === false) return;
+
+        section.option.forEach((item: any, optionIndex: number) => {
+          if (item.isValidate === false) return;
         const progressValue = item?.progress?.value;
         const ratingValue = item?.rating?.value;
         const noteValue = item?.note;

@@ -94,12 +94,22 @@ export default function SurveyInfo({ info, fieldKey, value, onChange, error }) {
   const visibleOptions = useMemo(() => {
     return filteredOptions.slice(0, visibleCount);
   }, [filteredOptions, visibleCount]);
+
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
   }, [searchText, selectOptions]);
+
+  const initializedKey = useRef<string | null>(null);
+
   useEffect(() => {
-    setVisibleCount(PAGE_SIZE);
-  }, [selectOptions]);
+    if (info.type === "date" && !value?.value && initializedKey.current !== fieldKey) {
+      onChange(fieldKey, {
+        key: info.key,
+        value: new Date().toISOString(),
+      });
+      initializedKey.current = fieldKey;
+    }
+  }, [info.type, info.key, fieldKey, value?.value, onChange]);
 
   const renderField = () => {
     switch (info.type) {
