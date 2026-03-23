@@ -45,7 +45,7 @@ export const adminMenu: MenuItem[] = [
     key: "smtp",
     label: "Cấu hình SMTP",
     icon: Settings,
-    permission: "users",
+    permission: "email_confirm",
     to: "/admin/smtp",
   },
   {
