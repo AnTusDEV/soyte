@@ -25,7 +25,6 @@ const Login: React.FC = () => {
         email: loginEmail,
         password: password,
       });
-      console.log(data);
 
       if (data && data.token) {
         await login(data.token);

@@ -1,6 +1,11 @@
-
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { api } from './api'; // Correctly import the api object
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import { api } from "./api"; // Correctly import the api object
 
 // Define the shape of the user object
 interface User {
@@ -8,7 +13,7 @@ interface User {
   name: string;
   email: string;
   full_name: string;
-  role: 'admin' | 'user';
+  role: "admin" | "user";
   permissions: string[];
 }
 
@@ -36,20 +41,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const token = localStorage.getItem('auth_token');
+        const token = localStorage.getItem("auth_token");
         if (token) {
-          const storedUser = localStorage.getItem('user_info');
+          const storedUser = localStorage.getItem("user_info");
           if (storedUser) {
             setUser(JSON.parse(storedUser));
             setLoading(false);
           }
-          const response = await api.get('/auth/me');
+          const response = await api.get("/auth/me");
           setUser(response.user); // Extract the user object
-          localStorage.setItem('user_info', JSON.stringify(response.user));
+          localStorage.setItem("user_info", JSON.stringify(response.user));
         }
       } catch (error) {
-        console.error('Failed to fetch user:', error);
-        localStorage.removeItem('auth_token');
+        console.error("Failed to fetch user:", error);
+        localStorage.removeItem("auth_token");
         setUser(null);
       } finally {
         setLoading(false);
@@ -60,41 +65,38 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const login = async (token: string) => {
-    localStorage.setItem('auth_token', token);
+    localStorage.setItem("auth_token", token);
     setLoading(true);
     try {
-        const response = await api.get('/auth/me');
-        setUser(response.user); // Extract the user object
-        localStorage.setItem('user_info', JSON.stringify(response.user));
-    } catch(error) {
-        console.error('Failed to fetch user after login:', error);
-        setUser(null);
+      const response = await api.get("/auth/me");
+      setUser(response.user); // Extract the user object
+      localStorage.setItem("user_info", JSON.stringify(response.user));
+      localStorage.setItem("unit_id", response.user.unit);
+    } catch (error) {
+      console.error("Failed to fetch user after login:", error);
+      setUser(null);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user_info');
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("user_info");
     setUser(null);
-    window.location.href = '/login';
+    window.location.href = "/login";
   };
 
   const value = { user, loading, login, logout };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 // Create a custom hook for easy consumption of the context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

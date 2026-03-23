@@ -4,6 +4,7 @@ import { Dropdown } from "primereact/dropdown";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 const PAGE_SIZE = 10;
 export default function SurveyInfo({ info, fieldKey, value, onChange, error }) {
+  console.log(info);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const [searchText, setSearchText] = useState("");
@@ -102,14 +103,30 @@ export default function SurveyInfo({ info, fieldKey, value, onChange, error }) {
   const initializedKey = useRef<string | null>(null);
 
   useEffect(() => {
-    if (info.type === "date" && !value?.value && initializedKey.current !== fieldKey) {
-      onChange(fieldKey, {
-        key: info.key,
-        value: new Date().toISOString(),
-      });
-      initializedKey.current = fieldKey;
+    if (!value?.value && initializedKey.current !== fieldKey) {
+      if (info.type === "date") {
+        onChange(fieldKey, {
+          key: info.key,
+          value: new Date().toISOString(),
+        });
+        initializedKey.current = fieldKey;
+      } else if (info.type === "select" || info.type === "facility_multiselect") {
+        const unitId = localStorage.getItem("unit_id");
+        if (unitId) {
+          const matchedOption = selectOptions.find(
+            (opt) => String(opt.key) === String(unitId),
+          );
+          if (matchedOption) {
+            onChange(fieldKey, {
+              key: info.key,
+              value: matchedOption,
+            });
+          }
+        }
+        initializedKey.current = fieldKey;
+      }
     }
-  }, [info.type, info.key, fieldKey, value?.value, onChange]);
+  }, [info.type, info.key, fieldKey, value?.value, onChange, selectOptions]);
 
   const renderField = () => {
     switch (info.type) {
