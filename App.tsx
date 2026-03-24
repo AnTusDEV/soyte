@@ -9,6 +9,8 @@ import EmergencyCenter from "./pages/EmergencyCenter";
 import HealthConsultation from "./pages/HealthConsultation";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
+import ChangePassword from "./pages/ChangePassword";
 import AdminDashboard from "./pages/AdminDashboard";
 import HealthRecordsDetail from "./pages/HealthRecordsDetail";
 import WorkSchedule from "./pages/WorkSchedule";
@@ -16,6 +18,7 @@ import DataLookup from "./pages/DataLookup";
 import PolicyHealthInsurance from "./pages/PolicyHealthInsurance";
 import UserManagement from "./pages/UserManagement";
 import SmtpSettings from "./pages/SmtpSettings";
+import ConfirmPassword from "./pages/ConfirmPassword";
 import AdminWorkSchedule from "./pages/AdminWorkSchedule";
 import TemplatesManagement from "./pages/TemplatesManagement";
 import TemplateCreate from "./pages/TemplateCreate";
@@ -29,7 +32,6 @@ import { Toast } from "@/components/prime";
 import { useRef } from "react";
 import FormDetail from "./pages/FormDetail";
 import FormList from "./pages/FormList";
-import ConfirmPassword from "./pages/ConfirmPassword";
 import { ConfirmDialog } from "primereact/confirmdialog";
 const App = () => {
   const { loading } = useAuth();
@@ -58,6 +60,8 @@ const App = () => {
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/change-password" element={<ChangePassword />} />
         <Route path="/confirm-password/:username" element={<ConfirmPassword />} />
         <Route path="/register" element={<Register />} />
         <Route
@@ -95,7 +99,6 @@ const App = () => {
           {/* New Admin Schedule Route */}
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
-
         {/* Not Found */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

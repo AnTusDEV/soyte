@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Home, LogOut, LayoutDashboard, User, ChevronDown } from "lucide-react";
+import { Home, LogOut, LayoutDashboard, User, ChevronDown, Key, Settings } from "lucide-react";
 import { useAuth } from "../AuthContext";
 import { Toast } from "primereact/toast";
 import { ConfirmDialog } from "primereact/confirmdialog";
+import { TieredMenu } from "primereact/tieredmenu";
 import { Button } from "@/components/prime";
 import { adminMenu, type MenuItem } from "../adminMenu";
+import UserInfoModal from "./UserInfoModal";
+import { useRef } from "react";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -21,11 +24,41 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const { logout, user } = useAuth();
+  const menu = useRef<TieredMenu>(null);
+  const [showUserInfo, setShowUserInfo] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
+
+  const profileMenuItems = [
+    {
+      label: "Thông tin cá nhân",
+      icon: <User size={16} className="mr-2" />,
+      command: () => setShowUserInfo(true),
+    },
+    {
+      label: "Đổi mật khẩu",
+      icon: "pi pi-key",
+      command: () => navigate("/change-password"),
+    },
+    { separator: true },
+    {
+      label: "Thoát hệ thống",
+      icon: <LogOut size={16} className="mr-2 text-red-500" />,
+      command: handleLogout,
+      template: (item: any, options: any) => (
+        <button
+          onClick={options.onClick}
+          className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-red-500 hover:bg-red-50 w-full transition-colors"
+        >
+          {item.icon}
+          <span>{item.label}</span>
+        </button>
+      ),
+    },
+  ];
 
   const getDefaultOpenMenus = (): Record<string, boolean> => {
     const result: Record<string, boolean> = {};
@@ -191,16 +224,22 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
               <span>Trang chủ</span>
             </Link>
 
-            <span className="flex items-center gap-1.5 rounded-lg bg-gray-100 px-3 py-2 text-sm font-bold text-gray-700">
-              <User size={18} />
+            <TieredMenu model={profileMenuItems} popup ref={menu} breakpoint="767px" className="rounded-xl shadow-2xl border-none ring-1 ring-black/5 p-1" />
+            
+            <button
+              onClick={(e) => menu.current?.toggle(e)}
+              className="flex items-center gap-2 rounded-lg bg-gray-100 hover:bg-gray-200 px-3 py-2 text-sm font-bold text-gray-700 transition-all border border-gray-200/50 group"
+            >
+              <User size={18} className="text-gray-400 group-hover:text-primary-600 transition-colors" />
               <span>{user?.full_name || user?.email?.split("@")[0]}</span>
-            </span>
+              <ChevronDown size={14} className="opacity-50" />
+            </button>
 
             <Button
               onClick={handleLogout}
               icon={<LogOut size={18} />}
               label="Thoát"
-              className="gap-2 px-3 py-2 text-sm text-red-500 hover:!bg-red-700 hover:text-white"
+              className="gap-2 px-3 py-2 text-sm text-red-500 hover:!bg-red-700 hover:text-white border-none shadow-none"
             />
           </div>
         </div>
@@ -208,6 +247,13 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
         <div className="flex-grow p-8">
           <div>{children}</div>
         </div>
+
+        {/* Modals */}
+        <UserInfoModal 
+          visible={showUserInfo} 
+          onHide={() => setShowUserInfo(false)} 
+          user={user} 
+        />
       </main>
     </div>
   );

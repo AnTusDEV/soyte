@@ -17,6 +17,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     location.pathname.startsWith('/login') ||
     location.pathname.startsWith('/register') ||
     location.pathname.startsWith('/confirm-password') ||
+    location.pathname.startsWith('/change-password') ||
+    location.pathname.startsWith('/forgot-password') ||
     location.pathname === '/hanoi-system' ||
     location.pathname === '/emergency';
 

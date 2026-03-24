@@ -1,7 +1,8 @@
 import { SmtpConfig } from "./types";
 
-// const BASE_URL = 'https://suckhoethudo.vn:7005/api';
-const BASE_URL = "https://localhost:7002/api";
+const BASE_URL = "https://suckhoethudo.vn:7005/api";
+//const BASE_URL = "https://localhost:7002/api";
+//const BASE_URL = "https://10.10.10.19:7002/api";
 
 export const api = {
   async get(endpoint: string, params?: Record<string, any>) {
@@ -170,5 +171,21 @@ export const api = {
 
   async updateSmtpConfig(data: SmtpConfig) {
     return this.put("/email-confirm", data);
+  },
+
+  async confirmPassword(username: string, password: string) {
+    return this.post(`/auth/confirm-password/${username}`, { password });
+  },
+
+  async forgotPassword(username: string) {
+    return this.post("/auth/forgot-password", { username });
+  },
+
+  async changePassword(data: any) {
+    return this.put("/auth/change-password", data);
+  },
+
+  async getMe() {
+    return this.get("/auth/me");
   },
 };

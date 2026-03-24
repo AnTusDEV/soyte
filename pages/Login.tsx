@@ -127,12 +127,21 @@ const Login: React.FC = () => {
                 />
               </div>
             </div>
-            <Link
-              to="/register"
-              className="flex items-center justify-end gap-2 text-xs font-bold text-primary-600 hover:text-primary-800 transition-colors uppercase tracking-widest group"
-            >
-              <span>→ Đăng ký ngay </span>
-            </Link>
+
+            <div className="flex items-center justify-between px-1">
+              <Link
+                to="/forgot-password"
+                className="text-[10px] font-black text-gray-400 hover:text-primary-600 transition-colors uppercase tracking-widest"
+              >
+                Quên mật khẩu?
+              </Link>
+              <Link
+                to="/register"
+                className="text-[10px] font-black text-primary-600 hover:text-primary-800 transition-colors uppercase tracking-widest"
+              >
+                Đăng ký ngay →
+              </Link>
+            </div>
             <div className="space-y-4">
               <Button
                 type="submit"

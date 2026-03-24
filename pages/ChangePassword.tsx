@@ -1,17 +1,22 @@
 import React, { useState, useRef } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { Eye, EyeOff, ArrowLeft, AlertCircle, CheckCircle2, ShieldCheck, Lock, XCircle } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff, ArrowLeft, AlertCircle, CheckCircle2, Lock, XCircle } from "lucide-react";
 import { Button } from "@/components/prime";
 import { api } from "../api";
 import { Toast } from "primereact/toast";
+import { useAuth } from "../AuthContext";
 
-const ConfirmPassword: React.FC = () => {
-  const { username } = useParams<{ username: string }>();
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+const ChangePassword: React.FC = () => {
+  const { user } = useAuth();
+  const [showOld, setShowOld] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [formData, setFormData] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const toast = useRef<Toast>(null);
@@ -32,54 +37,53 @@ const ConfirmPassword: React.FC = () => {
     };
   };
 
-  const validation = validatePassword(password);
-  const passwordsMatch = password && password === confirmPassword;
+  const validation = validatePassword(formData.newPassword);
+  const passwordsMatch = formData.newPassword && formData.newPassword === formData.confirmPassword;
+  const canSubmit = validation.isValid && passwordsMatch && formData.oldPassword;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validation.isValid) return;
-    if (!passwordsMatch) return;
+    if (!canSubmit) return;
 
     setError("");
     setIsLoading(true);
     try {
-      await api.confirmPassword(username || "", password);
+      await api.changePassword({
+        oldPassword: formData.oldPassword,
+        newPassword: formData.newPassword,
+      });
       setSuccess(true);
       toast.current?.show({
         severity: "success",
         summary: "Thành công",
-        detail: "Mật khẩu đã được cập nhật thành công",
+        detail: "Mật khẩu của bạn đã được thay đổi thành công",
       });
-      setTimeout(() => navigate("/login"), 3000);
+      setTimeout(() => navigate(-1), 3000);
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "Không thể cập nhật mật khẩu. Vui lòng thử lại.");
-      toast.current?.show({
-        severity: "error",
-        summary: "Lỗi",
-        detail: err.message || "Cập nhật mật khẩu thất bại",
-      });
+      setError(err.message || "Không thể cập nhật mật khẩu. Vui lòng kiểm tra lại mật khẩu cũ.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#e5e7eb] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#e5e7eb] flex items-center justify-center p-4 font-sans">
       <Toast ref={toast} />
       <div className="max-w-md w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <Link
-          to="/login"
+        <button
+          onClick={() => navigate(-1)}
           className="inline-flex items-center text-sm text-gray-500 hover:text-primary-600 mb-6 transition group"
         >
           <ArrowLeft
             size={16}
             className="mr-2 group-hover:-translate-x-1 transition-transform"
           />
-          Quay lại đăng nhập
-        </Link>
+          Quay lại
+        </button>
 
-        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+        <div className="bg-white rounded-[32px] shadow-2xl overflow-hidden border border-gray-100">
+          {/* Blue Header Section - Matching Image 8 */}
           <div className="bg-[#0066a2] p-10 text-center relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
             <div className="relative z-10">
@@ -91,10 +95,10 @@ const ConfirmPassword: React.FC = () => {
                 />
               </div>
               <h1 className="text-xl font-bold text-white uppercase tracking-tight">
-                Xác nhận mật khẩu
+                Đổi mật khẩu
               </h1>
               <p className="text-white/80 text-[10px] font-bold uppercase tracking-widest mt-2 bg-white/10 py-1 px-3 rounded-full inline-block">
-                Người dùng: {username}
+                Người dùng: {user?.full_name || user?.name || "Cán bộ"}
               </p>
             </div>
           </div>
@@ -113,7 +117,7 @@ const ConfirmPassword: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-green-800 font-bold">Thành công!</h3>
-                  <p className="text-green-600 text-xs">Mật khẩu của bạn đã được cập nhật. Bạn sẽ được chuyển hướng đến trang đăng nhập...</p>
+                  <p className="text-green-600 text-xs">Mật khẩu của bạn đã được cập nhật. Bạn sẽ được chuyển hướng quay lại...</p>
                 </div>
               </div>
             ) : (
@@ -121,68 +125,89 @@ const ConfirmPassword: React.FC = () => {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
-                       <Lock size={12} /> Mật khẩu mới
+                       <Lock size={12} /> Mật khẩu hiện tại
                     </label>
                     <div className="relative">
                       <input
-                        type={showPassword ? "text" : "password"}
+                        type={showOld ? "text" : "password"}
                         required
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className={`w-full p-4 bg-gray-50 border ${password && !validation.isValid ? 'border-red-200' : 'border-gray-200'} rounded-2xl outline-none focus:ring-4 focus:ring-primary-100 focus:bg-white transition-all text-sm font-bold`}
-                        placeholder="Nhập mật khẩu mới"
+                        value={formData.oldPassword}
+                        onChange={(e) => setFormData({ ...formData, oldPassword: e.target.value })}
+                        className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:ring-4 focus:ring-primary-100 focus:bg-white transition-all text-sm font-bold"
+                        placeholder="Nhập mật khẩu cũ"
                       />
-                      <Button
+                      <button
                         type="button"
-                        icon={showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                        text
-                        rounded
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 !text-gray-400 hover:!text-primary-600"
-                      />
+                        onClick={() => setShowOld(!showOld)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-600 transition-colors"
+                      >
+                        {showOld ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
                     </div>
                   </div>
 
                   <div>
                     <label className="block text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
-                       <CheckCircle2 size={12} /> Xác nhận mật khẩu
+                       <Lock size={12} /> Mật khẩu mới
                     </label>
                     <div className="relative">
                       <input
-                        type={showConfirmPassword ? "text" : "password"}
+                        type={showNew ? "text" : "password"}
                         required
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        className={`w-full p-4 bg-gray-50 border ${confirmPassword && !passwordsMatch ? 'border-red-200' : 'border-gray-200'} rounded-2xl outline-none focus:ring-4 focus:ring-primary-100 focus:bg-white transition-all text-sm font-bold`}
+                        value={formData.newPassword}
+                        onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
+                        className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:ring-4 focus:ring-primary-100 focus:bg-white transition-all text-sm font-bold"
+                        placeholder="Nhập mật khẩu mới"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNew(!showNew)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-600 transition-colors"
+                      >
+                        {showNew ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
+                       <CheckCircle2 size={12} /> Xác nhận mật khẩu mới
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showConfirm ? "text" : "password"}
+                        required
+                        value={formData.confirmPassword}
+                        onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                        className={`w-full p-4 bg-gray-50 border ${formData.confirmPassword && !passwordsMatch ? 'border-red-200' : 'border-gray-200'} rounded-2xl outline-none focus:ring-4 focus:ring-primary-100 focus:bg-white transition-all text-sm font-bold`}
                         placeholder="Nhập lại mật khẩu mới"
                       />
-                      <Button
+                      <button
                         type="button"
-                        icon={showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                        text
-                        rounded
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 !text-gray-400 hover:!text-primary-600"
-                      />
+                        onClick={() => setShowConfirm(!showConfirm)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-600 transition-colors"
+                      >
+                        {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
                     </div>
                   </div>
                 </div>
 
                 <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 space-y-2">
                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Điều kiện mật khẩu:</p>
-                   <ValidationItem label="Ít nhất 6 ký tự" isValid={validation.minLength} hasInput={!!password} />
-                   <ValidationItem label="Ít nhất 1 chữ cái in hoa" isValid={validation.hasUpper} hasInput={!!password} />
-                   <ValidationItem label="Ít nhất 1 ký tự đặc biệt" isValid={validation.hasSpecial} hasInput={!!password} />
-                   <ValidationItem label="Không chứa khoảng trắng" isValid={validation.noSpace} hasInput={!!password} />
-                   <ValidationItem label="Mật khẩu xác nhận phải khớp" isValid={passwordsMatch} hasInput={!!confirmPassword} />
+                   <ValidationItem label="Ít nhất 6 ký tự" isValid={validation.minLength} hasInput={!!formData.newPassword} />
+                   <ValidationItem label="Ít nhất 1 chữ cái in hoa" isValid={validation.hasUpper} hasInput={!!formData.newPassword} />
+                   <ValidationItem label="Ít nhất 1 ký tự đặc biệt" isValid={validation.hasSpecial} hasInput={!!formData.newPassword} />
+                   <ValidationItem label="Không chứa khoảng trắng" isValid={validation.noSpace} hasInput={!!formData.newPassword} />
+                   <ValidationItem label="Mật khẩu xác nhận phải khớp" isValid={passwordsMatch} hasInput={!!formData.confirmPassword} />
                 </div>
 
                 <Button
                   type="submit"
-                  disabled={isLoading || !validation.isValid || !passwordsMatch}
+                  disabled={isLoading || !canSubmit}
                   loading={isLoading}
-                  label="XÁC NHẬN MẬT KHẨU"
-                  className="w-full py-4 !bg-[#0088cc] !text-white font-black rounded-2xl shadow-xl shadow-primary-100 hover:!bg-[#0077bb] transition-all transform hover:-translate-y-1 disabled:opacity-50 disabled:transform-none"
+                  label="XÁC NHẬN ĐỔI MẬT KHẨU"
+                  className="w-full !h-[60px] !bg-[#0088cc] !text-white font-black rounded-2xl shadow-xl shadow-blue-100 hover:!bg-[#0077bb] transition-all transform hover:-translate-y-1 disabled:opacity-50 disabled:transform-none border-none"
                 />
               </>
             )}
@@ -218,4 +243,4 @@ const ValidationItem: React.FC<{ label: string; isValid: boolean; hasInput: bool
   );
 };
 
-export default ConfirmPassword;
+export default ChangePassword;

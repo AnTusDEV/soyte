@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Menu,
   X,
@@ -11,7 +11,10 @@ import {
   LayoutDashboard,
   ChevronLeft,
   ChevronRight,
+  Key
 } from "lucide-react";
+import { TieredMenu } from "primereact/tieredmenu";
+import UserInfoModal from "./UserInfoModal";
 import { MAIN_MENU } from "../constants";
 import { useAuth } from "../AuthContext";
 import { Button } from "@/components/prime";
@@ -20,6 +23,42 @@ const Header = () => {
   const [openSubMenu, setOpenSubMenu] = useState<string | null>(null);
   const [currentTime] = useState(new Date());
   const { user, logout } = useAuth(); // Use the context
+  const navigate = useNavigate();
+  const menu = useRef<TieredMenu>(null);
+  const [showUserInfo, setShowUserInfo] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
+  const profileMenuItems = [
+    {
+      label: "Thông tin cá nhân",
+      icon: <User size={16} className="mr-2" />,
+      command: () => setShowUserInfo(true),
+    },
+    {
+      label: "Đổi mật khẩu",
+      icon: "pi pi-key",
+      command: () => navigate("/change-password"),
+    },
+    { separator: true },
+    {
+      label: "Thoát hệ thống",
+      icon: <LogOut size={16} className="mr-2 text-red-500" />,
+      command: handleLogout,
+      template: (item: any, options: any) => (
+        <button
+          onClick={options.onClick}
+          className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-red-500 hover:bg-red-50 w-full transition-colors"
+        >
+          {item.icon}
+          <span>{item.label}</span>
+        </button>
+      ),
+    },
+  ];
 
   const location = useLocation();
 
@@ -123,9 +162,15 @@ const Header = () => {
           <div className="flex items-center space-x-3 md:space-x-4 font-medium">
             {user ? (
               <div className="relative flex items-center gap-3">
-                <span className="flex items-center gap-1.5 bg-white/10 px-2 py-0.5 rounded text-secondary-300">
-                  <User size={12} /> {user.full_name || "Quản trị viên"}
-                </span>
+                <TieredMenu model={profileMenuItems} popup ref={menu} breakpoint="767px" className="rounded-xl shadow-2xl border-none ring-1 ring-black/5 p-1" />
+                <button
+                  onClick={(e) => menu.current?.toggle(e)}
+                  className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 px-2 py-0.5 rounded text-secondary-300 transition-colors group"
+                >
+                  <User size={12} className="group-hover:text-white transition-colors" /> 
+                  <span>{user.full_name || "Quản trị viên"}</span>
+                  <ChevronDown size={10} className="opacity-50" />
+                </button>
                 {user?.role === "admin" && (
                   <Link
                     to="/admin/dashboard"
@@ -135,7 +180,7 @@ const Header = () => {
                   </Link>
                 )}
                 <Button
-                  onClick={logout}
+                  onClick={handleLogout}
                   label="Thoát"
                   icon="pi pi-sign-out"
                   iconPos="left"
@@ -292,6 +337,12 @@ const Header = () => {
            <MobileMenu />
         </div>
       </nav>
+      {/* Modals */}
+      <UserInfoModal 
+        visible={showUserInfo} 
+        onHide={() => setShowUserInfo(false)} 
+        user={user} 
+      />
     </header>
   );
 };
