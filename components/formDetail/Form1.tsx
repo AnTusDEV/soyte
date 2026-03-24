@@ -589,12 +589,18 @@ useEffect(() => {
     const newInfoErrors: Record<string, boolean> = {};
     const sectionsToOpen: Record<number, boolean> = {};
     let isValid = true;
+    const formIsValidate = formJson.isValidate !== false;
+
+    if (formIsValidate && !customerName.trim()) {
+      newInfoErrors["customerName"] = true; // This is a bit of a hack, but works for the error state if I map it
+      isValid = false;
+    }
 
     visibleInfo.forEach(({ item, fieldKey }: any, index: number) => {
       const key = fieldKey || item.key || item.name || `info-${index}`;
       const value = formData[key];
 
-      if (isEmptyValue(value)) {
+      if (item.isValidate !== false && isEmptyValue(value)) {
         newInfoErrors[key] = true;
         isValid = false;
       }
@@ -651,15 +657,16 @@ useEffect(() => {
   }, [formData, tableData, visibleInfo]);
 
   const submitForm = useCallback(async () => { 
-    let isValid2 = true;
-    if (!customerName.trim()) {
+    let nameIsValid = true;
+    const formIsValidate = formJson.isValidate !== false;
+    if (formIsValidate && !customerName.trim()) {
       setFullNameError(true);
-      isValid2 = false;
+      nameIsValid = false;
     } else {
       setFullNameError(false);
     }
-    const isValid = validateForm();
-    if (!isValid || !isValid2) {
+    const formValidationIsValid = validateForm();
+    if (!formValidationIsValid || !nameIsValid) {
       toast.current?.show({
         severity: "error",
         summary: "Thiếu thông tin",
@@ -740,7 +747,7 @@ useEffect(() => {
         >
           <div className="mb-2 min-h-[48px]">
             <label className="mb-1 block font-medium text-slate-700">
-              Họ và Tên
+              Họ và Tên {formJson.isValidate !== false && <span className="text-red-500">*</span>}
             </label>
           </div>
           <input

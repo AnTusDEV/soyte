@@ -219,7 +219,7 @@ export default function SurveyInfo({ info, fieldKey, value, onChange, error }) {
     <div>
       <div className="mb-2 min-h-[48px]">
         <label className="mb-1 block font-medium text-slate-700">
-          {info.title}
+          {info.title} {info.isValidate !== false && <span className="text-red-500">*</span>}
         </label>
       </div>
       {renderField()}
