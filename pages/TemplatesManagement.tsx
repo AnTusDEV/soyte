@@ -10,7 +10,7 @@ import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 
 import { Toast } from "@/components/prime";
-import { Plus } from "lucide-react";
+import { Plus, QrCode } from "lucide-react";
 const ALLOWED_TYPES = ["evaluate", "reflect"] as const;
 type FormType = (typeof ALLOWED_TYPES)[number];
 const statusOptions = [
@@ -136,10 +136,16 @@ const TemplatesManagement: React.FC = () => {
     return options.rowIndex + lazyParams.first + 1;
   };
 
+  const showQr = (rowData: any) => {
+    const formId = rowData.id || rowData._id;
+    navigate(`/admin/templates/qr/${formId}`);
+  };
+
   const actionBodyTemplate = (rowData: any) => {
     return (
       <div className="flex gap-2">
         <Button icon="pi pi-pencil" rounded outlined className="w-8 h-8 p-0 text-primary-600 border-primary-600 hover:bg-primary-50" onClick={() => editTemplate(rowData)} />
+        <Button icon={<QrCode size={14} />} rounded outlined className="w-8 h-8 p-0 text-secondary-600 border-secondary-600 hover:bg-secondary-50" onClick={() => showQr(rowData)} title="Xem mã QR" />
         {/* <Button icon="pi pi-trash" rounded outlined severity="danger" className="w-8 h-8 p-0 hover:bg-red-50" onClick={() => confirmDeleteTemplate(rowData)} /> */}
       </div>
     );

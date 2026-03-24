@@ -22,6 +22,7 @@ import ConfirmPassword from "./pages/ConfirmPassword";
 import AdminWorkSchedule from "./pages/AdminWorkSchedule";
 import TemplatesManagement from "./pages/TemplatesManagement";
 import TemplateCreate from "./pages/TemplateCreate";
+import TemplateQrView from "./pages/TemplateQrView";
 import FeedbacksManagement from "./pages/FeedbacksManagement";
 import AdminRoute from "./components/AdminRoute";
 import SocialFacilitiesManagement from "./pages/SocialFacilitiesManagement";
@@ -90,6 +91,7 @@ const App = () => {
           <Route path="templates/:type?" element={<TemplatesManagement />} />{" "}
           <Route path="templates/create/:type?" element={<TemplateCreate />} />{" "}
           <Route path="templates/edit/:id" element={<TemplateCreate />} />{" "}
+          <Route path="templates/qr/:id" element={<TemplateQrView />} />{" "}
           <Route path="feedbacks/:type?" element={<FeedbacksManagement />} />{" "}
           <Route
             path="social-facilities"
