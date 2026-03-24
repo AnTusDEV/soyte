@@ -185,6 +185,10 @@ export const api = {
     return this.post("/auth/forgot-password", { email });
   },
 
+  async resendVerification(email: string) {
+    return this.post("/auth/resend-confirmation", { email });
+  },
+
   async changePassword(data: any) {
     return this.put("/auth/change-password", data);
   },
