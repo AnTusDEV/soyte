@@ -32,31 +32,50 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
     navigate("/login");
   };
 
+  const itemTemplate = (item: any, options: any) => (
+    <button
+      onClick={options.onClick}
+      className={`flex items-center w-full px-4 py-3 gap-3 hover:bg-slate-50 transition-colors group ${
+        item.danger ? "text-red-600 hover:bg-red-50" : "text-slate-700"
+      }`}
+    >
+      <span className={`${item.danger ? "text-red-400 group-hover:text-red-600" : "text-slate-400 group-hover:text-primary-600"} transition-colors`}>
+        {item.icon}
+      </span>
+      <span className="flex flex-col items-start gap-0.5 text-left">
+        <span className="text-sm font-bold tracking-tight">{item.label}</span>
+        {item.description && (
+          <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider line-clamp-1">
+            {item.description}
+          </span>
+        )}
+      </span>
+    </button>
+  );
+
   const profileMenuItems = [
     {
       label: "Thông tin cá nhân",
-      icon: <User size={16} className="mr-2" />,
+      description: "Xem chi tiết tài khoản",
+      icon: <User size={18} />,
+      template: itemTemplate,
       command: () => setShowUserInfo(true),
     },
     {
       label: "Đổi mật khẩu",
-      icon: "pi pi-key",
+      description: "Bảo mật tài khoản",
+      icon: <Key size={18} />,
+      template: itemTemplate,
       command: () => navigate("/change-password"),
     },
     { separator: true },
     {
       label: "Thoát hệ thống",
-      icon: <LogOut size={16} className="mr-2 text-red-500" />,
+      description: "Đăng xuất an toàn",
+      icon: <LogOut size={18} />,
+      danger: true,
+      template: itemTemplate,
       command: handleLogout,
-      template: (item: any, options: any) => (
-        <button
-          onClick={options.onClick}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-red-500 hover:bg-red-50 w-full transition-colors"
-        >
-          {item.icon}
-          <span>{item.label}</span>
-        </button>
-      ),
     },
   ];
 
@@ -224,23 +243,24 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
               <span>Trang chủ</span>
             </Link>
 
-            <TieredMenu model={profileMenuItems} popup ref={menu} breakpoint="767px" className="rounded-xl shadow-2xl border-none ring-1 ring-black/5 p-1" />
+            <TieredMenu 
+              model={profileMenuItems} 
+              popup 
+              ref={menu} 
+              breakpoint="767px" 
+              className="rounded-2xl shadow-2xl border-none ring-1 ring-black/5 p-1.5 overflow-hidden animate-in fade-in zoom-in-95 duration-200" 
+            />
             
             <button
               onClick={(e) => menu.current?.toggle(e)}
-              className="flex items-center gap-2 rounded-lg bg-gray-100 hover:bg-gray-200 px-3 py-2 text-sm font-bold text-gray-700 transition-all border border-gray-200/50 group"
+              className="flex items-center gap-2.5 rounded-full bg-slate-50 hover:bg-slate-100 px-4 py-2 text-sm font-bold text-slate-700 transition-all border border-slate-200 group shadow-sm"
             >
-              <User size={18} className="text-gray-400 group-hover:text-primary-600 transition-colors" />
-              <span>{user?.full_name || user?.email?.split("@")[0]}</span>
-              <ChevronDown size={14} className="opacity-50" />
+              <div className="w-6 h-6 rounded-full bg-primary-600 flex items-center justify-center text-[10px] font-black text-white group-hover:scale-110 transition-transform">
+                {user?.full_name?.charAt(0) || "A"}
+              </div>
+              <span className="tracking-tight">{user?.full_name || user?.email?.split("@")[0]}</span>
+              <ChevronDown size={14} className="opacity-40 group-hover:rotate-180 transition-transform" />
             </button>
-
-            <Button
-              onClick={handleLogout}
-              icon={<LogOut size={18} />}
-              label="Thoát"
-              className="gap-2 px-3 py-2 text-sm text-red-500 hover:!bg-red-700 hover:text-white border-none shadow-none"
-            />
           </div>
         </div>
 

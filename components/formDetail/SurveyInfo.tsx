@@ -128,14 +128,17 @@ export default function SurveyInfo({ info, fieldKey, value, onChange, error }) {
     }
   }, [info.type, info.key, fieldKey, value?.value, onChange, selectOptions]);
 
+  const isReadOnly = info.title === "Ngày điền" || info.value === "ngay_ien";
+
   const renderField = () => {
     switch (info.type) {
       case "text":
         return (
           <input
             type="text"
+            disabled={isReadOnly}
             value={value?.value || ""}
-            className={commonInputClass}
+            className={`${commonInputClass} ${isReadOnly ? "bg-gray-100 cursor-not-allowed opacity-70" : ""}`}
             onChange={(e) =>
               onChange(fieldKey, {
                 key: info.key,
@@ -150,8 +153,9 @@ export default function SurveyInfo({ info, fieldKey, value, onChange, error }) {
         return (
           <input
             type="number"
+            disabled={isReadOnly}
             value={value?.value || ""}
-            className={commonInputClass}
+            className={`${commonInputClass} ${isReadOnly ? "bg-gray-100 cursor-not-allowed opacity-70" : ""}`}
             onChange={(e) =>
               onChange(fieldKey, {
                 key: info.key,
@@ -166,6 +170,7 @@ export default function SurveyInfo({ info, fieldKey, value, onChange, error }) {
         return (
           <Calendar
             value={value?.value ? new Date(value.value) : null}
+            disabled={isReadOnly}
             onChange={(e) =>
               onChange(fieldKey, {
                 key: info.key,
@@ -174,10 +179,10 @@ export default function SurveyInfo({ info, fieldKey, value, onChange, error }) {
             }
             dateFormat="dd/mm/yy"
             className="w-full"
-            inputClassName={commonInputClass}
+            inputClassName={`${commonInputClass} ${isReadOnly ? "bg-gray-100 cursor-not-allowed opacity-70" : ""}`}
             pt={{
               root: { className: "w-full" },
-              input: { className: commonInputClass },
+              input: { className: `${commonInputClass} ${isReadOnly ? "bg-gray-100 cursor-not-allowed opacity-70" : ""}` },
             }}
           />
         );

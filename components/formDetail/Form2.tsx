@@ -365,12 +365,12 @@ export default function SurveyForm({ id, type, formJson }: any) {
     let firstErrorSection: number | null = null;
     let isValid = true;
 
-     if (!customerName.trim()) {
-       setFullNameError(true);
-       isValid = false;
-     } else {
-       setFullNameError(false);
-     }
+    if (!customerName.trim()) {
+      setFullNameError(true);
+      isValid = false;
+    } else {
+      setFullNameError(false);
+    }
 
     info.forEach((item: any, index: number) => {
       if (!item.status) return;
@@ -426,15 +426,15 @@ export default function SurveyForm({ id, type, formJson }: any) {
             break;
         }
 
-       if (isEmpty) {
-         newErrors[key] = true;
+        if (isEmpty) {
+          newErrors[key] = true;
 
-         if (firstErrorSection === null) {
-           firstErrorSection = sIndex;
-         }
+          if (firstErrorSection === null) {
+            firstErrorSection = sIndex;
+          }
 
-         isValid = false;
-       }
+          isValid = false;
+        }
       });
     });
 
@@ -462,7 +462,10 @@ export default function SurveyForm({ id, type, formJson }: any) {
     }
 
     try {
+      const userInfo = JSON.parse(localStorage.getItem("user_info") || "{}");
+      const userId = userInfo.id || null;
       const payload = {
+        user_id: userId,
         form_id: Number(id),
         creator_name: customerName,
         info: {

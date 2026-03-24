@@ -1,7 +1,14 @@
 import { api } from "@/api";
 import { Button } from "primereact/button";
 import { InputTextarea } from "primereact/inputtextarea";
-import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Toast } from "primereact/toast";
 import { useNavigate } from "react-router-dom";
 import SurveyInfo from "./SurveyInfo";
@@ -236,7 +243,8 @@ const TableOptionRow = memo(function TableOptionRow({
               progressError ? "text-red-500" : "text-slate-400"
             }`}
           >
-            Tiến độ thực hiện {isValidate && <span className="text-red-500">*</span>}
+            Tiến độ thực hiện{" "}
+            {isValidate && <span className="text-red-500">*</span>}
           </div>
 
           <div
@@ -392,7 +400,9 @@ const TableSection = memo(function TableSection({
               oIndex={oIndex}
               progressError={!!errors[`progress-${sIndex}-${oIndex}`]}
               ratingError={!!errors[`rating-${sIndex}-${oIndex}`]}
-              isValidate={section.isValidate !== false && item.isValidate !== false}
+              isValidate={
+                section.isValidate !== false && item.isValidate !== false
+              }
               onUpdateNote={onUpdateNote}
               onUpdateProgress={onUpdateProgress}
               onUpdateRating={onUpdateRating}
@@ -449,32 +459,32 @@ export default function BieuMau1Table({ id, type, formJson }: any) {
     });
   }, []);
 
-const toggleSection = useCallback((index: number) => {
-  setOpenSection((prev) => (prev === index ? null : index));
-}, []);
+  const toggleSection = useCallback((index: number) => {
+    setOpenSection((prev) => (prev === index ? null : index));
+  }, []);
 
-useEffect(() => {
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-  };
-  scrollToTop();
-  requestAnimationFrame(scrollToTop);
-}, []);
+  useEffect(() => {
+    const scrollToTop = () => {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    };
+    scrollToTop();
+    requestAnimationFrame(scrollToTop);
+  }, []);
 
-useEffect(() => {
-  if (prevOpenSection.current !== openSection) {
-    prevOpenSection.current = openSection;
-    
-    if (openSection !== null) {
-      const el = sectionRefs.current[openSection];
-      if (el) {
-        const yOffset = -220; 
-        const y = el.getBoundingClientRect().top + window.scrollY + yOffset;
-        window.scrollTo({ top: y, behavior: "smooth" });
+  useEffect(() => {
+    if (prevOpenSection.current !== openSection) {
+      prevOpenSection.current = openSection;
+
+      if (openSection !== null) {
+        const el = sectionRefs.current[openSection];
+        if (el) {
+          const yOffset = -220;
+          const y = el.getBoundingClientRect().top + window.scrollY + yOffset;
+          window.scrollTo({ top: y, behavior: "smooth" });
+        }
       }
     }
-  }
-}, [openSection]);
+  }, [openSection]);
   const clearFieldError = useCallback((key: string) => {
     setErrors((prev) => {
       if (!prev[key]) return prev;
@@ -579,7 +589,6 @@ useEffect(() => {
 
         return next;
       });
-
     },
     [clearFieldError],
   );
@@ -607,10 +616,10 @@ useEffect(() => {
     });
 
     tableData.forEach((section: any, sectionIndex: number) => {
-        if (section.isValidate === false) return;
+      if (section.isValidate === false) return;
 
-        section.option.forEach((item: any, optionIndex: number) => {
-          if (item.isValidate === false) return;
+      section.option.forEach((item: any, optionIndex: number) => {
+        if (item.isValidate === false) return;
         const progressValue = item?.progress?.value;
         const ratingValue = item?.rating?.value;
         const noteValue = item?.note;
@@ -636,7 +645,6 @@ useEffect(() => {
           sectionsToOpen[sectionIndex] = true;
           isValid = false;
         }
-
       });
     });
 
@@ -656,7 +664,7 @@ useEffect(() => {
     return isValid;
   }, [formData, tableData, visibleInfo]);
 
-  const submitForm = useCallback(async () => { 
+  const submitForm = useCallback(async () => {
     let nameIsValid = true;
     const formIsValidate = formJson.isValidate !== false;
     if (formIsValidate && !customerName.trim()) {
@@ -676,7 +684,11 @@ useEffect(() => {
     }
 
     try {
+      const userInfo = JSON.parse(localStorage.getItem("user_info") || "{}");
+      const userId = userInfo.id || null;
+
       const payload = {
+        user_id: userId,
         form_id: Number(id),
         creator_name: customerName,
         info: {
@@ -697,13 +709,13 @@ useEffect(() => {
         detail: "Lưu thành công",
       });
 
-     if (navigateTimeoutRef.current) {
-       clearTimeout(navigateTimeoutRef.current);
-     }
+      if (navigateTimeoutRef.current) {
+        clearTimeout(navigateTimeoutRef.current);
+      }
 
-     navigateTimeoutRef.current = setTimeout(() => {
-       navigate(-1);
-     }, 500);
+      navigateTimeoutRef.current = setTimeout(() => {
+        navigate(-1);
+      }, 500);
     } catch (error) {
       console.error("Submit error:", error);
       toast.current?.show({
@@ -747,7 +759,10 @@ useEffect(() => {
         >
           <div className="mb-2 min-h-[48px]">
             <label className="mb-1 block font-medium text-slate-700">
-              Họ và Tên {formJson.isValidate !== false && <span className="text-red-500">*</span>}
+              Họ và Tên{" "}
+              {formJson.isValidate !== false && (
+                <span className="text-red-500">*</span>
+              )}
             </label>
           </div>
           <input

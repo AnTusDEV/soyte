@@ -4,6 +4,7 @@ import { Eye, EyeOff, ArrowLeft, AlertCircle, CheckCircle2, ShieldCheck, Lock, X
 import { Button } from "@/components/prime";
 import { api } from "../api";
 import { Toast } from "primereact/toast";
+import { useAuth } from "../AuthContext";
 
 const ConfirmPassword: React.FC = () => {
   const { username } = useParams<{ username: string }>();
@@ -16,6 +17,7 @@ const ConfirmPassword: React.FC = () => {
   const [error, setError] = useState("");
   const toast = useRef<Toast>(null);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const validatePassword = (pass: string) => {
     const minLength = pass.length >= 6;
@@ -43,14 +45,25 @@ const ConfirmPassword: React.FC = () => {
     setError("");
     setIsLoading(true);
     try {
-      await api.confirmPassword(username || "", password);
-      setSuccess(true);
-      toast.current?.show({
-        severity: "success",
-        summary: "Thành công",
-        detail: "Mật khẩu đã được cập nhật thành công",
-      });
-      setTimeout(() => navigate("/login"), 3000);
+      const response = await api.confirmPassword(username || "", password);
+      
+      if (response.token) {
+        await login(response.token);
+        toast.current?.show({
+          severity: "success",
+          summary: "Thành công",
+          detail: "Mật khẩu đã được cập nhật. Đang đăng nhập...",
+        });
+        setTimeout(() => navigate("/admin/dashboard"), 1500);
+      } else {
+        setSuccess(true);
+        toast.current?.show({
+          severity: "success",
+          summary: "Thành công",
+          detail: "Mật khẩu đã được cập nhật thành công",
+        });
+        setTimeout(() => navigate("/login"), 3000);
+      }
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Không thể cập nhật mật khẩu. Vui lòng thử lại.");
