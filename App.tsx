@@ -29,6 +29,7 @@ import SocialFacilitiesManagement from "./pages/SocialFacilitiesManagement";
 import PermissionsManagement from "./pages/PermissionsManagement";
 import Report_DCBC from "./pages/report/Report_DCBC";
 import Report_KSHL from "./pages/report/Report_KSHL";
+import Report_TCT01 from "./pages/report/Report_TCT01";
 import { useAuth } from "./AuthContext";
 import { Toast } from "@/components/prime";
 import { useRef } from "react";
@@ -101,6 +102,7 @@ const App = () => {
           <Route path="permissions" element={<PermissionsManagement />} />{" "}
           <Route path="report/DCBC" element={<Report_DCBC />} />
           <Route path="report/KSHL" element={<Report_KSHL />} />
+          <Route path="report/TCT01" element={<Report_TCT01 />} />
           {/* New Admin Schedule Route */}
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>

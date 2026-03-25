@@ -1,11 +1,10 @@
 import { jsPDF } from "jspdf"
 import autoTable from 'jspdf-autotable'
-import { formService } from '@/services/formService'
-import { feedBacksSevice } from '@/services/feedBacksSevice'
 import { ALL_FACILITIES } from '@/constants'
 import { TIMES_REGULAR_BASE64, TIMES_BOLD_BASE64 } from '@/utils/pdfFonts'
 import { formatDateVN } from '@/utils/dateUtils'
 import { FeedbackItem } from '@/types/feedbacks'
+import { calculateTotalUnits, calculateOnTimeStats } from '@/utils/reportDataUtils'
 
 export const exportReportToPDF = async (
     groupedFeedbacks: Record<string, { title: string, items: FeedbackItem[] }>,
@@ -70,46 +69,10 @@ export const exportReportToPDF = async (
             const formTemplate = formTemplates[formId];
             if (!formTemplate) continue;
 
-            let totalUnits = 0;
-            const infoSource = formTemplate.info || formTemplate.data?.info;
-            if (infoSource) {
-                let facilityField: any = null;
-                const findInArray = (arr: any[]) => arr.find((item: any) =>
-                    item.type === 'facility_multiselect' ||
-                    (item.title && (item.title.toLowerCase().includes('cơ sở y tế') || item.title.toLowerCase().includes('đơn vị')))
-                );
-                if (Array.isArray(infoSource)) facilityField = findInArray(infoSource);
-                else if (typeof infoSource === 'object') facilityField = findInArray(Object.values(infoSource));
-
-                if (facilityField) {
-                    if (facilityField.option?.length > 0) totalUnits = facilityField.option.length;
-                    else {
-                        const selectedTypes = facilityField.facilityTypeFilter || [];
-                        totalUnits = ALL_FACILITIES.filter(f => selectedTypes.length === 0 || selectedTypes.includes(f.type)).length;
-                    }
-                }
-            }
-
+            const totalUnits = calculateTotalUnits(formTemplate);
             const reportedCount = group.items.length;
             const unReportingCount = Math.max(0, totalUnits - reportedCount);
-            let onTimeCount = 0;
-            let lateCount = 0;
-
-            if (formTemplate && (formTemplate.startDate || formTemplate.endDate)) {
-                const startLimit = formTemplate.startDate ? new Date(formTemplate.startDate) : null;
-                const endLimit = formTemplate.endDate ? new Date(formTemplate.endDate) : null;
-                if (startLimit) startLimit.setHours(0, 0, 0, 0);
-                if (endLimit) endLimit.setHours(23, 59, 59, 999);
-
-                group.items.forEach(fb => {
-                    const submissionDate = new Date(fb.createdAt || fb.created_at || fb.date || Date.now());
-                    const isAfterStart = !startLimit || submissionDate >= startLimit;
-                    const isBeforeEnd = !endLimit || submissionDate <= endLimit;
-                    if (isAfterStart && isBeforeEnd) onTimeCount++; else lateCount++;
-                });
-            } else {
-                onTimeCount = reportedCount;
-            }
+            const { onTimeCount, lateCount } = calculateOnTimeStats(group.items, formTemplate);
 
             if (currentY > 240) { doc.addPage(); currentY = 20; }
 

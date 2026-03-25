@@ -1,10 +1,9 @@
 import { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, AlignmentType, WidthType, BorderStyle, VerticalAlign } from 'docx';
 import { saveAs } from 'file-saver';
-import { formService } from '@/services/formService';
-import { feedBacksSevice } from '@/services/feedBacksSevice';
 import { ALL_FACILITIES } from '@/constants';
 import { formatDateVN } from '@/utils/dateUtils';
 import { FeedbackItem } from '@/types/feedbacks';
+import { calculateTotalUnits, calculateOnTimeStats } from '@/utils/reportDataUtils';
 
 export const exportReportToWord = async (
     groupedFeedbacks: Record<string, { title: string, items: FeedbackItem[] }>,
@@ -88,46 +87,10 @@ export const exportReportToWord = async (
             const formTemplate = formTemplates[formId];
             if (!formTemplate) continue;
 
-            let totalUnits = 0;
-            const infoSource = formTemplate.info || formTemplate.data?.info;
-            if (infoSource) {
-                let facilityField: any = null;
-                const findInArray = (arr: any[]) => arr.find((item: any) =>
-                    item.type === 'facility_multiselect' ||
-                    (item.title && (item.title.toLowerCase().includes('cơ sở y tế') || item.title.toLowerCase().includes('đơn vị')))
-                );
-                if (Array.isArray(infoSource)) facilityField = findInArray(infoSource);
-                else if (typeof infoSource === 'object') facilityField = findInArray(Object.values(infoSource));
-
-                if (facilityField) {
-                    if (facilityField.option?.length > 0) totalUnits = facilityField.option.length;
-                    else {
-                        const selectedTypes = facilityField.facilityTypeFilter || [];
-                        totalUnits = ALL_FACILITIES.filter(f => selectedTypes.length === 0 || selectedTypes.includes(f.type)).length;
-                    }
-                }
-            }
-
+            const totalUnits = calculateTotalUnits(formTemplate);
             const reportedCount = group.items.length;
             const unReportingCount = Math.max(0, totalUnits - reportedCount);
-            let onTimeCount = 0;
-            let lateCount = 0;
-
-            if (formTemplate && (formTemplate.startDate || formTemplate.endDate)) {
-                const startLimit = formTemplate.startDate ? new Date(formTemplate.startDate) : null;
-                const endLimit = formTemplate.endDate ? new Date(formTemplate.endDate) : null;
-                if (startLimit) startLimit.setHours(0, 0, 0, 0);
-                if (endLimit) endLimit.setHours(23, 59, 59, 999);
-
-                group.items.forEach(fb => {
-                    const submissionDate = new Date(fb.createdAt || fb.created_at || fb.date || Date.now());
-                    const isAfterStart = !startLimit || submissionDate >= startLimit;
-                    const isBeforeEnd = !endLimit || submissionDate <= endLimit;
-                    if (isAfterStart && isBeforeEnd) onTimeCount++; else lateCount++;
-                });
-            } else {
-                onTimeCount = reportedCount;
-            }
+            const { onTimeCount, lateCount } = calculateOnTimeStats(group.items, formTemplate);
 
             // ... rest of the logic ...
             // Mục lớn
@@ -266,14 +229,14 @@ export const exportReportToWord = async (
                 }
             }
         } // End of loop
-        
+
         // --- PHỤ LỤC: Danh sách đơn vị ---
         children.push(new Paragraph({
             spacing: { before: 400, after: 200 },
             alignment: AlignmentType.CENTER,
             children: [new TextRun({ text: "PHỤ LỤC", font: "Times New Roman", size: 28, bold: true })]
         }));
-        
+
         children.push(new Paragraph({
             spacing: { after: 400 },
             alignment: AlignmentType.CENTER,
@@ -303,7 +266,7 @@ export const exportReportToWord = async (
 
         const appendixRoman = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
         const appendixRows: TableRow[] = [];
-        
+
         // Header của Phụ lục
         appendixRows.push(new TableRow({
             children: [
@@ -347,7 +310,7 @@ export const exportReportToWord = async (
             width: { size: 100, type: WidthType.PERCENTAGE },
             rows: appendixRows
         }));
-        
+
         children.push(new Paragraph({ spacing: { before: 400, after: 400 }, children: [] })); // Khoảng cách tới chữ ký
 
         // Footer (Chữ ký)

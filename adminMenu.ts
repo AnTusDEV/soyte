@@ -144,8 +144,13 @@ export const adminMenu: MenuItem[] = [
       {
         key: "report-KSHL",
         label: "Giám sát chất lượng",
-        to: "/admin/report/KSHL",
+        to: "/admin/report/KSHL"
       },
+      {
+        key: "report-TCT01",
+        label: "Kết quả thực hiện của Tổ công tác số 01",
+        to: "/admin/report/TCT01"
+      }
     ],
   },
 ];

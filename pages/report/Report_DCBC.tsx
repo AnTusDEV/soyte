@@ -4,13 +4,15 @@ import { feedBacksSevice } from '@/services/feedBacksSevice'
 import { formService } from '@/services/formService'
 import { ReportTabContent } from '@/components/feedbacks/ReportTabContent'
 import { FeedbackFilters } from '@/components/feedbacks/FeedbackFilters'
-import { Button, Toast } from '@/components/prime'
+import { Toast } from '@/components/prime'
 import { TabView, TabPanel } from 'primereact/tabview'
 import { FeedbackItem } from '@/types/feedbacks'
-import { formatDateVN, getDefaultDates } from '@/utils/dateUtils'
 import { exportReportToPDF } from '@/utils/pdfExport'
 import { exportReportToWord } from '@/utils/wordExport'
 import { ReportAppendix } from '@/components/feedbacks/ReportAppendix'
+import { ReportHeader } from '@/components/feedbacks/ReportHeader'
+import { ReportLoadingState, ReportEmptyState, StyledTabViewCSS } from '@/components/feedbacks/ReportStates'
+import { useReportFilter } from '@/hooks/useReportFilter'
 
 const Report_DCBC = () => {
     const toast = useRef<Toast>(null);
@@ -20,9 +22,7 @@ const Report_DCBC = () => {
     const loadingTemplatesRef = useRef<Set<string>>(new Set());
     const [loading, setLoading] = useState(false);
 
-    // Bộ lọc
-    const [filterType, setFilterType] = useState('this_year');
-    const [dateFilter, setDateFilter] = useState(getDefaultDates());
+    const { filterType, dateFilter, handleFilterChange, handleCustomDateChange } = useReportFilter();
 
     const fetchAllFeedbacks = async () => {
         try {
@@ -47,72 +47,17 @@ const Report_DCBC = () => {
         fetchAllFeedbacks();
     }, [dateFilter.startDate, dateFilter.endDate]);
 
-    const handleFilterChange = (newType: string) => {
-        setFilterType(newType);
-        const now = new Date();
-        const year = now.getFullYear();
-        const formatDate = (date: Date) => {
-            const y = date.getFullYear();
-            const m = String(date.getMonth() + 1).padStart(2, '0');
-            const d = String(date.getDate()).padStart(2, '0');
-            return `${y}-${m}-${d}`;
-        };
-
-        let start = new Date();
-        let end = new Date();
-
-        if (newType === 'this_month') {
-            start = new Date(year, now.getMonth(), 1);
-            end = new Date(year, now.getMonth() + 1, 0);
-        } else if (newType === 'last_month') {
-            start = new Date(year, now.getMonth() - 1, 1);
-            end = new Date(year, now.getMonth(), 0);
-        } else if (newType === 'first_half') {
-            start = new Date(year, 0, 1);
-            end = new Date(year, 5, 30);
-        } else if (newType === 'this_year') {
-            start = new Date(year, now.getMonth() - 11, 1);
-            end = new Date(year, now.getMonth() + 1, 0);
-        } else if (newType === 'second_half') {
-            start = new Date(year, 6, 1);
-            end = new Date(year, 11, 31);
-        } else if (newType === 'custom') {
-            return;
-        }
-
-        setDateFilter({
-            startDate: formatDate(start),
-            endDate: formatDate(end)
-        });
-    };
-
-    const handleCustomDateChange = (date: Date | null, field: 'startDate' | 'endDate') => {
-        if (date) {
-            const y = date.getFullYear();
-            const m = String(date.getMonth() + 1).padStart(2, '0');
-            const d = String(date.getDate()).padStart(2, '0');
-            setDateFilter(prev => ({ ...prev, [field]: `${y}-${m}-${d}` }));
-        }
-    };
-
     // Nhóm các phản hồi theo Biểu mẫu
     const groupedFeedbacks = useMemo<Record<string, { title: string, items: FeedbackItem[] }>>(() => {
-        // Dựa vào API để lọc theo ngày, nên lấy tất cả các phản hồi trả về
         const groups: Record<string, { title: string, items: FeedbackItem[] }> = {};
 
         feedbacks.forEach(fb => {
             const fId = fb.form_id || 'unknown';
             let title = "";
 
-            if (fId === 3) {
-                title = "Khối các bệnh viện trực thuộc"
-            }
-            if (fId === 17) {
-                title = "Đơn vị trợ giúp xã hội trực thuộc"
-            }
-            if (fId === 18) {
-                title = "Khối các trạm y tế xã, phường"
-            }
+            if (fId === 3) { title = "Khối các bệnh viện trực thuộc" }
+            if (fId === 17) { title = "Đơn vị trợ giúp xã hội trực thuộc" }
+            if (fId === 18) { title = "Khối các trạm y tế xã, phường" }
 
             if (!groups[fId]) {
                 groups[fId] = {
@@ -132,13 +77,11 @@ const Report_DCBC = () => {
             const formIds = Object.keys(groupedFeedbacks).filter(id => id !== 'unknown');
 
             for (const id of formIds) {
-                // Chỉ fetch nếu chưa có trong cache và chưa đang loading
                 if (!fetchedTemplatesRef.current.has(id) && !loadingTemplatesRef.current.has(id)) {
                     loadingTemplatesRef.current.add(id);
                     try {
                         const res = await formService.fetchFormById(id);
                         const tplData = res.data || res;
-
                         setFormTemplates(prev => ({ ...prev, [id]: tplData }));
                         fetchedTemplatesRef.current.add(id);
                     } catch (err) {
@@ -155,57 +98,31 @@ const Report_DCBC = () => {
         }
     }, [groupedFeedbacks]);
 
-    // Hàm xuất PDF
     const exportToPDF = async () => {
         await exportReportToPDF(
-            groupedFeedbacks,
-            formTemplates,
-            dateFilter,
-            setLoading,
+            groupedFeedbacks, formTemplates, dateFilter, setLoading,
             (msg) => toast.current?.show({ severity: 'success', summary: 'Thành công', detail: msg }),
             (msg) => toast.current?.show({ severity: 'error', summary: 'Lỗi', detail: msg })
         );
     };
 
-    // Hàm xuất Word
     const exportToWord = async () => {
         await exportReportToWord(
-            groupedFeedbacks,
-            formTemplates,
-            dateFilter,
-            setLoading,
+            groupedFeedbacks, formTemplates, dateFilter, setLoading,
             (msg) => toast.current?.show({ severity: 'success', summary: 'Thành công', detail: msg }),
             (msg) => toast.current?.show({ severity: 'error', summary: 'Lỗi', detail: msg })
         );
     };
 
     const reportHeader = (
-        <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary-50 rounded-xl flex items-center justify-center">
-                <i className="pi pi-chart-bar text-primary-600 text-xl"></i>
-            </div>
-            <h2 className="text-lg md:text-xl font-bold text-slate-800 tracking-tight">
-                Kết quả tiếp nhận báo cáo từ ngày <span className="text-primary-700">{formatDateVN(dateFilter.startDate)}</span> đến ngày <span className="text-primary-700">{formatDateVN(dateFilter.endDate)}</span>
-            </h2>
-            <div className="ml-auto flex items-center gap-2">
-                <Button
-                    label="Xuất Word"
-                    icon="pi pi-file-word"
-                    className="bg-gradient-to-br from-blue-500 to-blue-700 border-none rounded-2xl font-bold shadow-lg shadow-blue-200/50 hover:shadow-blue-300/60 hover:scale-105 active:translate-y-0 active:scale-95 transition-all duration-300 text-white px-6 py-2.5 flex items-center gap-2"
-                    onClick={exportToWord}
-                    disabled={loading || feedbacks.length === 0}
-                    loading={loading}
-                />
-                <Button
-                    label="Xuất PDF"
-                    icon="pi pi-file-pdf"
-                    className="bg-gradient-to-br from-primary-500 to-primary-700 border-none rounded-2xl font-bold shadow-lg shadow-primary-200/50 hover:shadow-primary-300/60 hover:scale-105 active:translate-y-0 active:scale-95 transition-all duration-300 text-white px-6 py-2.5 flex items-center gap-2"
-                    onClick={exportToPDF}
-                    disabled={loading || feedbacks.length === 0}
-                    loading={loading}
-                />
-            </div>
-        </div>
+        <ReportHeader
+            title="Kết quả tiếp nhận báo cáo từ ngày"
+            dateFilter={dateFilter}
+            loading={loading}
+            disabledExport={feedbacks.length === 0}
+            onExportWord={exportToWord}
+            onExportPDF={exportToPDF}
+        />
     );
 
     return (
@@ -222,10 +139,7 @@ const Report_DCBC = () => {
                 />
 
                 {loading ? (
-                    <div className="flex justify-center items-center py-20 bg-white rounded-3xl shadow-sm border border-slate-100">
-                        <i className="pi pi-spin pi-spinner text-4xl text-primary-500"></i>
-                        <span className="ml-3 text-lg font-medium text-slate-600">Đang tải dữ liệu tổng hợp...</span>
-                    </div>
+                    <ReportLoadingState />
                 ) : Object.keys(groupedFeedbacks).length > 0 ? (
                     <>
                         <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
@@ -257,53 +171,11 @@ const Report_DCBC = () => {
                         <ReportAppendix groupedFeedbacks={groupedFeedbacks} />
                     </>
                 ) : (
-                    <div className="text-center py-20 bg-white rounded-3xl shadow-sm border border-slate-100">
-                        <div className="inline-flex w-20 h-20 bg-slate-50 items-center justify-center rounded-full mb-4">
-                            <i className="pi pi-inbox text-4xl text-slate-300"></i>
-                        </div>
-                        <h3 className="text-xl font-bold text-slate-700 mb-2">Không có dữ liệu báo cáo</h3>
-                        <p className="text-slate-500">Không tìm thấy phản ánh nào trong khoảng thời gian đã chọn.</p>
-                    </div>
+                    <ReportEmptyState message="Không tìm thấy phản ánh nào trong khoảng thời gian đã chọn." />
                 )}
             </div>
 
-            <style>{`
-                .styled-tabview .p-tabview-nav {
-                    background: transparent;
-                    border-bottom: 1px solid #e2e8f0;
-                    padding: 0 1.5rem;
-                }
-                .styled-tabview .p-tabview-nav li .p-tabview-nav-link {
-                    background: transparent;
-                    border: none;
-                    border-bottom: 2px solid transparent;
-                    color: #64748b;
-                    font-weight: 600;
-                    padding: 1rem 1.25rem;
-                    transition: all 0.2s;
-                    box-shadow: none !important;
-                    display: block;
-                    max-width: 400px; 
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                }
-                .styled-tabview .p-tabview-nav li:not(.p-highlight):hover .p-tabview-nav-link {
-                    color: #475569;
-                    border-color: #cbd5e1;
-                    background: #f8fafc;
-                }
-                .styled-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
-                    color: #1e3a8a; 
-                    border-color: #1e40af; 
-                    background: #eff6ff;
-                }
-                .styled-tabview .p-tabview-panels {
-                    padding: 0;
-                    background: transparent;
-                    border: none;
-                }
-            `}</style>
+            <StyledTabViewCSS />
         </AdminLayout>
     )
 }

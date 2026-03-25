@@ -126,11 +126,16 @@ export const exportKSHLToWord = async (
         children.push(mkParagraph('1. Kết quả chung về việc triển khai khảo sát sự hài lòng qua mã QR', { bold: true }));
         children.push(mkParagraph('Thực hiện Kế hoạch của Sở Y tế Hà Nội, các đơn vị đã triển khai hình thức khảo sát trực tuyến thông qua mã QR Code. Tại các cơ sở khám bệnh, chữa bệnh và trạm y tế, mã QR khảo sát được bố trí tại nhiều vị trí khác nhau, trung bình từ 10 - 30 điểm/đơn vị đối với bệnh viện, từ 1-3 điểm/đơn vị đối với trạm y tế đặc biệt là khu vực đón tiếp, khu vực khám bệnh ngoại trú, các khoa lâm sàng đối với người bệnh nội trú, khu vực tiêm chủng mở rộng, bảng thông tin bệnh viện và các vị trí đông người qua lại nhằm tạo điều kiện thuận lợi cho người bệnh và người dân tham gia khảo sát. Số điểm dán mã QR khảo sát:', { indent: 700 }));
 
-        children.push(mkParagraph([
-            mkText(`- Tại các Bệnh viện Công lập: ........ điểm khảo sát`),
-            mkText(`- Tại các Bệnh viện ngoài Công lập: ........ điểm khảo sát`, { break: 1 }),
-            mkText(`- Tại các Trạm Y tế: ........ điểm khảo sát`, { break: 1 }),
-        ], { after: 200, indent: 700 }));
+        children.push(new Paragraph({
+            alignment: AlignmentType.LEFT,
+            spacing: { before: 0, after: 200, line: 360 },
+            indent: { left: 1000 }, 
+            children: [
+                new TextRun({ text: `- Tại các Bệnh viện Công lập: ....... điểm khảo sát`, font: "Times New Roman", size: 24 }),
+                new TextRun({ text: `- Tại các Bệnh viện ngoài Công lập: ....... điểm khảo sát`, font: "Times New Roman", size: 24, break: 1 }),
+                new TextRun({ text: `- Tại các Trạm Y tế: ....... điểm khảo sát`, font: "Times New Roman", size: 24, break: 1 }),
+            ]
+        }));
 
         // --- DRAW TABLE FUNCTION ---
         const createSummaryTable = (title: string, data: any[], unitLabel: string = 'Đơn vị') => {
