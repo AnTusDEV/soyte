@@ -290,8 +290,12 @@ const Register: React.FC = () => {
                 disabled={isLoading}
                 loading={isLoading}
                 label={isLoading ? "Đang xử lý..." : "Gửi yêu cầu đăng ký"}
-                icon={!isLoading && <UserPlus size={18} />}
-                className="w-full py-4 !bg-[#0088cc] !text-white font-bold rounded-xl shadow-lg hover:!bg-[#0077bb] transition-all"
+                icon={
+                  !isLoading && (
+                    <UserPlus className="w-4 h-4" strokeWidth={2.4} />
+                  )
+                }
+                className="w-full py-4 !px-6 !bg-[#0088cc] !text-white font-bold rounded-xl shadow-lg hover:!bg-[#0077bb] transition-all !flex !items-center !justify-center !gap-2 !leading-none"
               />
             </div>
           </form>
