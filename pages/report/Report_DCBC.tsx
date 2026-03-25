@@ -2,16 +2,16 @@ import AdminLayout from '@/components/AdminLayout'
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { feedBacksSevice } from '@/services/feedBacksSevice'
 import { formService } from '@/services/formService'
-import { ReportTabContent } from '@/components/feedbacks/ReportTabContent'
-import { FeedbackFilters } from '@/components/feedbacks/FeedbackFilters'
+import { ReportTabContent } from '@/components/report/ReportTabContent'
+import { ReportFilters } from '@/components/report/ReportFilters'
 import { Toast } from '@/components/prime'
 import { TabView, TabPanel } from 'primereact/tabview'
 import { FeedbackItem } from '@/types/feedbacks'
 import { exportReportToPDF } from '@/utils/pdfExport'
 import { exportReportToWord } from '@/utils/wordExport'
-import { ReportAppendix } from '@/components/feedbacks/ReportAppendix'
-import { ReportHeader } from '@/components/feedbacks/ReportHeader'
-import { ReportLoadingState, ReportEmptyState, StyledTabViewCSS } from '@/components/feedbacks/ReportStates'
+import { ReportAppendix } from '@/components/report/ReportAppendix'
+import { ReportHeader } from '@/components/report/ReportHeader'
+import { ReportLoadingState, ReportEmptyState, StyledTabViewCSS } from '@/components/report/ReportStates'
 import { useReportFilter } from '@/hooks/useReportFilter'
 import { useFacilities } from '@/hooks/useFacilities'
 
@@ -132,7 +132,7 @@ const Report_DCBC = () => {
             <Toast ref={toast} />
 
             <div className="space-y-6">
-                <FeedbackFilters
+                <ReportFilters
                     filterType={filterType}
                     handleFilterChange={handleFilterChange}
                     dateFilter={dateFilter}

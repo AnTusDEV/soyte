@@ -1,7 +1,7 @@
 import AdminLayout from '@/components/AdminLayout'
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 
-import { FeedbackFilters } from '@/components/feedbacks/FeedbackFilters'
+import { ReportFilters } from '@/components/report/ReportFilters'
 import { Toast } from '@/components/prime'
 import { TabView, TabPanel } from 'primereact/tabview'
 import { exportTCT01ToWord } from '@/utils/wordExportTCT01'
@@ -10,11 +10,11 @@ import { feedBacksSevice } from '@/services/feedBacksSevice'
 import { formService } from '@/services/formService'
 import { useFacilities } from '@/hooks/useFacilities'
 import { FeedbackItem } from '@/types/feedbacks'
-import { ReportAppendix } from '@/components/feedbacks/ReportAppendix'
-import { TCT01TabContent } from '@/components/feedbacks/TCT01TabContent'
+import { ReportAppendix } from '@/components/report/ReportAppendix'
+import { TCT01TabContent } from '@/components/report/TCT01TabContent'
 import { calculateTotalUnits, calculateOnTimeStats, formatRate } from '@/utils/reportDataUtils'
-import { ReportHeader } from '@/components/feedbacks/ReportHeader'
-import { ReportLoadingState, ReportEmptyState, StyledTabViewCSS } from '@/components/feedbacks/ReportStates'
+import { ReportHeader } from '@/components/report/ReportHeader'
+import { ReportLoadingState, ReportEmptyState, StyledTabViewCSS } from '@/components/report/ReportStates'
 import { useReportFilter } from '@/hooks/useReportFilter'
 
 const Report_TCT01 = () => {
@@ -204,7 +204,7 @@ const Report_TCT01 = () => {
             <Toast ref={toast} />
 
             <div className="space-y-6">
-                <FeedbackFilters
+                <ReportFilters
                     filterType={filterType}
                     handleFilterChange={handleFilterChange}
                     dateFilter={dateFilter}

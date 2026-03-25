@@ -1,12 +1,12 @@
 import AdminLayout from '@/components/AdminLayout'
 import React, { useState, useRef } from 'react'
 import { Toast } from '@/components/prime'
-import { FeedbackFilters } from '@/components/feedbacks/FeedbackFilters'
+import { ReportFilters } from '@/components/report/ReportFilters'
 import { TablePreview } from '@/components/report/TablePreview'
 import { exportKSHLToWord } from '@/utils/wordExportKSHL'
 import { exportKSHLToPDF } from '@/utils/pdfExportKSHL'
 import { useKSHLData } from '@/hooks/useKSHLData'
-import { ReportHeader } from '@/components/feedbacks/ReportHeader'
+import { ReportHeader } from '@/components/report/ReportHeader'
 import { useReportFilter } from '@/hooks/useReportFilter'
 
 const Report_KSHL = () => {
@@ -60,7 +60,7 @@ const Report_KSHL = () => {
         <AdminLayout title="Báo cáo Khảo sát hài lòng" subtitle="">
             <Toast ref={toast} />
             <div className="space-y-6 pb-10">
-                <FeedbackFilters filterType={filterType} handleFilterChange={handleFilterChange} dateFilter={dateFilter} handleCustomDateChange={handleCustomDateChange} reportHeader={reportHeader} />
+                <ReportFilters filterType={filterType} handleFilterChange={handleFilterChange} dateFilter={dateFilter} handleCustomDateChange={handleCustomDateChange} reportHeader={reportHeader} />
 
                 {/* Bảng Tổng hợp */}
                 <TablePreview title="1. Kết quả người bệnh ngoại trú" data={dataNgoaiTru} tableKey="ngoaiTru" {...tableProps} />

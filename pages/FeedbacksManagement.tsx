@@ -5,7 +5,7 @@ import { Navigate, useParams } from "react-router-dom";
 import { getDefaultDates } from "../utils/dateUtils";
 import { useFeedbacks } from "../hooks/useFeedbacks";
 import { useFeedbackStats } from "../hooks/useFeedbackStats";
-import { FeedbackFilters } from "../components/feedbacks/FeedbackFilters";
+import { ReportFilters } from "../components/report/ReportFilters";
 import { FeedbackStatsSection } from "../components/feedbacks/FeedbackStatsSection";
 import { FeedbackDataTable } from "../components/feedbacks/FeedbackDataTable";
 import { FeedbackDetailsDialog } from "../components/feedbacks/FeedbackDetailsDialog";
@@ -112,11 +112,12 @@ const FeedbacksManagement: React.FC = () => {
     <AdminLayout title="Quản lý góp ý - phản hồi">
       <Toast ref={toast} />
 
-      <FeedbackFilters
+      <ReportFilters
         filterType={filterType}
         handleFilterChange={handleFilterChange}
         dateFilter={dateFilter}
         handleCustomDateChange={handleCustomDateChange}
+        reportHeader={null}
       />
 
       <FeedbackStatsSection

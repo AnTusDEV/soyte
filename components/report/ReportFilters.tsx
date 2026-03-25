@@ -3,7 +3,7 @@ import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
 import { formatDateVN } from '../../utils/dateUtils';
 
-interface FeedbackFiltersProps {
+interface ReportFiltersProps {
   filterType: string;
   handleFilterChange: (type: string) => void;
   dateFilter: { startDate: string, endDate: string };
@@ -20,7 +20,7 @@ const filterOptions = [
   { label: 'Tùy chọn', value: 'custom' }
 ];
 
-export const FeedbackFilters: React.FC<FeedbackFiltersProps> = ({
+export const ReportFilters: React.FC<ReportFiltersProps> = ({
   filterType,
   handleFilterChange,
   dateFilter,
