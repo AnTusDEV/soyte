@@ -87,14 +87,14 @@ const NewsDetail = () => {
 
         const postData = await api.get(`/posts/${id}`);
         if (postData) {
-          setPost(postData.data);
+          setPost(postData);
 
           // Fetch related posts by category
-          if (postData.data.category_id) {
+          if (postData.category_id) {
             const relatedResponse = await api.get("/posts", {
-              category_id: postData.data.category_id,
+              category_id: postData.category_id,
               limit: 6,
-              exclude: postData.data.id,
+              exclude: postData.id,
             });
 
             // Extract items correctly from API response
