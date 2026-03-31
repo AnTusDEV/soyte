@@ -30,4 +30,10 @@ export const feedBacksSevice = {
         if (survey_key && survey_key !== "") params.survey_key = survey_key;
         return api.get(`/feedbacks`, params);
     },
-};
+    async fetchCompare(survey_key?: string, type?: string) {
+        const params: any = {};
+        if (survey_key && survey_key !== "") params.survey_key = survey_key;
+        if (type && type !== "") params.type = type;
+        return api.get(`/feedbacks/compare`, params);
+    },
+};

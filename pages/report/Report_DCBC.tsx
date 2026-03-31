@@ -242,8 +242,10 @@ const Report_DCBC = () => {
                           formId={formId}
                           feedbacks={group.items}
                           dateFilter={dateFilter}
-                          filterType={filterType}
+                          surveyType="reflect"
                           formTemplate={formTemplates[formId]}
+                          surveys={surveys}
+                          selectedSurveyKey={selectedSurveyKey}
                         />
                       </div>
                     </TabPanel>
