@@ -339,7 +339,7 @@ const TemplateQrView: React.FC = () => {
                   <div className="w-full h-px bg-slate-100/50 mb-6 lg:hidden"></div>
                   <div className="flex items-center justify-end w-full px-4 no-print">
                     <Link
-                      to={`/forms/${id}`}
+                      to={`/forms/${id}${surveyKey ? `?survey_key=${surveyKey}` : ""}`}
                       className="text-[11px] font-black text-slate-400 hover:text-primary-600 transition-all uppercase tracking-[0.12em] flex items-center gap-2 group/link"
                     >
                       XEM CHI TIẾT{" "}

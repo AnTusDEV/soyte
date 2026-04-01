@@ -15,6 +15,7 @@ interface User {
   full_name: string;
   role: "admin" | "user";
   permissions: string[];
+  unit: string;
 }
 
 // Define the shape of the context value
