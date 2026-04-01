@@ -149,7 +149,7 @@ const FormList: React.FC = () => {
                       <FileText className="w-8 h-8" />
                     </div>
                     
-                    <h3 className="text-base md:text-lg font-black text-slate-800 group-hover:text-primary-700 transition-colors mb-3 leading-tight px-2 relative z-10 line-clamp-3 h-14">
+                    <h3 className="text-base md:text-lg font-black text-slate-800 group-hover:text-primary-700 transition-colors mb-3 leading-tight px-2 relative z-10 min-h-[3.5rem]">
                       {form.name}
                     </h3>
                     
