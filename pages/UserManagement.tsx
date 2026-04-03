@@ -240,16 +240,25 @@ const UserManagement: React.FC = () => {
                     <td className="px-6 py-4">
                       <div className="flex flex-wrap gap-1">
                         {(() => {
+                          const details = user.permission_details;
                           const perms = user.permissions;
-                          const permList = !perms
-                            ? []
-                            : Array.isArray(perms)
-                              ? perms.map((p: any) =>
-                                  typeof p === "object"
-                                    ? p.description || p.name
-                                    : p,
-                                )
-                              : Object.keys(perms);
+                          
+                          let permList: string[] = [];
+                          
+                          if (Array.isArray(details) && details.length > 0) {
+                            // Priority 1: Use permission_details for human-readable labels
+                            permList = details.map((d: any) => d.description || d.name);
+                          } else if (!perms) {
+                            permList = [];
+                          } else if (Array.isArray(perms)) {
+                            // Priority 2: Standard array of permissions
+                            permList = perms.map((p: any) => 
+                              typeof p === "object" ? p.description || p.name : p
+                            );
+                          } else {
+                            // Priority 3: Keys from the permission object
+                            permList = Object.keys(perms);
+                          }
 
                           if (permList.length > 0) {
                             return (

@@ -77,6 +77,7 @@ export interface User {
   facility_id?: string;
   unit?: string;
   permissions?: any; // Supporting nested object or array
+  permission_details?: { name: string; description: string }[];
   us?: string;
   pass?: string;
 }
