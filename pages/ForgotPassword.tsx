@@ -9,13 +9,25 @@ const ForgotPassword: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [errors, setErrors] = useState<any>({});
   const navigate = useNavigate();
+
+  const validateForm = () => {
+    const newErrors: any = {};
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim()) {
+      newErrors.email = "Vui lòng nhập địa chỉ email.";
+    } else if (!emailRegex.test(email)) {
+      newErrors.email = "Email không đúng định dạng.";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
-
     setError("");
+    if (!validateForm()) return;
     setIsLoading(true);
     try {
       await api.forgotPassword(email);
@@ -101,12 +113,12 @@ const ForgotPassword: React.FC = () => {
                   </label>
                   <input
                     type="email"
-                    required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:ring-4 focus:ring-primary-100 focus:bg-white transition-all text-sm font-bold"
-                    placeholder="example@soyte.gov.vn"
+                    className={`w-full p-4 bg-gray-50 border ${errors.email ? "border-red-500" : "border-gray-200"} rounded-2xl outline-none focus:ring-4 focus:ring-primary-100 focus:bg-white transition-all text-sm font-bold`}
+                    placeholder="example@gmail.com"
                   />
+                  {errors.email && <p className="text-red-500 text-[10px] mt-1 font-bold ml-1">{errors.email}</p>}
                 </div>
 
                 <Button

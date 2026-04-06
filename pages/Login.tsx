@@ -15,9 +15,20 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth(); // Get the login function from context
 
+  const [errors, setErrors] = useState<any>({});
+
+  const validateForm = () => {
+    const newErrors: any = {};
+    if (!email.trim()) newErrors.email = "Vui lòng nhập tài khoản hoặc email.";
+    if (!password) newErrors.password = "Vui lòng nhập mật khẩu.";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    if (!validateForm()) return;
     setIsLoading(true);
 
     try {
@@ -101,9 +112,10 @@ const Login: React.FC = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary-100 focus:bg-white transition-all text-sm font-medium"
+                className={`w-full p-4 bg-gray-50 border ${errors.email ? "border-red-500" : "border-gray-200"} rounded-xl outline-none focus:ring-2 focus:ring-primary-100 focus:bg-white transition-all text-sm font-medium`}
                 placeholder="admin@soyte.gov.vn"
               />
+              {errors.email && <p className="text-red-500 text-[10px] mt-1 font-bold ml-1">{errors.email}</p>}
             </div>
 
             <div>
@@ -116,7 +128,7 @@ const Login: React.FC = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary-100 focus:bg-white transition-all text-sm font-medium"
+                  className={`w-full p-4 bg-gray-50 border ${errors.password ? "border-red-500" : "border-gray-200"} rounded-xl outline-none focus:ring-2 focus:ring-primary-100 focus:bg-white transition-all text-sm font-medium`}
                   placeholder="••••••••"
                 />
                 <Button
@@ -128,6 +140,7 @@ const Login: React.FC = () => {
                   className="absolute right-2 top-1/2 -translate-y-1/2 !text-gray-400 hover:!text-primary-600"
                 />
               </div>
+              {errors.password && <p className="text-red-500 text-[10px] mt-1 font-bold ml-1">{errors.password}</p>}
             </div>
 
             <div className="flex items-center justify-between px-1">

@@ -5,51 +5,102 @@ import {
   EyeOff,
   ArrowLeft,
   AlertCircle,
-  Loader2,
   UserPlus,
-  Building2,
   Mail,
   User,
 } from "lucide-react";
 import { api } from "../api";
 import { Dropdown, Button } from "@/components/prime";
-import { FACILITIES_BT, FACILITIES_BV, FACILITIES_CC, FACILITIES_TT, FACILITIES_TYT } from "@/constants";
+import {
+  FACILITIES_BT,
+  FACILITIES_BV,
+  FACILITIES_CC,
+  FACILITIES_TT,
+  FACILITIES_TYT,
+} from "@/constants";
+
 const Register: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-   const [formData, setFormData] = useState<any>({
-     full_name: "",
-     email: "",
-     password: "",
-     role: "user",
-     status: 0,
-     type: "",
-     unit: "",
-     permissions: [],
-     us: "",
-     pass: "",
-   });
+  const [formData, setFormData] = useState<any>({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    role: "user",
+    status: 0,
+    type: "",
+    unit: "",
+    permissions: [],
+    us: "",
+    pass: "",
+  });
+  const [errors, setErrors] = useState<any>({});
+
   const navigate = useNavigate();
+
   const getFacilityOptions = (type: string) => {
-      switch (type) {
-        case "BV": return FACILITIES_BV.map(f => ({ label: f.name, value: f.id }));
-        case "TT": return FACILITIES_TT.map(f => ({ label: f.name, value: f.id }));
-        case "BT": return FACILITIES_BT.map(f => ({ label: f.name, value: f.id }));
-        case "TYT": return FACILITIES_TYT.map(f => ({ label: f.name, value: f.id }));
-        case "CC": return FACILITIES_CC.map(f => ({ label: f.name, value: f.id }));
-        default: return [];
+    switch (type) {
+      case "BV":
+        return FACILITIES_BV.map((f) => ({ label: f.name, value: f.id }));
+      case "TT":
+        return FACILITIES_TT.map((f) => ({ label: f.name, value: f.id }));
+      case "BT":
+        return FACILITIES_BT.map((f) => ({ label: f.name, value: f.id }));
+      case "TYT":
+        return FACILITIES_TYT.map((f) => ({ label: f.name, value: f.id }));
+      case "CC":
+        return FACILITIES_CC.map((f) => ({ label: f.name, value: f.id }));
+      default:
+        return [];
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors: any = {};
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!formData.fullName?.trim()) {
+      newErrors.fullName = "Vui lòng nhập họ và tên cán bộ.";
+    }
+
+    if (!formData.email?.trim()) {
+      newErrors.email = "Vui lòng nhập email công vụ.";
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = "Email không đúng định dạng.";
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Vui lòng nhập mật khẩu.";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Mật khẩu phải có ít nhất 6 ký tự.";
+    }
+
+    if (formData.confirmPassword !== formData.password) {
+      newErrors.confirmPassword = "Mật khẩu xác nhận không khớp.";
+    }
+
+    if (formData.role === "user") {
+      if (!formData.type) {
+        newErrors.type = "Vui lòng chọn loại hình cơ sở.";
       }
-    };
+      if (formData.type && !formData.unit) {
+        newErrors.unit = "Vui lòng chọn đơn vị công tác.";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccessMessage("");
 
-    if (formData.password !== formData.confirmPassword) {
-      setError("Mật khẩu xác nhận không khớp.");
+    if (!validateForm()) {
       return;
     }
 
@@ -71,10 +122,9 @@ const Register: React.FC = () => {
       setSuccessMessage(
         "Đăng ký tài khoản thành công! Vui lòng chờ quản trị viên phê duyệt.",
       );
-      // Optionally navigate after a short delay or user acknowledgment
       setTimeout(() => {
         navigate("/login");
-      }, 3000); // Navigate after 3 seconds
+      }, 3000);
     } catch (err: any) {
       setError(
         "Đăng ký thất bại: " +
@@ -102,10 +152,8 @@ const Register: React.FC = () => {
         </Link>
 
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100">
-          {/* Header Section */}
           <div className="bg-[#0066a2] p-8 text-center relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-
             <div className="relative z-10">
               <div className="w-20 h-20 mx-auto mb-4 bg-white rounded-full p-0.5 shadow-lg flex items-center justify-center overflow-hidden border-2 border-white">
                 <img
@@ -161,20 +209,26 @@ const Register: React.FC = () => {
                   />
                   <input
                     type="text"
-                    required
                     value={formData.fullName}
                     onChange={(e) =>
                       setFormData({ ...formData, fullName: e.target.value })
                     }
-                    className="w-full p-4 pl-12 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary-100 focus:bg-white transition-all text-sm font-medium"
+                    className={`w-full p-4 pl-12 bg-gray-50 border ${
+                      errors.fullName ? "border-red-500" : "border-gray-200"
+                    } rounded-xl outline-none focus:ring-2 focus:ring-primary-100 focus:bg-white transition-all text-sm font-medium`}
                     placeholder="Nguyễn Văn A"
                   />
                 </div>
+                {errors.fullName && (
+                  <p className="text-red-500 text-[10px] mt-1 font-bold ml-1">
+                    {errors.fullName}
+                  </p>
+                )}
               </div>
 
               <div className="md:col-span-2">
                 <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2">
-                  Email công vụ (@soyte.gov.vn)
+                  Email công vụ
                 </label>
                 <div className="relative">
                   <Mail
@@ -183,15 +237,21 @@ const Register: React.FC = () => {
                   />
                   <input
                     type="email"
-                    required
                     value={formData.email}
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
                     }
-                    className="w-full p-4 pl-12 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary-100 focus:bg-white transition-all text-sm font-medium"
-                    placeholder="canbo@soyte.gov.vn"
+                    className={`w-full p-4 pl-12 bg-gray-50 border ${
+                      errors.email ? "border-red-500" : "border-gray-200"
+                    } rounded-xl outline-none focus:ring-2 focus:ring-primary-100 focus:bg-white transition-all text-sm font-medium`}
+                    placeholder="canbo@gmail.com"
                   />
                 </div>
+                {errors.email && (
+                  <p className="text-red-500 text-[10px] mt-1 font-bold ml-1">
+                    {errors.email}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -201,12 +261,13 @@ const Register: React.FC = () => {
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
-                    required
                     value={formData.password}
                     onChange={(e) =>
                       setFormData({ ...formData, password: e.target.value })
                     }
-                    className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary-100 focus:bg-white transition-all text-sm font-medium"
+                    className={`w-full p-4 bg-gray-50 border ${
+                      errors.password ? "border-red-500" : "border-gray-200"
+                    } rounded-xl outline-none focus:ring-2 focus:ring-primary-100 focus:bg-white transition-all text-sm font-medium`}
                     placeholder="••••••••"
                   />
                   <Button
@@ -220,6 +281,11 @@ const Register: React.FC = () => {
                     className="absolute right-4 top-1/2 -translate-y-1/2 !text-gray-400 hover:!text-primary-600"
                   />
                 </div>
+                {errors.password && (
+                  <p className="text-red-500 text-[10px] mt-1 font-bold ml-1">
+                    {errors.password}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -228,7 +294,6 @@ const Register: React.FC = () => {
                 </label>
                 <input
                   type={showPassword ? "text" : "password"}
-                  required
                   value={formData.confirmPassword}
                   onChange={(e) =>
                     setFormData({
@@ -236,11 +301,21 @@ const Register: React.FC = () => {
                       confirmPassword: e.target.value,
                     })
                   }
-                  className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary-100 focus:bg-white transition-all text-sm font-medium"
+                  className={`w-full p-4 bg-gray-50 border ${
+                    errors.confirmPassword
+                      ? "border-red-500"
+                      : "border-gray-200"
+                  } rounded-xl outline-none focus:ring-2 focus:ring-primary-100 focus:bg-white transition-all text-sm font-medium`}
                   placeholder="••••••••"
                 />
+                {errors.confirmPassword && (
+                  <p className="text-red-500 text-[10px] mt-1 font-bold ml-1">
+                    {errors.confirmPassword}
+                  </p>
+                )}
               </div>
             </div>
+
             {formData.role === "user" && (
               <div className="p-4 bg-gray-50 rounded-2xl border border-gray-200 space-y-4 animate-in slide-in-from-top-2">
                 <div>
@@ -254,13 +329,19 @@ const Register: React.FC = () => {
                       { label: "Trung tâm y tế", value: "TT" },
                       { label: "Bảo trợ xã hội", value: "BT" },
                       { label: "Trạm y tế", value: "TYT" },
+                      { label: "Cấp cứu 115", value: "CC" },
                     ]}
                     onChange={(e) =>
                       setFormData({ ...formData, type: e.value, unit: "" })
                     }
                     placeholder="-- Chọn loại hình --"
-                    className="w-full !bg-white !border-gray-200 !rounded-xl outline-none font-bold text-gray-700"
+                    className={`w-full !bg-white !border-${errors.type ? "red-500" : "gray-200"} !rounded-xl outline-none font-bold text-gray-700`}
                   />
+                  {errors.type && (
+                    <p className="text-red-500 text-[9px] mt-1 font-bold ml-1">
+                      {errors.type}
+                    </p>
+                  )}
                 </div>
 
                 {formData.type && (
@@ -278,12 +359,18 @@ const Register: React.FC = () => {
                       filter
                       filterPlaceholder="Tìm kiếm tên đơn vị..."
                       virtualScrollerOptions={{ itemSize: 38 }}
-                      className="w-full !bg-white !border-gray-200 !rounded-xl outline-none font-bold text-gray-700"
+                      className={`w-full !bg-white !border-${errors.unit ? "red-500" : "gray-200"} !rounded-xl outline-none font-bold text-gray-700`}
                     />
+                    {errors.unit && (
+                      <p className="text-red-500 text-[9px] mt-1 font-bold ml-1">
+                        {errors.unit}
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
             )}
+
             <div className="pt-4">
               <Button
                 type="submit"
@@ -295,15 +382,14 @@ const Register: React.FC = () => {
                     <UserPlus className="w-4 h-4" strokeWidth={2.4} />
                   )
                 }
-                className="w-full py-4 !px-6 !bg-[#0088cc] !text-white font-bold rounded-xl shadow-lg hover:!bg-[#0077bb] transition-all !flex !items-center !justify-center !gap-2 !leading-none"
+                className="w-full py-4 px-6 !bg-[#0088cc] !text-white font-bold rounded-xl shadow-lg hover:!bg-[#0077bb] transition-all flex items-center justify-center gap-2 leading-none"
               />
             </div>
           </form>
 
           <div className="bg-gray-50/50 p-6 text-center border-t border-gray-100">
             <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-relaxed">
-              Lưu ý: Tài khoản đăng ký cần được quản trị viên hệ thống phê duyệt
-              trước khi có thể sử dụng.
+              Lưu ý: Tài khoản đăng ký cần được quản trị viên hệ thống phê duyệt trước khi có thể sử dụng.
             </p>
           </div>
         </div>

@@ -389,7 +389,7 @@ const PermissionsManagement: React.FC = () => {
                   } rounded-lg font-bold focus:ring-2 focus:ring-primary-100 outline-none`}
                 />
                 {errors.name && (
-                  <p className="text-red-500 text-[10px] mt-1 font-bold">
+                  <p className="text-red-500 text-[10px] mt-1 font-bold ml-1">
                     {errors.name}
                   </p>
                 )}

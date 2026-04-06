@@ -14,7 +14,6 @@ import {
   X,
   Save,
   Loader2,
-  ChevronRight,
   ChevronDown,
   PlusIcon,
   Edit3Icon,
@@ -38,7 +37,6 @@ const flattenPermissions = (obj: any): string[] => {
     for (const key in currentObj) {
       const value = currentObj[key];
 
-      // Handle structural 'children' key
       if (key === "children" && typeof value === "object" && value !== null) {
         traverse(value, currentPath);
         continue;
@@ -47,12 +45,9 @@ const flattenPermissions = (obj: any): string[] => {
       const path = currentPath ? `${currentPath}.${key}` : key;
 
       if (typeof value === "object" && value !== null) {
-        // It's a module
         result.push(path);
-        // Recurse
         traverse(value, path);
       } else if (key === "view" && value === true) {
-        // It's a view action - this matches availablePermissions names like 'posts.view'
         result.push(path);
       }
     }
@@ -80,7 +75,6 @@ const nestPermissions = (paths: string[]): any => {
     let current = result;
 
     parts.forEach((part, index) => {
-      // If it's an action key at the end of a path, set it as a boolean
       if (actionKeys.includes(part)) {
         current[part] = true;
         return;
@@ -89,11 +83,8 @@ const nestPermissions = (paths: string[]): any => {
       if (!current[part]) current[part] = {};
 
       if (index === parts.length - 1) {
-        // If it's the last part and not an action key, it's a module.
-        // Grant 'view' by default to ensure it shows up in API filters.
         current[part].view = true;
       } else {
-        // Prepare for next level
         if (!current[part].children) current[part].children = {};
         current = current[part].children;
       }
@@ -131,13 +122,13 @@ const UserModal: React.FC<UserModalProps> = ({
   const [expandedParents, setExpandedParents] = useState<
     Record<number, boolean>
   >({});
-  const [emailAccounts, setEmailAccounts] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [errors, setErrors] = useState<any>({});
 
   useEffect(() => {
     if (visible) {
+      setErrors({});
       fetchPermissions();
-      if (!isEdit) fetchEmailAccounts();
       if (isEdit && user) {
         const unit = user.unit || user.facility_id || "";
         let type = user.type || "";
@@ -159,9 +150,9 @@ const UserModal: React.FC<UserModalProps> = ({
           unit: unit,
           us: user.us || "",
           pass: user.pass || "",
+          password: "", // Don't show password or populate it
         });
 
-        // Use flattener for nested object
         const perms =
           user.permissions && typeof user.permissions === "object"
             ? flattenPermissions(user.permissions)
@@ -198,32 +189,12 @@ const UserModal: React.FC<UserModalProps> = ({
     }
   };
 
-  const fetchEmailAccounts = async () => {
-    try {
-      const response = await api.getEmailAccounts();
-      const data = response.emailAccounts || response.data || response;
-      const accounts = Array.isArray(data) ? data : [];
-      setEmailAccounts(accounts);
-
-      if (accounts.length > 0) {
-        setFormData((prev: any) => ({
-          ...prev,
-          us: accounts[0].username,
-          pass: accounts[0].password,
-        }));
-      }
-    } catch (error) {
-      console.error("Error fetching email accounts:", error);
-    }
-  };
-
   const hierarchicalPermissions = useMemo(() => {
-    // Recursive function to filter out granular actions and limit depth
     const filterActionsRecursive = (
       items: Permission[],
       depth = 0,
     ): Permission[] => {
-      if (depth >= 2) return []; // Stop at Level 2 (0-indexed: 0=root, 1=child)
+      if (depth >= 2) return [];
 
       return items
         .filter((p) => {
@@ -245,20 +216,16 @@ const UserModal: React.FC<UserModalProps> = ({
         }));
     };
 
-    // If the API already returns a tree with 'children', use it.
-    // Otherwise, build it from parent_id.
     const hasAlreadyNested = availablePermissions.some(
       (p) => p.children && p.children.length > 0,
     );
 
     if (hasAlreadyNested) {
       const filtered = filterActionsRecursive(availablePermissions);
-      // Filter only root nodes (those without parent_id or parent_id not in the list)
       const allIds = new Set(filtered.map((p) => p.id));
       return filtered.filter((p) => !p.parent_id || !allIds.has(p.parent_id));
     }
 
-    // Fallback: build from parent_id if flat
     const map: Record<number, Permission & { children: Permission[] }> = {};
     const filteredFlat = availablePermissions.filter((p) => {
       const name = p.name.toLowerCase();
@@ -294,7 +261,6 @@ const UserModal: React.FC<UserModalProps> = ({
 
     let newSelected = [...selectedPermissions];
 
-    // Recursive function to get all descendant names (deep)
     const getAllDescendantNames = (p: any): string[] => {
       let names: string[] = [p.name];
       if (p.children && p.children.length > 0) {
@@ -305,99 +271,96 @@ const UserModal: React.FC<UserModalProps> = ({
       return names;
     };
 
-    // Recursive function to get all ancestor names
     const getAncestorNames = (pName: string): string[] => {
       const p = availablePermissions.find((x) => x.name === pName);
       if (!p || !p.parent_id) return [];
-
-      // Find parent by ID
       const parent = availablePermissions.find((x) => x.id === p.parent_id);
       if (!parent) return [];
-
       return [parent.name, ...getAncestorNames(parent.name)];
     };
 
     if (isSelected) {
-      // Deselecting: Remove self and ALL descendants
       const descendantsToDeselect = getAllDescendantNames(permission);
       newSelected = newSelected.filter((p) => !descendantsToDeselect.includes(p));
     } else {
-      // Selecting: Add self AND ALL descendants
       const descendantsToSelect = getAllDescendantNames(permission);
       newSelected = Array.from(
         new Set([...newSelected, ...descendantsToSelect]),
       );
-
-      // Also ensure all ancestors are selected
       const ancestorsToSelect = getAncestorNames(permissionName);
       newSelected = Array.from(new Set([...newSelected, ...ancestorsToSelect]));
-
-      // Expand if has children
       if (permission.children?.length > 0) {
         setExpandedParents((prev) => ({ ...prev, [permission.id]: true }));
       }
     }
-
     setSelectedPermissions(newSelected);
-  };
-
-  const toggleExpand = (e: React.MouseEvent, id: number) => {
-    e.stopPropagation();
-    setExpandedParents((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   const getFacilityOptions = (type: string) => {
     switch (type) {
-      case "BV":
-        return FACILITIES_BV.map((f) => ({ label: f.name, value: f.id }));
-      case "TT":
-        return FACILITIES_TT.map((f) => ({ label: f.name, value: f.id }));
-      case "BT":
-        return FACILITIES_BT.map((f) => ({ label: f.name, value: f.id }));
-      case "TYT":
-        return FACILITIES_TYT.map((f) => ({ label: f.name, value: f.id }));
-      case "CC":
-        return FACILITIES_CC.map((f) => ({ label: f.name, value: f.id }));
-      default:
-        return [];
+      case "BV": return FACILITIES_BV.map((f) => ({ label: f.name, value: f.id }));
+      case "TT": return FACILITIES_TT.map((f) => ({ label: f.name, value: f.id }));
+      case "BT": return FACILITIES_BT.map((f) => ({ label: f.name, value: f.id }));
+      case "TYT": return FACILITIES_TYT.map((f) => ({ label: f.name, value: f.id }));
+      case "CC": return FACILITIES_CC.map((f) => ({ label: f.name, value: f.id }));
+      default: return [];
     }
   };
 
+  const validateForm = () => {
+    const newErrors: any = {};
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!formData.full_name?.trim()) {
+      newErrors.full_name = "Họ và tên không được để trống.";
+    }
+
+    if (!formData.email?.trim()) {
+      newErrors.email = "Email không được để trống.";
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = "Email không đúng định dạng.";
+    }
+
+    if (!formData.role) {
+      newErrors.role = "Vui lòng chọn vai trò.";
+    }
+
+    if (formData.role === "user") {
+      if (!formData.type) {
+        newErrors.type = "Vui lòng chọn loại hình.";
+      }
+      if (formData.type && !formData.unit) {
+        newErrors.unit = "Vui lòng chọn đơn vị.";
+      }
+    }
+
+    if (!isEdit && !formData.password) {
+      newErrors.password = "Mật khẩu không được để trống.";
+    } else if (formData.password && formData.password.length < 6) {
+      newErrors.password = "Mật khẩu phải có ít nhất 6 ký tự.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSave = async () => {
-    if (
-      !formData.full_name ||
-      !formData.email ||
-      (!isEdit && !formData.password)
-    ) {
+    if (!validateForm()) {
       toast.current?.show({
         severity: "warn",
-        summary: "Cảnh báo",
-        detail: "Vui lòng nhập đầy đủ thông tin bắt buộc",
+        summary: "Thông tin chưa hợp lệ",
+        detail: "Vui lòng kiểm tra lại các trường thông tin.",
       });
       return;
     }
 
-    if (formData.role === "user") {
-      if (!formData.type || !formData.unit) {
-        toast.current?.show({
-          severity: "warn",
-          summary: "Cảnh báo",
-          detail: "Vui lòng chọn Loại hình và Đơn vị công tác",
-        });
-        return;
-      }
-    }
-
     setIsSaving(true);
     try {
-      const { ...restOfFormData } = formData;
-
-      // Use nester to build the hierarchical object
       const hierarchicalPermissions =
         formData.role === "user" ? {} : nestPermissions(selectedPermissions);
 
       const dataToSubmit = {
-        ...restOfFormData,
+        ...formData,
         permissions: hierarchicalPermissions,
       };
 
@@ -410,82 +373,55 @@ const UserModal: React.FC<UserModalProps> = ({
       toast.current?.show({
         severity: "success",
         summary: "Thành công",
-        detail: isEdit
-          ? "Cập nhật người dùng thành công"
-          : "Thêm người dùng mới thành công",
+        detail: isEdit ? "Cập nhật người dùng thành công" : "Thêm người dùng mới thành công",
       });
 
       setTimeout(() => {
         onSaveSuccess();
         onHide();
       }, 1000);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving user:", error);
       toast.current?.show({
         severity: "error",
         summary: "Lỗi",
-        detail: "Không thể lưu thông tin người dùng",
+        detail: error.response?.data?.message || "Không thể lưu thông tin người dùng",
       });
     } finally {
       setIsSaving(false);
     }
   };
 
-  const renderPermissionItem = (
-    item: Permission,
-    level = 0,
-  ) => {
+  const renderPermissionItem = (item: Permission, level = 0) => {
     const isSelected = selectedPermissions.includes(item.name);
     const children = item.children || [];
     const hasChildren = children.length > 0;
-    // Automatically expand if selected OR if manually expanded
     const isExpanded = !!expandedParents[item.id] || isSelected;
 
     return (
       <React.Fragment key={item.id}>
         <div
-          className={`group flex items-center gap-3 p-3.5 rounded-xl transition-all cursor-pointer border mb-2 ${
-            isSelected
-              ? "bg-primary-50 border-primary-200 shadow-sm"
-              : "bg-white border-gray-100 hover:border-gray-300"
-          }`}
+          className={`group flex items-center gap-3 p-3.5 rounded-xl transition-all cursor-pointer border mb-2 ${isSelected ? "bg-primary-50 border-primary-200 shadow-sm" : "bg-white border-gray-100 hover:border-gray-300"}`}
           style={{ marginLeft: `${level * 24}px` }}
           onClick={() => handleTogglePermission(item)}
         >
           <div className="flex items-center gap-3 flex-1">
-            <div
-              className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${
-                isSelected
-                  ? "bg-primary-600 border-primary-600 shadow-primary-100 shadow-lg"
-                  : "bg-gray-50 border-gray-200 group-hover:border-primary-300"
-              }`}
-            >
-              {isSelected && (
-                <div className="w-1.5 h-1.5 bg-white rounded-full animate-in zoom-in-50" />
-              )}
+            <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${isSelected ? "bg-primary-600 border-primary-600 shadow-primary-100 shadow-lg" : "bg-gray-50 border-gray-200 group-hover:border-primary-300"}`}>
+              {isSelected && <div className="w-1.5 h-1.5 bg-white rounded-full animate-in zoom-in-50" />}
             </div>
-
-            <div
-              className={`text-[11px] font-black tracking-tight leading-tight uppercase transition-colors ${
-                isSelected ? "text-primary-800" : "text-gray-600"
-              }`}
-            >
+            <div className={`text-[11px] font-black tracking-tight leading-tight uppercase transition-colors ${isSelected ? "text-primary-800" : "text-gray-600"}`}>
               {item.description}
             </div>
           </div>
-
           {hasChildren && (
             <div className={`transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}>
               <ChevronDown size={14} className={isSelected ? "text-primary-500" : "text-gray-400"} />
             </div>
           )}
         </div>
-
         {hasChildren && isExpanded && (
           <div className="animate-in slide-in-from-top-1 fade-in duration-300">
-            {children.map((child) =>
-              renderPermissionItem(child, level + 1),
-            )}
+            {children.map((child) => renderPermissionItem(child, level + 1))}
           </div>
         )}
       </React.Fragment>
@@ -497,27 +433,17 @@ const UserModal: React.FC<UserModalProps> = ({
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
       <Toast ref={toast} />
-      <div
-        className={`bg-white w-full ${formData.role === "user" ? "max-w-[40vw]" : "max-w-[60vw]"} rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh] transition-all duration-300`}
-      >
+      <div className={`bg-white w-full ${formData.role === "user" ? "max-w-[40vw]" : "max-w-[60vw]"} rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh] transition-all duration-300`}>
         <div className="bg-primary-700 p-4 flex justify-between items-center text-white shrink-0">
           <h3 className="font-bold flex items-center gap-2 text-lg uppercase tracking-tight">
             {isEdit ? <Edit3Icon size={20} /> : <PlusIcon size={20} />}
             {isEdit ? "CẬP NHẬT THÔNG TIN" : "THÊM MỚI NGƯỜI DÙNG"}
           </h3>
-          <Button
-            icon={<X size={20} />}
-            text
-            rounded
-            onClick={onHide}
-            className="!text-white hover:!bg-white/20"
-          />
+          <Button icon={<X size={20} />} text rounded onClick={onHide} className="!text-white hover:!bg-white/20" />
         </div>
 
         <div className="p-8 overflow-y-auto custom-scrollbar">
-          <div
-            className={`grid grid-cols-1 ${formData.role !== "user" ? "md:grid-cols-2" : ""} gap-8`}
-          >
+          <div className={`grid grid-cols-1 ${formData.role !== "user" ? "md:grid-cols-2" : ""} gap-8`}>
             <div className="space-y-6">
               <h4 className="font-black text-gray-800 flex items-center gap-2 border-b border-gray-100 pb-2">
                 <Users size={18} className="text-primary-600" />
@@ -531,12 +457,11 @@ const UserModal: React.FC<UserModalProps> = ({
                   </label>
                   <InputText
                     value={formData.full_name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, full_name: e.target.value })
-                    }
-                    className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-100 outline-none font-bold text-gray-700 transition-all font-inter"
+                    onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                    className={`w-full p-3 bg-gray-50 border ${errors.full_name ? "border-red-500" : "border-gray-200"} rounded-xl focus:ring-2 focus:ring-primary-100 outline-none font-bold text-gray-700 transition-all`}
                     placeholder="Nhập họ và tên đầy đủ"
                   />
+                  {errors.full_name && <p className="text-red-500 text-[10px] mt-1 font-bold ml-1">{errors.full_name}</p>}
                 </div>
 
                 <div>
@@ -545,13 +470,12 @@ const UserModal: React.FC<UserModalProps> = ({
                   </label>
                   <InputText
                     value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     disabled={isEdit}
-                    className={`w-full p-3 border border-gray-200 rounded-xl outline-none font-bold transition-all font-inter ${isEdit ? "bg-gray-100 text-gray-400" : "bg-gray-50 text-gray-700 focus:ring-2 focus:ring-primary-100"}`}
+                    className={`w-full p-3 border ${errors.email ? "border-red-500" : "border-gray-200"} rounded-xl outline-none font-bold transition-all ${isEdit ? "bg-gray-100 text-gray-400" : "bg-gray-50 text-gray-700 focus:ring-2 focus:ring-primary-100"}`}
                     placeholder="example@gmail.com"
                   />
+                  {errors.email && <p className="text-red-500 text-[10px] mt-1 font-bold ml-1">{errors.email}</p>}
                 </div>
 
                 {!isEdit && (
@@ -562,57 +486,48 @@ const UserModal: React.FC<UserModalProps> = ({
                     <InputText
                       type="password"
                       value={formData.password}
-                      onChange={(e) =>
-                        setFormData({ ...formData, password: e.target.value })
-                      }
-                      className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-100 outline-none font-bold text-gray-700 transition-all font-inter"
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      className={`w-full p-3 bg-gray-50 border ${errors.password ? "border-red-500" : "border-gray-200"} rounded-xl focus:ring-2 focus:ring-primary-100 outline-none font-bold text-gray-700 transition-all`}
                       placeholder="••••••••"
                     />
+                    {errors.password && <p className="text-red-500 text-[10px] mt-1 font-bold ml-1">{errors.password}</p>}
                   </div>
                 )}
 
                 <div className={isEdit ? "grid grid-cols-2 gap-4" : "block"}>
                   <div>
-                    <label className="block text-[10px] font-black text-gray-400 uppercase mb-1.5 ml-1">
-                      Vai trò hệ thống
-                    </label>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase mb-1.5 ml-1">Vai trò hệ thống</label>
                     <Dropdown
                       value={formData.role}
                       options={[
                         { label: "Người dùng", value: "user" },
                         { label: "Quản trị viên", value: "admin" },
                       ]}
-                      onChange={(e) =>
-                        setFormData({ ...formData, role: e.value })
-                      }
-                      className="w-full !bg-gray-50 !border-gray-200 !rounded-xl outline-none font-bold text-gray-700"
+                      onChange={(e) => setFormData({ ...formData, role: e.value })}
+                      className={`w-full !bg-gray-50 !border-${errors.role ? "red-500" : "gray-200"} !rounded-xl outline-none font-bold text-gray-700`}
                     />
+                    {errors.role && <p className="text-red-500 text-[10px] mt-1 font-bold ml-1">{errors.role}</p>}
                   </div>
                   {isEdit && (
                     <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase mb-1.5 ml-1">
-                        Trạng thái
-                      </label>
+                      <label className="block text-[10px] font-black text-gray-400 uppercase mb-1.5 ml-1">Trạng thái</label>
                       <Dropdown
                         value={formData.status}
                         options={[
                           { label: "Hoạt động", value: 1 },
                           { label: "Vô hiệu hóa", value: 0 },
                         ]}
-                        onChange={(e) =>
-                          setFormData({ ...formData, status: e.value })
-                        }
+                        onChange={(e) => setFormData({ ...formData, status: e.value })}
                         className="w-full !bg-gray-50 !border-gray-200 !rounded-xl outline-none font-bold text-gray-700"
                       />
                     </div>
                   )}
                 </div>
+
                 {formData.role === "user" && (
                   <div className="p-4 bg-gray-50 rounded-2xl border border-gray-200 space-y-4 animate-in slide-in-from-top-2">
                     <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase mb-1.5 ml-1">
-                        Loại hình cơ sở <span className="text-red-500">*</span>
-                      </label>
+                      <label className="block text-[10px] font-black text-gray-400 uppercase mb-1.5 ml-1">Loại hình cơ sở <span className="text-red-500">*</span></label>
                       <Dropdown
                         value={formData.type}
                         options={[
@@ -620,58 +535,51 @@ const UserModal: React.FC<UserModalProps> = ({
                           { label: "Trung tâm y tế", value: "TT" },
                           { label: "Bảo trợ xã hội", value: "BT" },
                           { label: "Trạm y tế", value: "TYT" },
+                          { label: "Cấp cứu 115", value: "CC" },
                         ]}
-                        onChange={(e) =>
-                          setFormData({ ...formData, type: e.value, unit: "" })
-                        }
+                        onChange={(e) => setFormData({ ...formData, type: e.value, unit: "" })}
                         placeholder="-- Chọn loại hình --"
-                        className="w-full !bg-white !border-gray-200 !rounded-xl outline-none font-bold text-gray-700"
+                        className={`w-full !bg-white !border-${errors.type ? "red-500" : "gray-200"} !rounded-xl outline-none font-bold text-gray-700`}
                       />
+                      {errors.type && <p className="text-red-500 text-[10px] mt-1 font-bold ml-1">{errors.type}</p>}
                     </div>
 
                     {formData.type && (
                       <div>
-                        <label className="block text-[10px] font-black text-gray-400 uppercase mb-1.5 ml-1">
-                          Đơn vị công tác <span className="text-red-500">*</span>
-                        </label>
+                        <label className="block text-[10px] font-black text-gray-400 uppercase mb-1.5 ml-1">Đơn vị công tác <span className="text-red-500">*</span></label>
                         <Dropdown
                           value={formData.unit}
                           options={getFacilityOptions(formData.type)}
-                          onChange={(e) =>
-                            setFormData({ ...formData, unit: e.value })
-                          }
+                          onChange={(e) => setFormData({ ...formData, unit: e.value })}
                           placeholder="-- Chọn đơn vị --"
                           filter
                           filterPlaceholder="Tìm kiếm tên đơn vị..."
                           virtualScrollerOptions={{ itemSize: 38 }}
-                          className="w-full !bg-white !border-gray-200 !rounded-xl outline-none font-bold text-gray-700"
+                          className={`w-full !bg-white !border-${errors.unit ? "red-500" : "gray-200"} !rounded-xl outline-none font-bold text-gray-700`}
                         />
+                        {errors.unit && <p className="text-red-500 text-[10px] mt-1 font-bold ml-1">{errors.unit}</p>}
                       </div>
                     )}
                   </div>
                 )}
               </div>
             </div>
+
             {formData.role !== "user" && (
               <div className="space-y-6">
                 <h4 className="font-black text-gray-800 flex items-center gap-2 border-b border-gray-100 pb-2 uppercase text-sm">
                   <Shield size={18} className="text-primary-600" />
                   PHÂN QUYỀN ({selectedPermissions.length})
                 </h4>
-
                 <div className="bg-gray-100 p-5 rounded-3xl border border-gray-200 max-h-[450px] overflow-y-auto custom-scrollbar-thin">
                   {availablePermissions.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-10 text-gray-400">
                       <Loader2 className="animate-spin mb-2" size={24} />
-                      <p className="text-[10px] font-black uppercase tracking-widest">
-                        Đang kết nối...
-                      </p>
+                      <p className="text-[10px] font-black uppercase tracking-widest">Đang kết nối...</p>
                     </div>
                   ) : (
                     <div className="flex flex-col">
-                      {hierarchicalPermissions.map((permission) =>
-                        renderPermissionItem(permission),
-                      )}
+                      {hierarchicalPermissions.map((permission) => renderPermissionItem(permission))}
                     </div>
                   )}
                 </div>
@@ -681,21 +589,10 @@ const UserModal: React.FC<UserModalProps> = ({
         </div>
 
         <div className="p-6 border-t border-gray-100 flex gap-4 shrink-0 bg-gray-50/50">
-          <Button
-            label="HỦY BỎ"
-            onClick={onHide}
-            className="flex-1 py-4 border-gray-200 text-gray-500 font-black rounded-2xl hover:bg-white transition-all uppercase tracking-widest text-[11px] shadow-sm"
-            outlined
-          />
+          <Button label="HỦY BỎ" onClick={onHide} className="flex-1 py-4 border-gray-200 text-gray-500 font-black rounded-2xl hover:bg-white transition-all uppercase tracking-widest text-[11px] shadow-sm" outlined />
           <Button
             label={isEdit ? "CẬP NHẬT DỮ LIỆU" : "KHỞI TẠO NGƯỜI DÙNG"}
-            icon={
-              isSaving ? (
-                <Loader2 className="animate-spin" size={18} />
-              ) : (
-                <Save size={18} />
-              )
-            }
+            icon={isSaving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
             onClick={handleSave}
             loading={isSaving}
             disabled={isSaving}
