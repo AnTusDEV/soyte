@@ -12,7 +12,7 @@ import { useFacilities } from '@/hooks/useFacilities'
 import { FeedbackItem } from '@/types/feedbacks'
 import { ReportAppendix } from '@/components/report/ReportAppendix'
 import { TCT01TabContent } from '@/components/report/TCT01TabContent'
-import { calculateTotalUnits, calculateOnTimeStats, formatRate } from '@/utils/reportDataUtils'
+import { calculateTotalUnits, calculateOnTimeStats, formatRate, getReportedFacilityId } from '@/utils/reportDataUtils'
 import { ReportHeader } from '@/components/report/ReportHeader'
 import { ReportLoadingState, ReportEmptyState, StyledTabViewCSS } from '@/components/report/ReportStates'
 import { useReportFilter } from '@/hooks/useReportFilter'
@@ -95,16 +95,36 @@ const Report_TCT01 = () => {
             "17": { title: "Đơn vị trợ giúp xã hội trực thuộc", items: [] },
             "18": { title: "Khối các trạm y tế xã, phường", items: [] },
         };
+        // Map phụ để khử trùng: formId -> { unitKey -> latestFeedback }
+        const formUnitMap: Record<string, Record<string, FeedbackItem>> = {
+            "3": {}, "17": {}, "18": {}
+        };
 
         feedbacks.forEach((fb) => {
             const fId = String(fb.form_id);
             if (groups[fId]) {
-                groups[fId].items.push(fb);
+                const unitKey = getReportedFacilityId(fb, facilities) || `fb-${fb.id}`;
+                const existing = formUnitMap[fId][unitKey];
+                
+                if (!existing) {
+                    formUnitMap[fId][unitKey] = fb;
+                } else {
+                    const existingDate = new Date(existing.createdAt || existing.created_at || existing.date || 0);
+                    const fbDate = new Date(fb.createdAt || fb.created_at || fb.date || 0);
+                    if (fbDate > existingDate) {
+                        formUnitMap[fId][unitKey] = fb;
+                    }
+                }
             }
         });
 
+        // Chuyển kết quả vào items
+        Object.keys(formUnitMap).forEach(fId => {
+            groups[fId].items = Object.values(formUnitMap[fId]);
+        });
+
         return groups;
-    }, [feedbacks]);
+    }, [feedbacks, facilities]);
 
     // Tải template
     useEffect(() => {

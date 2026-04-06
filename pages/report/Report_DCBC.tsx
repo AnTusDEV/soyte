@@ -19,6 +19,7 @@ import {
 import { useReportFilter } from "@/hooks/useReportFilter";
 import { useFacilities } from "@/hooks/useFacilities";
 import { surveyService } from "@/services/surveyService";
+import { getReportedFacilityId } from "@/utils/reportDataUtils";
 
 const Report_DCBC = () => {
   const { facilities } = useFacilities();
@@ -92,32 +93,49 @@ const Report_DCBC = () => {
     Record<string, { title: string; items: FeedbackItem[] }>
   >(() => {
     const groups: Record<string, { title: string; items: FeedbackItem[] }> = {};
+    // Map phụ để khử trùng theo formId + unitId: formId -> { unitId -> latestFeedback }
+    const formUnitMap: Record<string, Record<string, FeedbackItem>> = {};
 
     feedbacks.forEach((fb) => {
-      const fId = fb.form_id || "unknown";
-      let title = "";
-
-      if (Number(fId) === 3) {
-        title = "Khối các bệnh viện trực thuộc";
-      }
-      if (Number(fId) === 17) {
-        title = "Đơn vị trợ giúp xã hội trực thuộc";
-      }
-      if (Number(fId) === 18) {
-        title = "Khối các trạm y tế xã, phường";
-      }
-
+      const fId = String(fb.form_id || "unknown");
+      
+      // Xác định title cho group nếu chưa có
       if (!groups[fId]) {
+        let title = "";
+        if (Number(fId) === 3) title = "Khối các bệnh viện trực thuộc";
+        else if (Number(fId) === 17) title = "Đơn vị trợ giúp xã hội trực thuộc";
+        else if (Number(fId) === 18) title = "Khối các trạm y tế xã, phường";
+        
         groups[fId] = {
           title: title || fb.info?.title || `Mẫu phản ánh (${fId})`,
           items: [],
         };
+        formUnitMap[fId] = {};
       }
-      groups[fId].items.push(fb);
+
+      // Xác định key duy nhất cho đơn vị để khử trùng
+      const unitKey = getReportedFacilityId(fb, facilities) || `fb-${fb.id}`;
+      
+      const existing = formUnitMap[fId][unitKey];
+      if (!existing) {
+        formUnitMap[fId][unitKey] = fb;
+      } else {
+        // Ưu tiên bản ghi có ngày tạo mới nhất (trường hợp nộp lại nhiều lần)
+        const existingDate = new Date(existing.createdAt || existing.created_at || existing.date || 0);
+        const fbDate = new Date(fb.createdAt || fb.created_at || fb.date || 0);
+        if (fbDate > existingDate) {
+          formUnitMap[fId][unitKey] = fb;
+        }
+      }
+    });
+
+    // Chuyển kết quả từ formUnitMap vào groups.items
+    Object.keys(formUnitMap).forEach(fId => {
+      groups[fId].items = Object.values(formUnitMap[fId]);
     });
 
     return groups;
-  }, [feedbacks]);
+  }, [feedbacks, facilities]);
 
   // Tự động tải template cho tất cả các form có trong dữ liệu báo cáo
   useEffect(() => {
@@ -259,6 +277,9 @@ const Report_DCBC = () => {
               groupedFeedbacks={groupedFeedbacks} 
               formTemplates={formTemplates} 
               type="DCBC" 
+              surveys={surveys}
+              selectedSurveyKey={selectedSurveyKey}
+              dateFilter={dateFilter}
             />
           </>
         ) : (
