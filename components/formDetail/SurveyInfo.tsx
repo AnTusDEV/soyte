@@ -1,11 +1,17 @@
 import { socialFacilitiesService } from "@/services/socialFacilitiesService";
+import { api } from "@/api";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/AuthContext";
 const PAGE_SIZE = 10;
-export default function SurveyInfo({ info, fieldKey, value, onChange, error }) {
+export default function SurveyInfo({ info, fieldKey, value, onChange, error, survey_key, form_id }) {
   const { user } = useAuth();
+
+  // State kiểm tra đơn vị đã khai báo chưa
+  const [checkUnitStatus, setCheckUnitStatus] = useState<null | "checking" | "declared" | "not_declared">(null);
+  const [checkUnitMessage, setCheckUnitMessage] = useState<string>("");
+  const checkUnitAbortRef = useRef<AbortController | null>(null);
 
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
@@ -248,6 +254,56 @@ export default function SurveyInfo({ info, fieldKey, value, onChange, error }) {
                 key: info.key,
                 value: selectedOption,
               });
+
+              // Gọi API check-unit khi chọn xong đơn vị
+              if (selectedOption && survey_key && form_id) {
+                // Hủy request cũ nếu có
+                if (checkUnitAbortRef.current) {
+                  checkUnitAbortRef.current.abort();
+                }
+                const controller = new AbortController();
+                checkUnitAbortRef.current = controller;
+                setCheckUnitStatus("checking");
+
+                api
+                  .get("/feedbacks/check-unit", {
+                    survey_key: survey_key,
+                    unit_id: selectedOption.key,
+                    form_id: Number(form_id),
+                  })
+                  .then((res) => {
+                    if (controller.signal.aborted) return;
+                    // Kết quả: phân biệt dựa trên data, hoặc nội dung message nếu API luôn trả về success = true
+                    const msg = (res?.message || "").toLowerCase();
+                    let isDeclared = false;
+                    
+                    if (res?.data !== undefined) {
+                      isDeclared = res.data === true;
+                    } else if (res?.declared !== undefined) {
+                      isDeclared = res.declared === true;
+                    } else if (res?.exists !== undefined) {
+                      isDeclared = res.exists === true;
+                    } else if (typeof res === "boolean") {
+                      isDeclared = res;
+                    } else if (msg) {
+                      isDeclared = !msg.includes("chưa");
+                    } else {
+                      isDeclared = res?.success === true;
+                    }
+
+                    setCheckUnitStatus(
+                      isDeclared ? "declared" : "not_declared",
+                    );
+                    setCheckUnitMessage(res?.message || "");
+                  })
+                  .catch((err) => {
+                    if (controller.signal.aborted) return;
+                    console.error("check-unit error:", err);
+                    setCheckUnitStatus(null);
+                  });
+              } else {
+                setCheckUnitStatus(null);
+              }
             }}
           />
         );
@@ -265,6 +321,33 @@ export default function SurveyInfo({ info, fieldKey, value, onChange, error }) {
         </label>
       </div>
       {renderField()}
+      {/* Badge trạng thái kiểm tra đơn vị */}
+      {(info.type === "select" || info.type === "facility_multiselect") && checkUnitStatus && (
+        <div className="mt-2">
+          {checkUnitStatus === "checking" && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-600">
+              <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-blue-400 border-t-transparent" />
+              Đang kiểm tra...
+            </span>
+          )}
+          {checkUnitStatus === "declared" && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
+              <svg className="h-3.5 w-3.5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              {checkUnitMessage || "Đơn vị này đã khai báo rồi"}
+            </span>
+          )}
+          {checkUnitStatus === "not_declared" && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+              <svg className="h-3.5 w-3.5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              {checkUnitMessage || "Đơn vị chưa khai báo"}
+            </span>
+          )}
+        </div>
+      )}
       {error && (
         <div className="mt-2 text-sm text-red-500">
           Vui lòng nhập thông tin này

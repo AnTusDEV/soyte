@@ -657,6 +657,8 @@ export default function SurveyForm({ id, type, formJson, survey_key }: any) {
                   value={formData[fieldKey]}
                   onChange={handleChange}
                   error={hasError}
+                  survey_key={survey_key}
+                  form_id={id}
                 />
               </div>
             );

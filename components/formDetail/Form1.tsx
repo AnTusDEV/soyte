@@ -106,12 +106,16 @@ const SurveyInfoCard = memo(function SurveyInfoCard({
   value,
   error,
   onChange,
+  survey_key,
+  form_id,
 }: {
   item: any;
   fieldKey: string;
   value: any;
   error: boolean;
   onChange: (fieldKey: string, fieldData: any) => void;
+  survey_key?: string;
+  form_id?: number | string;
 }) {
   return (
     <div
@@ -127,6 +131,8 @@ const SurveyInfoCard = memo(function SurveyInfoCard({
         value={value}
         onChange={onChange}
         error={error}
+        survey_key={survey_key}
+        form_id={form_id}
       />
     </div>
   );
@@ -821,6 +827,8 @@ export default function BieuMau1Table({ id, type, formJson, survey_key }: any) {
             value={formData[fieldKey]}
             onChange={handleChange}
             error={!!infoErrors[fieldKey]}
+            survey_key={survey_key}
+            form_id={id}
           />
         ))}
       </div>
