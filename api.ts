@@ -206,7 +206,7 @@ export const api = {
   },
 
   async requestVerificationEmail(email: string) {
-    return this.post("/resend-verification", { email });
+    return this.post("/auth/resend-verification", { email });
   },
 
   async changePassword(data: any) {
