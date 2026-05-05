@@ -451,7 +451,7 @@ const DataLookup = () => {
                         Hỗ trợ tra cứu
                       </p>
                       <p className="mt-1 text-lg font-black text-white">
-                        096 777 1010
+                        02439985765
                       </p>
                     </div>
                   </div>
