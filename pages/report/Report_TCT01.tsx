@@ -90,7 +90,14 @@ const Report_TCT01 = () => {
 
     useEffect(() => {
         fetchAllFeedbacks();
-    }, [dateFilter.startDate, dateFilter.endDate, selectedSurveyKey, finalUnit, finalUnitType]);
+    }, [
+        dateFilter.startDate,
+        dateFilter.endDate,
+        selectedSurveyKey,
+        finalUnit,
+        finalUnitType,
+        isFilterLoading,
+    ]);
 
     useEffect(() => {
         const fetchSurveys = async () => {

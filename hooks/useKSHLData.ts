@@ -59,7 +59,7 @@ export function useKSHLData(dateFilter: DateFilter, surveyKey?: string, unit?: s
             }
         };
         fetchData();
-    }, [dateFilter, surveyKey, unit, unitType]);
+    }, [dateFilter, surveyKey, unit, unitType, isFilterLoading]);
 
     const processedData = useMemo(() => {
         if (!rawFeedbacks.length) {
