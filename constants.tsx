@@ -1,4 +1,10 @@
 import { MenuItem, NewsItem, User } from "./types";
+import baoTroXHImage from "./assets/image/bao tro XH-By5fco0o.png";
+import chinhSachYTeImage from "./assets/image/chinh sach y te-C_dDpJVZ.png";
+import chuyenDoiSoImage from "./assets/image/chuyen doi so-DSivldkT.png";
+import guongNguoiTotImage from "./assets/image/guong nguoi tot-C7NJJGDV.png";
+import khamBenhImage from "./assets/image/kham benh-__1wzyZ_.png";
+import phongBenhImage from "./assets/image/phong benh-CTWuljBT.png";
 
 import {
   Newspaper,
@@ -382,7 +388,7 @@ export const CATEGORIES = [
     icon: Stethoscope,
     iconColor: "text-pink-600",
     hoverColor: "text-pink-600",
-    image: "https://suckhoethudo.vn/assets/kham benh-__1wzyZ_.png",
+    image: khamBenhImage,
     data: [],
   },
   // {
@@ -391,7 +397,7 @@ export const CATEGORIES = [
   //   icon: ShieldPlus,
   //   iconColor: "text-orange-500",
   //   hoverColor: "text-orange-600",
-  //   image: "https://suckhoethudo.vn/assets/phong benh-CTWuljBT.png",
+  //   image: phongBenhImage,
   //   data: [],
   //   paddingClass: "md:pl-8",
   // },
@@ -401,7 +407,7 @@ export const CATEGORIES = [
     icon: HeartHandshake,
     iconColor: "text-blue-500",
     hoverColor: "text-blue-600",
-    image: "https://suckhoethudo.vn/assets/bao tro XH-By5fco0o.png",
+    image: baoTroXHImage,
     data: [],
     paddingClass: "md:pl-8",
   },
@@ -411,7 +417,7 @@ export const CATEGORIES = [
     icon: Laptop2,
     iconColor: "text-pink-600",
     hoverColor: "text-pink-600",
-    image: "https://suckhoethudo.vn/assets/chuyen doi so-DSivldkT.png",
+    image: chuyenDoiSoImage,
     data: [],
   },
   {
@@ -420,7 +426,7 @@ export const CATEGORIES = [
     icon: FileText,
     iconColor: "text-orange-500",
     hoverColor: "text-orange-600",
-    image: "https://suckhoethudo.vn/assets/chinh sach y te-C_dDpJVZ.png",
+    image: chinhSachYTeImage,
     data: [],
     paddingClass: "md:pl-8",
   },
@@ -430,7 +436,7 @@ export const CATEGORIES = [
   //   icon: Award,
   //   iconColor: "text-blue-500",
   //   hoverColor: "text-blue-600",
-  //   image: "https://suckhoethudo.vn/assets/guong nguoi tot-C7NJJGDV.png",
+  //   image: guongNguoiTotImage,
   //   data: [],
   //   paddingClass: "md:pl-8",
   // },

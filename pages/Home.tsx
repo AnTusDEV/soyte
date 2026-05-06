@@ -19,6 +19,8 @@ import {
   CATEGORIES,
 } from "../constants";
 import { Button } from "@/components/prime";
+import heroSlide1 from "@/assets/image/anh1-CFkqSFx4.png";
+import heroSlide2 from "@/assets/image/anh2-r7WidWql.jpg";
 import HospitalSlider from "../components/HospitalSlider";
 import { api } from "../api";
 const Home = () => {
@@ -42,8 +44,8 @@ const Home = () => {
   const [currentVideo, setCurrentVideo] = useState(MOCK_VIDEOS[0]);
   const [isPlaying, setIsPlaying] = useState(false);
   const images = [
-    // "https://suckhoethudo.vn/assets/anh2-r7WidWql.jpg",
-    "https://suckhoethudo.vn/assets/anh1-CFkqSFx4.png",
+    heroSlide2,
+    heroSlide1,
   ];
   const CategoryColumn = ({
     title,

@@ -9,7 +9,8 @@
     "build:golive": "vite build --mode golive",
     "preview": "vite preview",
     "preview:golive": "vite preview --mode golive",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "inspect:feedbacks": "node scripts/inspect_feedback_apis.mjs"
   },
   "dependencies": {
     "chart.js": "^4.5.1",
