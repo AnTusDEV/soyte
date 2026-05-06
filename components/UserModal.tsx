@@ -1,13 +1,7 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import { api } from "../api";
 import { User, Permission } from "../types";
-import {
-  FACILITIES_BV,
-  FACILITIES_TT,
-  FACILITIES_BT,
-  FACILITIES_TYT,
-  FACILITIES_CC,
-} from "../constants";
+import { socialFacilitiesService } from "../services/socialFacilitiesService";
 import {
   Users,
   Shield,
@@ -27,6 +21,11 @@ interface UserModalProps {
   user: User | null; // null for add mode
   onSaveSuccess: () => void;
 }
+
+type FacilityOption = {
+  label: string;
+  value: string;
+};
 
 // Helper to flatten nested permission object back into dot-notation strings
 const flattenPermissions = (obj: any): string[] => {
@@ -124,30 +123,54 @@ const UserModal: React.FC<UserModalProps> = ({
   >({});
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [errors, setErrors] = useState<any>({});
+  const [facilityOptions, setFacilityOptions] = useState<FacilityOption[]>([]);
+  const [facilityOptionsLoading, setFacilityOptionsLoading] = useState(false);
+  const shouldAutoSelectAdminUnitsRef = useRef(false);
 
   useEffect(() => {
-    if (visible) {
+    if (!visible) return;
+
+    let cancelled = false;
+
+    const initializeForm = async () => {
       setErrors({});
       fetchPermissions();
-      if (isEdit && user) {
-        const unit = user.unit || user.facility_id || "";
-        let type = user.type || "";
 
-        if (!type && unit) {
-          if (FACILITIES_BV.some((f) => f.id === unit)) type = "BV";
-          else if (FACILITIES_TT.some((f) => f.id === unit)) type = "TT";
-          else if (FACILITIES_BT.some((f) => f.id === unit)) type = "BT";
-          else if (FACILITIES_TYT.some((f) => f.id === unit)) type = "TYT";
-          else if (FACILITIES_CC.some((f) => f.id === unit)) type = "CC";
+      if (isEdit && user) {
+        const rawUnit = user.unit || user.facility_id || "";
+        const parsedUnit =
+          user.role === "admin"
+            ? Array.isArray(rawUnit)
+              ? rawUnit
+              : typeof rawUnit === "string" && rawUnit
+                ? rawUnit.split(",").filter(Boolean)
+                : []
+            : rawUnit;
+
+        let resolvedType = user.type || "";
+
+        if (!resolvedType) {
+          const firstUnitId = Array.isArray(parsedUnit) ? parsedUnit[0] : parsedUnit;
+
+          if (firstUnitId) {
+            try {
+              const facility = await socialFacilitiesService.getById(firstUnitId);
+              resolvedType = facility?.type || "";
+            } catch (error) {
+              console.error("Error resolving facility type for user:", error);
+            }
+          }
         }
+
+        if (cancelled) return;
 
         setFormData({
           full_name: user.full_name || "",
           email: user.email || "",
           role: user.role || "user",
           status: Number(user.status) as 0 | 1,
-          type: type,
-          unit: user.role === "admin" ? (unit && typeof unit === "string" ? unit.split(",") : (Array.isArray(unit) ? unit : [])) : unit,
+          type: resolvedType,
+          unit: parsedUnit,
           us: user.us || "",
           pass: user.pass || "",
           password: "", // Don't show password or populate it
@@ -176,8 +199,62 @@ const UserModal: React.FC<UserModalProps> = ({
         setSelectedPermissions([]);
         setExpandedParents({});
       }
-    }
+    };
+
+    initializeForm();
+
+    return () => {
+      cancelled = true;
+    };
   }, [visible, user]);
+
+  useEffect(() => {
+    if (!visible || !formData.type) {
+      setFacilityOptions([]);
+      setFacilityOptionsLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    const fetchFacilitiesByType = async () => {
+      setFacilityOptionsLoading(true);
+      try {
+        const facilities = await socialFacilitiesService.fetchAll(formData.type);
+        if (cancelled) return;
+
+        const options = facilities.map((facility: any) => ({
+          label: facility.name,
+          value: facility.id,
+        }));
+
+        setFacilityOptions(options);
+
+        if (shouldAutoSelectAdminUnitsRef.current && formData.role === "admin") {
+          setFormData((prev: any) => ({
+            ...prev,
+            unit: options.map((option) => option.value),
+          }));
+          shouldAutoSelectAdminUnitsRef.current = false;
+        }
+      } catch (error) {
+        console.error("Error fetching facilities by type:", error);
+        if (!cancelled) {
+          setFacilityOptions([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setFacilityOptionsLoading(false);
+        }
+      }
+    };
+
+    fetchFacilitiesByType();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [visible, formData.type, formData.role]);
 
   const fetchPermissions = async () => {
     try {
@@ -294,17 +371,6 @@ const UserModal: React.FC<UserModalProps> = ({
       }
     }
     setSelectedPermissions(newSelected);
-  };
-
-  const getFacilityOptions = (type: string) => {
-    switch (type) {
-      case "BV": return FACILITIES_BV.map((f) => ({ label: f.name, value: f.id }));
-      case "TT": return FACILITIES_TT.map((f) => ({ label: f.name, value: f.id }));
-      case "BT": return FACILITIES_BT.map((f) => ({ label: f.name, value: f.id }));
-      case "TYT": return FACILITIES_TYT.map((f) => ({ label: f.name, value: f.id }));
-      case "CC": return FACILITIES_CC.map((f) => ({ label: f.name, value: f.id }));
-      default: return [];
-    }
   };
 
   const validateForm = () => {
@@ -503,15 +569,21 @@ const UserModal: React.FC<UserModalProps> = ({
                 <div className={isEdit ? "grid grid-cols-2 gap-4" : "block"}>
                   <div>
                     <label className="block text-[10px] font-black text-gray-400 uppercase mb-1.5 ml-1">Vai trò hệ thống</label>
-                    <Dropdown
-                      value={formData.role}
-                      options={[
-                        { label: "Người dùng", value: "user" },
-                        { label: "Quản trị viên", value: "admin" },
-                      ]}
-                      onChange={(e) => setFormData({ ...formData, role: e.value, unit: e.value === "admin" ? [] : "" })}
-                      className={`w-full !bg-gray-50 !border-${errors.role ? "red-500" : "gray-200"} !rounded-xl outline-none font-bold text-gray-700`}
-                    />
+                      <Dropdown
+                        value={formData.role}
+                        options={[
+                          { label: "Người dùng", value: "user" },
+                          { label: "Quản trị viên", value: "admin" },
+                        ]}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            role: e.value,
+                            unit: e.value === "admin" ? [] : "",
+                          })
+                        }
+                        className={`w-full !bg-gray-50 !border-${errors.role ? "red-500" : "gray-200"} !rounded-xl outline-none font-bold text-gray-700`}
+                      />
                     {errors.role && <p className="text-red-500 text-[10px] mt-1 font-bold ml-1">{errors.role}</p>}
                   </div>
                   {isEdit && (
@@ -555,10 +627,15 @@ const UserModal: React.FC<UserModalProps> = ({
                         <label className="block text-[10px] font-black text-gray-400 uppercase mb-1.5 ml-1">Đơn vị công tác <span className="text-red-500">*</span></label>
                         <Dropdown
                           value={formData.unit}
-                          options={getFacilityOptions(formData.type)}
+                          options={facilityOptions}
                           onChange={(e) => setFormData({ ...formData, unit: e.value })}
-                          placeholder="-- Chọn đơn vị --"
+                          placeholder={
+                            facilityOptionsLoading
+                              ? "Đang tải đơn vị..."
+                              : "-- Chọn đơn vị --"
+                          }
                           filter
+                          disabled={facilityOptionsLoading}
                           filterPlaceholder="Tìm kiếm tên đơn vị..."
                           virtualScrollerOptions={{ itemSize: 38 }}
                           className={`w-full !bg-white !border-${errors.unit ? "red-500" : "gray-200"} !rounded-xl outline-none font-bold text-gray-700`}
@@ -573,20 +650,19 @@ const UserModal: React.FC<UserModalProps> = ({
                   <div className="p-4 bg-gray-50 rounded-2xl border border-gray-200 space-y-4 animate-in slide-in-from-top-2">
                     <div>
                       <label className="block text-[10px] font-black text-gray-400 uppercase mb-1.5 ml-1">Loại hình quản lý</label>
-                      <Dropdown
-                        value={formData.type}
-                        options={[
+                        <Dropdown
+                          value={formData.type}
+                          options={[
                           { label: "Bệnh viện", value: "BV" },
                           { label: "Trung tâm y tế", value: "TT" },
                           { label: "Bảo trợ xã hội", value: "BT" },
                           { label: "Trạm y tế", value: "TYT" },
                           { label: "Cấp cứu 115", value: "CC" },
-                        ]}
+                          ]}
                         onChange={(e) => {
                           const newType = e.value;
-                          const options = getFacilityOptions(newType);
-                          const allUnitIds = options.map((o) => o.value);
-                          setFormData({ ...formData, type: newType, unit: allUnitIds });
+                          shouldAutoSelectAdminUnitsRef.current = true;
+                          setFormData({ ...formData, type: newType, unit: [] });
                         }}
                         placeholder="-- Chọn loại hình --"
                         className="w-full !bg-white !border-gray-200 !rounded-xl outline-none font-bold text-gray-700"
@@ -598,10 +674,15 @@ const UserModal: React.FC<UserModalProps> = ({
                         <label className="block text-[10px] font-black text-gray-400 uppercase mb-1.5 ml-1">Đơn vị quản lý</label>
                         <MultiSelect
                           value={formData.unit}
-                          options={getFacilityOptions(formData.type)}
+                          options={facilityOptions}
                           onChange={(e) => setFormData({ ...formData, unit: e.value })}
-                          placeholder="-- Chọn đơn vị --"
+                          placeholder={
+                            facilityOptionsLoading
+                              ? "Đang tải đơn vị..."
+                              : "-- Chọn đơn vị --"
+                          }
                           filter
+                          disabled={facilityOptionsLoading}
                           filterPlaceholder="Tìm kiếm tên đơn vị..."
                           className="w-full !bg-white !border-gray-200 !rounded-xl outline-none font-bold text-gray-700 user-modal-ms h-[48px]"
                           panelClassName="facility-ms-panel"

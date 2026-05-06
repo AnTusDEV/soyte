@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Eye,
@@ -11,19 +11,20 @@ import {
 } from "lucide-react";
 import { api } from "../api";
 import { Dropdown, Button } from "@/components/prime";
-import {
-  FACILITIES_BT,
-  FACILITIES_BV,
-  FACILITIES_CC,
-  FACILITIES_TT,
-  FACILITIES_TYT,
-} from "@/constants";
+import { socialFacilitiesService } from "@/services/socialFacilitiesService";
+
+type FacilityOption = {
+  label: string;
+  value: string;
+};
 
 const Register: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [facilityOptions, setFacilityOptions] = useState<FacilityOption[]>([]);
+  const [facilityOptionsLoading, setFacilityOptionsLoading] = useState(false);
   const [formData, setFormData] = useState<any>({
     fullName: "",
     email: "",
@@ -41,22 +42,45 @@ const Register: React.FC = () => {
 
   const navigate = useNavigate();
 
-  const getFacilityOptions = (type: string) => {
-    switch (type) {
-      case "BV":
-        return FACILITIES_BV.map((f) => ({ label: f.name, value: f.id }));
-      case "TT":
-        return FACILITIES_TT.map((f) => ({ label: f.name, value: f.id }));
-      case "BT":
-        return FACILITIES_BT.map((f) => ({ label: f.name, value: f.id }));
-      case "TYT":
-        return FACILITIES_TYT.map((f) => ({ label: f.name, value: f.id }));
-      case "CC":
-        return FACILITIES_CC.map((f) => ({ label: f.name, value: f.id }));
-      default:
-        return [];
-    }
-  };
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchFacilitiesByType = async () => {
+      if (!formData.type) {
+        setFacilityOptions([]);
+        setFacilityOptionsLoading(false);
+        return;
+      }
+
+      setFacilityOptionsLoading(true);
+      try {
+        const facilities = await socialFacilitiesService.fetchAll(formData.type);
+        if (!cancelled) {
+          setFacilityOptions(
+            facilities.map((facility: any) => ({
+              label: facility.name,
+              value: facility.id,
+            })),
+          );
+        }
+      } catch (err) {
+        console.error("Failed to fetch facilities for register:", err);
+        if (!cancelled) {
+          setFacilityOptions([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setFacilityOptionsLoading(false);
+        }
+      }
+    };
+
+    fetchFacilitiesByType();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [formData.type]);
 
   const validateForm = () => {
     const newErrors: any = {};
@@ -351,12 +375,17 @@ const Register: React.FC = () => {
                     </label>
                     <Dropdown
                       value={formData.unit}
-                      options={getFacilityOptions(formData.type)}
+                      options={facilityOptions}
                       onChange={(e) =>
                         setFormData({ ...formData, unit: e.value })
                       }
-                      placeholder="-- Chọn đơn vị --"
+                      placeholder={
+                        facilityOptionsLoading
+                          ? "Đang tải đơn vị..."
+                          : "-- Chọn đơn vị --"
+                      }
                       filter
+                      disabled={facilityOptionsLoading}
                       filterPlaceholder="Tìm kiếm tên đơn vị..."
                       virtualScrollerOptions={{ itemSize: 38 }}
                       className={`w-full !bg-white !border-${errors.unit ? "red-500" : "gray-200"} !rounded-xl outline-none font-bold text-gray-700`}

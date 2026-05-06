@@ -2,6 +2,13 @@ import { api } from "../api";
 
 const getAllCache = new Map<string, Promise<any>>();
 
+const normalizeFacilityList = (response: any) => {
+  if (Array.isArray(response)) return response;
+  if (Array.isArray(response?.items)) return response.items;
+  if (Array.isArray(response?.data)) return response.data;
+  return [];
+};
+
 export const socialFacilitiesService = {
   getAll: async (page: number = 1, limit: number = 10, type?: string) => {
     const cacheKey = `${page}-${limit}-${type || ""}`;
@@ -23,9 +30,9 @@ export const socialFacilitiesService = {
 
     return promise;
   },
-    fetchAll: async () => {
-        const response = await api.get('/social-facilities', { page: 1, limit: 1000 });
-        return response.data;
+    fetchAll: async (type?: string, limit: number = 1000) => {
+        const response = await api.get('/social-facilities', { page: 1, limit, ...(type ? { type } : {}) });
+        return normalizeFacilityList(response);
     },
     getById: async (id: string) => {
         const response = await api.get(`/social-facilities/${id}`);
